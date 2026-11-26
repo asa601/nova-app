@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Nova City</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{background:#07030f;color:#f3f0ff;font-family:system-ui,-apple-system,Roboto,sans-serif;overscroll-behavior:none}
+#app{max-width:460px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(#0b0520,#160a33 45%,#0a0518)}
+.top{display:flex;gap:5px;padding:9px 8px 0;flex-wrap:nowrap}
+.pill{flex:1;display:flex;align-items:center;gap:5px;padding:4px 8px 4px 4px;border-radius:20px;font-weight:900;font-size:12.5px;background:rgba(0,0,0,.5);border:1.5px solid;white-space:nowrap;overflow:hidden}
+.pill .i{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
+.pill small{font-size:10px;opacity:.7;font-weight:700}
+#inc{text-align:center;font-size:11px;font-weight:800;color:#2ef2a0;margin-top:5px;opacity:.9}
+#mapw{position:relative;height:360px;flex:none}
+#map{position:absolute;inset:0;width:100%;height:100%}
+#tags{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.fl{position:absolute;font-weight:900;font-size:12px;color:#2ef2a0;text-shadow:0 1px 3px #000;transform:translate(-50%,-50%);animation:fl 1.2s ease-out forwards;white-space:nowrap}
+@keyframes fl{0%{opacity:0;margin-top:0}15%{opacity:1}100%{opacity:0;margin-top:-34px}}
+#event{position:absolute;top:6px;right:8px;width:168px;border-radius:12px;padding:8px 10px;background:rgba(30,6,24,.9);border:1.5px solid #ff3a5c;font-size:11.5px;display:none;box-shadow:0 0 18px rgba(255,58,92,.35)}
+#event b{display:block;font-size:13px}
+#event .t{color:#ff3a5c;font-weight:900;font-size:10.5px}
+#panel{flex:1;padding:0 8px 8px;display:flex;flex-direction:column;gap:6px;min-height:240px}
+.card{border-radius:14px;padding:10px 11px;background:rgba(14,8,32,.92);border:1.5px solid rgba(40,240,255,.5);font-size:12px}
+.card h3{font-size:15px;font-weight:900;display:flex;align-items:center;gap:6px}
+.card h3 span{font-size:11.5px;color:#28f0ff}
+.card p{opacity:.8;margin-top:3px;line-height:1.35}
+.btn{border:none;border-radius:10px;padding:9px 11px;font-weight:900;font-size:12.5px;color:#04281a;background:#2ef2a0;font-family:inherit}
+.btn:disabled{filter:grayscale(1);opacity:.4}
+.btn.red{background:#ff3a5c;color:#fff}.btn.blue{background:#28f0ff;color:#012}.btn.gray{background:#333a55;color:#fff}.btn.gold{background:#ffcf4a;color:#2a1a00}
+.row{display:flex;gap:6px;align-items:center;margin-top:7px;flex-wrap:wrap}
+.list{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.it{display:flex;align-items:center;gap:8px;padding:6px 7px;border-radius:10px;background:rgba(255,255,255,.05)}
+.it .e{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.it .x{flex:1;font-size:11px;opacity:.85;line-height:1.3}.it .x b{font-size:12.5px;display:block;opacity:1}
+.it.lock{opacity:.4}
+.bar{height:7px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:4px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#28f0ff,#ff3cac)}
+.nav{display:flex;gap:5px;padding:6px 8px 10px;position:sticky;bottom:0;background:linear-gradient(transparent,#07030f 35%)}
+.nav button{flex:1;border:none;border-radius:12px;padding:6px 0 5px;font-weight:800;font-size:10.5px;color:#fff;background:rgba(255,255,255,.07);font-family:inherit}
+.nav button span{display:block;font-size:19px}
+.nav button.on{background:#28f0ff;color:#021}
+#toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:rgba(10,4,24,.95);border:1.5px solid #28f0ff;border-radius:12px;padding:9px 14px;font-weight:800;font-size:13px;z-index:9;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;text-align:center}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:10;padding:20px}
+#modal .card{max-width:340px;text-align:center}
+</style></head>
+<body><div id="app">
+<div class="top">
+ <div class="pill" style="border-color:#2ef2a0"><span class="i" style="background:#2ef2a0;color:#032">$</span><span id="cash">0</span></div>
+ <div class="pill" style="border-color:#ff3cac"><span class="i" style="background:#ff3cac">★</span><span id="resp">0</span></div>
+ <div class="pill" style="border-color:#28f0ff"><span class="i" style="background:#28f0ff;color:#012">✊</span><span id="pow">0</span></div>
+</div>
+<div id="inc"></div>
+<div id="mapw"><canvas id="map"></canvas><div id="tags"></div>
+ <div id="event"><span class="t">⚠ GUERRE DE GANG</span><b id="evt"></b><span id="evd"></span><div class="row"><button class="btn red" id="evb">Défendre</button></div></div>
+</div>
+<div id="panel"></div>
+<div class="nav">
+ <button data-t="ville" class="on"><span>🏙️</span>Ville</button>
+ <button data-t="gang"><span>🔫</span>Gang</button>
+ <button data-t="braq"><span>🚗</span>Braquages</button>
+ <button data-t="terr"><span>🗺️</span>Territoires</button>
+</div>
+</div>
+<div id="toast"></div>
+<div id="modal"><div class="card" id="mc"></div></div>
+<script>
+/* ================== DONNÉES ================== */
+const N=11,ROADS=[3,7];
+const isRoad=(i,j)=>ROADS.includes(i)||ROADS.includes(j);
+const dOf=(i,j)=>[i<3?0:i<7?1:2,j<3?0:j<7?1:2];
+const DNAMES=[["Néo-Centre","Les Docks","Chinatown"],["Marina","Quartier Rouge","Zone Indus"],["Les Tours","Port Sombre","Bas-Fonds"]];
+const BIZ=[
+ {k:'snack',n:'Snack de nuit',e:'🌭',c:'#ffcf4a',cost:15,inc:.4,h:.55,r:0},
+ {k:'garage',n:'Garage louche',e:'🚗',c:'#28f0ff',cost:140,inc:2.6,h:.5,r:0},
+ {k:'bar',n:'Bar clandestin',e:'🍺',c:'#ff9a3c',cost:1600,inc:16,h:.95,r:15},
+ {k:'club',n:'Club Néon',e:'🍸',c:'#ff3cac',cost:18000,inc:95,h:1.35,r:45},
+ {k:'casino',n:'Casino',e:'🎰',c:'#ffcf4a',cost:220000,inc:640,h:1.9,r:120},
+ {k:'labo',n:'Labo Tech',e:'🧪',c:'#7cff6b',cost:2.8e6,inc:4200,h:2.5,r:300},
+];
+const HEISTS=[
+ {n:'Supérette',e:'🏪',t:20,m:3,mult:25,flat:40,r:0},
+ {n:'Fourgon blindé',e:'🚚',t:120,m:12,mult:200,flat:900,r:1},
+ {n:'Bijouterie',e:'💎',t:600,m:30,mult:1100,flat:12000,r:3},
+ {n:'Banque Centrale',e:'🏦',t:1800,m:70,mult:4000,flat:150000,r:10},
+];
+function newState(){
+  const D=[];for(let a=0;a<3;a++){D[a]=[];for(let b=0;b<3;b++)D[a][b]={o:'n'}}
+  D[0][0].o='me';D[2][2].o='v';D[2][1].o='v';D[1][2].o='v';
+  return{cash:30,resp:0,men:2,arms:1,lots:{},D,heist:null,ev:null,nextEv:150,t:0,last:Date.now(),won:0};
+}
+let S;
+try{S=JSON.parse(localStorage.getItem('novacity1'))}catch(e){}
+if(!S||!S.D)S=newState();
+
+/* ================== FORMULES ================== */
+function fmt(n){n=Math.floor(n);if(n<1e4)return n.toLocaleString('fr-FR');const u=['K','M','Md','T','Qa','Qi'];let i=-1;while(n>=1e3&&i<u.length-1){n/=1e3;i++}return(n<100?n.toFixed(n<10?2:1):n.toFixed(0)).replace('.',',')+' '+u[i]}
+const biz=k=>BIZ.find(b=>b.k===k);
+function lotInc(L){const b=biz(L.k);let m=1;[10,25,50,100,200].forEach(x=>{if(L.lv>=x)m*=2});return b.inc*L.lv*m}
+function upCost(L){return biz(L.k).cost*Math.pow(1.17,L.lv)}
+function buyCost(b){const n=Object.values(S.lots).filter(l=>l.k===b.k).length;return b.cost*Math.pow(2.2,n)}
+function income(){let s=0;for(const k in S.lots){const L=S.lots[k];const[i,j]=k.split(',').map(Number);const[a,b]=dOf(i,j);if(S.D[a][b].o==='me')s+=lotInc(L)}return s*(1+S.resp*0.01)}
+const power=()=>Math.round(S.men*6*Math.pow(1.3,S.arms-1));
+const menCost=()=>Math.round(25*Math.pow(1.13,S.men));
+const armsCost=()=>Math.round(400*Math.pow(2.6,S.arms-1));
+function defOf(a,b){const d=S.D[a][b];if(d.o==='v')return Math.round(900*Math.pow(3.2,(a+b)-3)*(1+S.t/3600));const dist=a+b;return Math.round(30*Math.pow(5.5,dist-1)*(d.lost?1.5:1))}
+function adjacentMine(a,b){return[[1,0],[-1,0],[0,1],[0,-1]].some(([x,y])=>S.D[a+x]&&S.D[a+x][b+y]&&S.D[a+x][b+y].o==='me')}
+const myCount=()=>S.D.flat().filter(d=>d.o==='me').length;
+
+/* ================== CARTE ================== */
+const cv=document.getElementById('map'),X=cv.getContext('2d');
+let CW,CHh,TW,TH,OX,OY,DPR;
+function resize(){const r=cv.getBoundingClientRect();CW=r.width;CHh=r.height;DPR=Math.min(devicePixelRatio||1,2);cv.width=CW*DPR;cv.height=CHh*DPR;TW=Math.min(42,CW/10.6);TH=TW/2;OX=CW/2;OY=CHh-N*TH-14}
+const iso=(i,j,h=0)=>[OX+(i-j)*TW/2,OY+(i+j)*TH/2-h];
+function P(c){c=c.replace('#','');return[0,2,4].map(i=>parseInt(c.substr(i,2),16))}
+function sh(c,t){const a=P(c),b=t>0?[255,255,255]:[0,0,0];t=Math.abs(t);return'rgb('+a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')+')'}
+function quad(p,c){X.fillStyle=c;X.beginPath();X.moveTo(p[0][0],p[0][1]);for(let k=1;k<p.length;k++)X.lineTo(p[k][0],p[k][1]);X.closePath();X.fill()}
+function tile(i,j,c){quad([iso(i,j),iso(i+1,j),iso(i+1,j+1),iso(i,j+1)],c)}
+function hash(i,j,s=0){let h=(i*374761393+j*668265263+s*982451653)|0;h=(h^(h>>>13))*1274126177;return((h^(h>>>16))>>>0)/4294967296}
+function box(i,j,w,d,h,c,o){
+  const A=iso(i,j,h),B=iso(i+w,j,h),C=iso(i+w,j+d,h),D=iso(i,j+d,h),Bb=iso(i+w,j),Cb=iso(i+w,j+d),Db=iso(i,j+d);
+  quad([D,C,Cb,Db],sh(c,-.2));quad([B,C,Cb,Bb],sh(c,-.45));quad([A,B,C,D],sh(c,.1));
+  if(o.win){const face=(P1,P2,n,s)=>{for(let u=0;u<n;u++)for(let v=6,r=0;v<h-4;v+=7,r++){const q=hash(i*7+u,j*5+r,s);if(q>o.win)continue;const t=(u+.5)/n,x=P1[0]+(P2[0]-P1[0])*t,y=P1[1]+(P2[1]-P1[1])*t-v;X.fillStyle=q<o.win*.5?o.c1:o.c2;X.fillRect(x-1.5,y-2,3,3.5)}};
+    face(Db,Cb,3,1);face(Cb,Bb,3,2)}
+  if(o.edge){X.save();X.shadowColor=o.edge;X.shadowBlur=10;X.strokeStyle=o.edge;X.lineWidth=1.6;X.beginPath();X.moveTo(A[0],A[1]);X.lineTo(B[0],B[1]);X.lineTo(C[0],C[1]);X.lineTo(D[0],D[1]);X.closePath();X.stroke();X.restore()}
+  return[(A[0]+C[0])/2,(A[1]+C[1])/2];
+}
+let sel=null; // {type:'lot',i,j} | {type:'d',a,b}
+const tops={};
+function draw(t){
+  X.setTransform(DPR,0,0,DPR,0,0);X.clearRect(0,0,CW,CHh);
+  X.fillStyle='#fff';for(let k=0;k<40;k++){X.globalAlpha=hash(k,1)*.6;X.fillRect(hash(k,2)*CW,hash(k,3)*120,1.2,1.2)}X.globalAlpha=1;
+  const zc={me:'rgba(40,240,255,.2)',v:'rgba(255,58,92,.2)',n:'rgba(255,255,255,.03)'};
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+    if(isRoad(i,j)){tile(i,j,'#1b1730');if(ROADS.includes(i)&&!ROADS.includes(j)&&j%2===0){const a=iso(i+.5,j+.25),b=iso(i+.5,j+.75);X.strokeStyle='#ffcf4a88';X.lineWidth=1;X.beginPath();X.moveTo(a[0],a[1]);X.lineTo(b[0],b[1]);X.stroke()}}
+    else{const[a,b]=dOf(i,j);tile(i,j,'#221c3c');tile(i,j,zc[S.D[a][b].o])}
+  }
+  // bordures de quartiers
+  for(let a=0;a<3;a++)for(let b=0;b<3;b++){const o=S.D[a][b].o;if(o==='n'&&!(sel&&sel.type==='d'&&sel.a===a&&sel.b===b))continue;
+    const i0=[0,4,8][a],j0=[0,4,8][b];const c=sel&&sel.type==='d'&&sel.a===a&&sel.b===b?'#ffffff':o==='me'?'#28f0ff':'#ff3a5c';
+    X.save();X.shadowColor=c;X.shadowBlur=8;X.strokeStyle=c;X.lineWidth=1.8;X.setLineDash([5,4]);const p=[iso(i0,j0),iso(i0+3,j0),iso(i0+3,j0+3),iso(i0,j0+3)];X.beginPath();p.forEach((q,k)=>k?X.lineTo(q[0],q[1]):X.moveTo(q[0],q[1]));X.closePath();X.stroke();X.restore()}
+  // bâtiments
+  for(let s=0;s<=2*N;s++)for(let i=0;i<N;i++){const j=s-i;if(j<0||j>=N||isRoad(i,j))continue;
+    const[a,b]=dOf(i,j),o=S.D[a][b].o,L=S.lots[i+','+j];let top;
+    const isSel=sel&&sel.type==='lot'&&sel.i===i&&sel.j===j;
+    if(L&&o==='me'){const B=biz(L.k);const h=TW*B.h*(1+Math.min(L.lv,100)/80);
+      top=box(i+.12,j+.12,.76,.76,h,'#251d48',{win:.6,c1:B.c,c2:'#ffffff',edge:isSel?'#fff':B.c});
+      X.save();X.shadowColor=B.c;X.shadowBlur=12;X.fillStyle=B.c;X.font=`${Math.round(TW*.42)}px system-ui`;X.textAlign='center';X.fillText(B.e,top[0],top[1]+TW*.12);X.restore();
+    }else{
+      const hh=hash(i,j);const h=TW*(.45+hh*1.5);const c=o==='v'?'#2c1530':'#1e1a38';
+      top=box(i+.14,j+.14,.72,.72,h,c,{win:.45,c1:o==='v'?'#ff6a7a':'#2ee6ff',c2:'#ff4fb8',edge:isSel?'#fff':(o==='me'&&hh>.7?'#28f0ff55':null)});
+      if(o==='me'&&!L){X.fillStyle='rgba(46,242,160,.9)';X.font=`900 ${Math.round(TW*.36)}px system-ui`;X.textAlign='center';X.fillText('+',top[0],top[1]+4)}
+    }
+    tops[i+','+j]=top;
+  }
+  // voitures sur les routes
+  const cars=[[3,'#28f0ff',0],[7,'#ff3cac',1],[3,'#ffcf4a',2],[7,'#ff3a5c',3]];
+  cars.forEach(([r,c,k],n)=>{const u=((t*.35+k*2.7)%N);const p=n%2?iso(r+.5,u):iso(u,r+.5);X.save();X.shadowColor=c;X.shadowBlur=8;X.fillStyle=c;X.beginPath();X.ellipse(p[0],p[1]-2,TW*.2,TW*.1,n%2?.46:-.46,0,7);X.fill();X.restore()});
+  // étiquettes de quartier
+  X.textAlign='center';X.font='900 10px system-ui';
+  for(let a=0;a<3;a++)for(let b=0;b<3;b++){const d=S.D[a][b];if(d.o==='me')continue;const p=iso([0,4,8][a]+1.5,[0,4,8][b]+1.5,TW*2.2);
+    const txt=(d.o==='v'?'💀 ':'')+fmt(defOf(a,b));const w=X.measureText(txt).width+12;X.fillStyle=d.o==='v'?'rgba(255,58,92,.92)':'rgba(20,14,40,.85)';X.beginPath();X.roundRect(p[0]-w/2,p[1]-9,w,16,7);X.fill();X.fillStyle='#fff';X.fillText(txt,p[0],p[1]+3)}
+}
+/* clic carte */
+cv.addEventListener('pointerdown',e=>{
+  const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  // bâtiments d'abord, de l'avant vers l'arrière
+  let hit=null;
+  for(let s=2*N;s>=0&&!hit;s--)for(let i=0;i<N;i++){const j=s-i;if(j<0||j>=N||isRoad(i,j))continue;const tp=tops[i+','+j];if(!tp)continue;const g=iso(i+.5,j+.5);
+    if(Math.abs(x-g[0])<TW*.38&&y<g[1]+TH*.4&&y>tp[1]-TH*.4){hit=[i,j];break}}
+  if(!hit){const u=(x-OX)/(TW/2),v=(y-OY)/(TH/2);const i=Math.floor((u+v)/2),j=Math.floor((v-u)/2);if(i>=0&&j>=0&&i<N&&j<N&&!isRoad(i,j))hit=[i,j]}
+  if(!hit){sel=null;tab='ville';render();return}
+  const[a,b]=dOf(hit[0],hit[1]);
+  if(S.D[a][b].o==='me')sel={type:'lot',i:hit[0],j:hit[1]};else sel={type:'d',a,b};
+  setTab('ville');
+});
+
+/* ================== PANNEAU ================== */
+let tab='ville';
+const $=id=>document.getElementById(id);
+function setTab(t){tab=t;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render()}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(b.dataset.t==='ville')sel=null;setTab(b.dataset.t)});
+function toast(m,c){const t=$('toast');t.textContent=m;t.style.borderColor=c||'#28f0ff';t.style.opacity=1;clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity=0,1800)}
+function modal(h){$('mc').innerHTML=h+'<div class="row" style="justify-content:center"><button class="btn blue" onclick="document.getElementById(\'modal\').style.display=\'none\'">OK</button></div>';$('modal').style.display='flex'}
+function render(){
+  const p=$('panel');let h='';
+  if(tab==='ville'){
+    if(sel&&sel.type==='lot'){
+      const k=sel.i+','+sel.j,L=S.lots[k],[a,b]=dOf(sel.i,sel.j);
+      if(L){const B=biz(L.k),c=upCost(L),nx=[10,25,50,100,200].find(x=>x>L.lv);
+        h+=`<div class="card"><h3>${B.e} ${B.n} <span>Niv. ${L.lv}</span></h3><p>+${fmt(lotInc(L))} $/s · ${DNAMES[a][b]}${nx?` · ×2 au niveau ${nx}`:''}</p>
+        <div class="bar"><i style="width:${nx?Math.round(L.lv/nx*100):100}%"></i></div>
+        <div class="row"><button class="btn" data-a="up" ${S.cash<c?'disabled':''}>Améliorer · ${fmt(c)} $</button><button class="btn gray" data-a="up10">×10</button></div></div>`;
+      }else{
+        h+=`<div class="card"><h3>🏗️ Terrain libre <span>${DNAMES[a][b]}</span></h3><p>Rachète l'immeuble et lance un business.</p><div class="list">`;
+        BIZ.forEach((B,n)=>{const lock=S.resp<B.r,c=buyCost(B);h+=`<div class="it ${lock?'lock':''}"><div class="e" style="background:${B.c}33">${B.e}</div><div class="x"><b>${B.n}</b>${lock?`🔒 ${B.r} Respect`:`+${fmt(B.inc)} $/s au niv. 1`}</div>${lock?'':`<button class="btn" data-a="buy" data-n="${n}" ${S.cash<c?'disabled':''}>${fmt(c)} $</button>`}</div>`});
+        h+='</div></div>';
+      }
+    }else if(sel&&sel.type==='d'){
+      const d=S.D[sel.a][sel.b],df=defOf(sel.a,sel.b),adj=adjacentMine(sel.a,sel.b),pw=power();
+      h+=`<div class="card" style="border-color:${d.o==='v'?'#ff3a5c':'#ffffff55'}"><h3>${d.o==='v'?'💀':'🏙️'} ${DNAMES[sel.a][sel.b]} <span style="color:${d.o==='v'?'#ff3a5c':'#aaa'}">${d.o==='v'?'Vipères Rouges':'Neutre'}</span></h3>
+      <p>Défense : <b>${fmt(df)}</b> · Ta puissance : <b style="color:${pw>=df?'#2ef2a0':'#ff3a5c'}">${fmt(pw)}</b></p>
+      <p>${adj?'Récompense : +'+(d.o==='v'?40:10)+' Respect, 9 terrains':'🔒 Il faut un quartier voisin à toi pour attaquer.'}</p>
+      <div class="row"><button class="btn red" data-a="atk" ${!adj?'disabled':''}>⚔️ Attaquer</button></div></div>`;
+    }else{
+      const inc=income();
+      h+=`<div class="card"><h3>👑 Ton empire <span>${myCount()}/9 quartiers</span></h3><p>Revenu : <b style="color:#2ef2a0">${fmt(inc)} $/s</b> · Bonus Respect +${S.resp} %</p><p>Tape un <b>+</b> vert pour construire, un de tes business pour l'améliorer, ou un quartier ennemi pour l'attaquer.</p></div>`;
+      const best=Object.entries(S.lots).filter(([k])=>{const[i,j]=k.split(',').map(Number),[a,b]=dOf(i,j);return S.D[a][b].o==='me'});
+      if(best.length){h+='<div class="card"><h3>💼 Tes business</h3><div class="list">';best.sort((x,y)=>lotInc(y[1])-lotInc(x[1])).slice(0,4).forEach(([k,L])=>{const B=biz(L.k),c=upCost(L);h+=`<div class="it"><div class="e" style="background:${B.c}33">${B.e}</div><div class="x"><b>${B.n} · Niv. ${L.lv}</b>+${fmt(lotInc(L))} $/s</div><button class="btn" data-a="upk" data-k="${k}" ${S.cash<c?'disabled':''}>${fmt(c)} $</button></div>`});h+='</div></div>'}
+    }
+  }
+  if(tab==='gang'){
+    h+=`<div class="card"><h3>🔫 Ton gang <span>Puissance ${fmt(power())}</span></h3><div class="list">
+     <div class="it"><div class="e" style="background:#28f0ff33">👥</div><div class="x"><b>Recruter · ${S.men} hommes</b>+${fmt(Math.round(6*Math.pow(1.3,S.arms-1)))} puissance chacun</div><button class="btn" data-a="men" ${S.cash<menCost()?'disabled':''}>${fmt(menCost())} $</button></div>
+     <div class="it"><div class="e" style="background:#ff3cac33">🔧</div><div class="x"><b>Armement niv. ${S.arms}</b>+30 % de puissance pour tout le gang</div><button class="btn" data-a="arms" ${S.cash<armsCost()?'disabled':''}>${fmt(armsCost())} $</button></div>
+    </div></div>`;
+  }
+  if(tab==='braq'){
+    h+='<div class="card"><h3>🚗 Braquages <span>gain basé sur ton revenu</span></h3><div class="list">';
+    const now=Date.now();
+    HEISTS.forEach((H,n)=>{const run=S.heist&&S.heist.n===n,left=run?Math.max(0,Math.ceil((S.heist.end-now)/1000)):0,can=!S.heist&&S.men>=H.m;
+      const gain=Math.round(Math.max(income(),1)*H.mult+H.flat);
+      h+=`<div class="it ${S.men<H.m&&!run?'lock':''}"><div class="e" style="background:#ffcf4a33">${H.e}</div><div class="x"><b>${H.n}</b>${H.m} hommes · ${H.t<60?H.t+' s':H.t/60+' min'} · ~${fmt(gain)} $${H.r?' · +'+H.r+' ★':''}</div>
+      ${run?(left>0?`<button class="btn gray" disabled>${left>=60?Math.ceil(left/60)+' min':left+' s'}</button>`:`<button class="btn gold" data-a="claim">Récupérer</button>`):`<button class="btn blue" data-a="heist" data-n="${n}" ${can?'':'disabled'}>Lancer</button>`}</div>`});
+    h+='</div></div>';
+  }
+  if(tab==='terr'){
+    h+='<div class="card"><h3>🗺️ Territoires</h3><div class="list">';
+    for(let a=0;a<3;a++)for(let b=0;b<3;b++){const d=S.D[a][b];h+=`<div class="it" data-a="seld" data-ab="${a},${b}"><div class="e" style="background:${d.o==='me'?'#28f0ff33':d.o==='v'?'#ff3a5c33':'#ffffff11'}">${d.o==='me'?'👑':d.o==='v'?'💀':'🏙️'}</div><div class="x"><b>${DNAMES[a][b]}</b>${d.o==='me'?'À toi':(d.o==='v'?'Vipères Rouges':'Neutre')+' · défense '+fmt(defOf(a,b))}</div></div>`}
+    h+='</div></div><div class="card" style="font-size:11px;opacity:.75">🔄 <b>Réinitialiser la partie</b> <button class="btn gray" data-a="reset" style="margin-left:6px;padding:5px 9px">Recommencer</button></div>';
+  }
+  if(h!==lastH){p.innerHTML=h;lastH=h}
+}
+let lastH='';
+$('panel').addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');if(!el||el.disabled)return;const a=el.dataset.a;
+  if(a==='buy'){const B=BIZ[+el.dataset.n],c=buyCost(B);if(S.cash>=c){S.cash-=c;S.lots[sel.i+','+sel.j]={k:B.k,lv:1};toast(B.e+' '+B.n+' ouvert !','#2ef2a0')}}
+  if(a==='up'||a==='upk'||a==='up10'){const k=a==='upk'?el.dataset.k:sel.i+','+sel.j;const L=S.lots[k];let n=a==='up10'?10:1;while(n-->0&&S.cash>=upCost(L)){S.cash-=upCost(L);L.lv++;if([10,25,50,100,200].includes(L.lv))toast('×2 revenus ! '+biz(L.k).n+' niv. '+L.lv,'#ffcf4a')}}
+  if(a==='men'&&S.cash>=menCost()){S.cash-=menCost();S.men++}
+  if(a==='arms'&&S.cash>=armsCost()){S.cash-=armsCost();S.arms++}
+  if(a==='atk')attack(sel.a,sel.b);
+  if(a==='heist'){const H=HEISTS[+el.dataset.n];S.heist={n:+el.dataset.n,end:Date.now()+H.t*1000,gain:Math.round(Math.max(income(),1)*H.mult+H.flat)};toast(H.e+' Braquage lancé')}
+  if(a==='claim'){const H=HEISTS[S.heist.n];const ok=Math.random()<.85;if(ok){S.cash+=S.heist.gain;S.resp+=H.r;modal(`<h3 style="justify-content:center">${H.e} Braquage réussi !</h3><p style="font-size:20px;color:#2ef2a0;font-weight:900;margin-top:8px">+${fmt(S.heist.gain)} $</p>${H.r?`<p>+${H.r} Respect</p>`:''}`)}else{const lost=Math.max(1,Math.round(H.m*.2));S.men=Math.max(2,S.men-lost);modal(`<h3 style="justify-content:center">🚨 Les flics !</h3><p style="margin-top:8px">Le braquage a raté. ${lost} homme(s) arrêté(s).</p>`)}S.heist=null}
+  if(a==='seld'){const[x,y]=el.dataset.ab.split(',').map(Number);if(S.D[x][y].o!=='me'){sel={type:'d',a:x,b:y};setTab('ville');return}}
+  if(a==='reset'){S=newState();sel=null;save();toast('Nouvelle partie')}
+  render();save();
+});
+function attack(a,b){
+  const d=S.D[a][b],df=defOf(a,b),pw=power();
+  const chance=Math.min(.95,Math.max(.05,.5+(pw-df)/(2*df)));
+  const won=Math.random()<chance;
+  if(won){const rv=d.o==='v';d.o='me';d.lost=0;S.resp+=rv?40:10;const loot=Math.round(df*3);S.cash+=loot;S.won++;
+    modal(`<h3 style="justify-content:center">👑 ${DNAMES[a][b]} est à toi !</h3><p style="margin-top:8px">+${rv?40:10} Respect · +${fmt(loot)} $ de butin</p><p>9 nouveaux terrains disponibles.</p>`);sel=null;
+    if(myCount()===9)setTimeout(()=>modal('<h3 style="justify-content:center">🏆 Nova City est à toi</h3><p style="margin-top:8px">Tu contrôles toute la ville. (La suite : nouvelles villes et prestige.)</p>'),400);
+  }else{const lost=Math.max(1,Math.round(S.men*.25));S.men=Math.max(2,S.men-lost);modal(`<h3 style="justify-content:center">💥 Attaque repoussée</h3><p style="margin-top:8px">Chance de victoire : ${Math.round(chance*100)} %. Tu perds ${lost} homme(s).</p>`)}
+}
+/* ================== ÉVÉNEMENTS ================== */
+function spawnEvent(){
+  const targets=[];for(let a=0;a<3;a++)for(let b=0;b<3;b++)if(S.D[a][b].o==='me'&&!(a===0&&b===0)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([x,y])=>S.D[a+x]&&S.D[a+x][b+y]&&S.D[a+x][b+y].o==='v'))targets.push([a,b]);
+  if(!targets.length)return;
+  const[a,b]=targets[Math.floor(Math.random()*targets.length)];
+  S.ev={a,b,pow:Math.round(power()*(.6+Math.random()*.9)),end:Date.now()+45000};
+}
+$('evb').onclick=()=>{if(!S.ev)return;const{a,b,pow}=S.ev,pw=power();if(pw>=pow){S.resp+=5;S.cash+=pow*4;toast('🛡️ Attaque repoussée ! +5 Respect','#2ef2a0')}else{S.D[a][b].o='v';S.D[a][b].lost=1;toast('💀 '+DNAMES[a][b]+' perdu…','#ff3a5c')}S.ev=null;S.nextEv=180+Math.random()*180;render();save()};
+function evUI(){const e=$('event');if(!S.ev){e.style.display='none';return}e.style.display='block';const left=Math.max(0,Math.ceil((S.ev.end-Date.now())/1000));
+  $('evt').textContent='Les Vipères attaquent '+DNAMES[S.ev.a][S.ev.b];$('evd').textContent='Force '+fmt(S.ev.pow)+' · '+left+' s';
+  if(left<=0){S.D[S.ev.a][S.ev.b].o='v';S.D[S.ev.a][S.ev.b].lost=1;toast('💀 '+DNAMES[S.ev.a][S.ev.b]+' perdu (pas défendu)','#ff3a5c');S.ev=null;S.nextEv=180+Math.random()*180;render()}}
+/* ================== BOUCLE ================== */
+function save(){S.last=Date.now();try{localStorage.setItem('novacity1',JSON.stringify(S))}catch(e){}}
+function hud(){$('cash').textContent=fmt(S.cash);$('resp').textContent=fmt(S.resp);$('pow').textContent=fmt(power());$('inc').textContent='+'+fmt(income())+' $/s';}
+let lastT=performance.now(),acc=0,flT=0,rT=0;
+function loop(now){
+  const dt=Math.min(1,(now-lastT)/1000);lastT=now;
+  S.cash+=income()*dt;S.t+=dt;
+  if(!S.ev){S.nextEv-=dt;if(S.nextEv<=0){spawnEvent();S.nextEv=200}}
+  flT+=dt;if(flT>1.4){flT=0;const ks=Object.keys(S.lots).filter(k=>{const[i,j]=k.split(',').map(Number),[a,b]=dOf(i,j);return S.D[a][b].o==='me'});
+    if(ks.length){const k=ks[Math.floor(Math.random()*ks.length)],tp=tops[k];if(tp){const f=document.createElement('div');f.className='fl';f.textContent='+'+fmt(lotInc(S.lots[k])*1.4)+' $';f.style.left=tp[0]+'px';f.style.top=(tp[1]-8)+'px';$('tags').appendChild(f);setTimeout(()=>f.remove(),1200)}}}
+  rT+=dt;if(rT>.5){rT=0;hud();evUI();render();save()}
+  draw(now/1000);
+  requestAnimationFrame(loop);
+}
+addEventListener('resize',resize);resize();
+// gains hors-ligne (max 2 h)
+(()=>{const off=Math.min(7200,(Date.now()-S.last)/1000);if(off>60&&income()>0){const g=income()*off*.5;S.cash+=g;setTimeout(()=>modal(`<h3 style="justify-content:center">🌙 Pendant ton absence</h3><p style="margin-top:8px">Tes business ont rapporté</p><p style="font-size:22px;color:#2ef2a0;font-weight:900">+${fmt(g)} $</p><p style="font-size:11px;opacity:.6">(${Math.round(off/60)} min, max 2 h)</p>`),300)}})();
+if(!Object.keys(S.lots).length&&S.cash<=30)setTimeout(()=>modal('<h3 style="justify-content:center">🌃 Bienvenue à Nova City</h3><p style="margin-top:8px;line-height:1.45">Tu tiens <b>Néo-Centre</b>, tout en haut. Tape un <b style="color:#2ef2a0">+</b> vert pour ouvrir ton premier business, recrute ton gang et prends la ville quartier par quartier.<br><br>Attention aux <b style="color:#ff3a5c">Vipères Rouges</b>.</p>'),200);
+hud();render();requestAnimationFrame(loop);
+</script></body></html>

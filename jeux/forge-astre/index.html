@@ -1,0 +1,589 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Forge-Astre</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Exo+2:wght@400;600;800&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#04060d;--panel:#0c1322;--panel2:#111a2e;--line:#1f2d4a;--line2:#2c3f66;--txt:#e7edff;--mut:#8592b5;--cy:#3de1ff;--gold:#ffc548;--red:#ff4d5e;--grn:#a8ff3a;
+--r0:#9aa7b8;--r1:#3fa0ff;--r2:#b45cff;--r3:#ffa53a;--fh:'Chakra Petch','Segoe UI',system-ui,sans-serif;--fb:'Exo 2','Segoe UI',system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{background:radial-gradient(120% 60% at 50% 0%,#0b1430 0%,var(--bg) 60%) var(--bg);margin:0;color:var(--txt);font-family:var(--fb)}
+body{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 26px;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:460px;margin:0 auto}
+header h1{font-family:var(--fh);font-size:26px;margin:0;letter-spacing:.06em;text-transform:uppercase;background:linear-gradient(90deg,#fff,var(--cy) 60%,#9b7bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{margin:3px 0 0;font-size:13px;color:var(--mut);line-height:1.35}
+header p b{color:var(--txt);font-weight:600}
+.stage{position:relative;width:100%;aspect-ratio:3/4;margin-top:10px;border-radius:18px;overflow:hidden;border:1px solid var(--line2);box-shadow:0 0 0 1px #000,0 18px 40px -12px #000,inset 0 0 40px rgba(61,225,255,.06);background:#02030a;user-select:none;-webkit-user-select:none}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.hud{position:absolute;inset:0;pointer-events:none}
+.ic{width:1em;height:1em;fill:currentColor;flex:none}
+.top{position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.pill{display:flex;align-items:center;gap:7px;background:linear-gradient(180deg,rgba(18,28,52,.88),rgba(8,12,24,.88));border:1px solid var(--line2);border-radius:12px;padding:6px 10px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+.cr{font-family:var(--fh);font-weight:700;font-size:19px;color:#fff}
+.cr .ic{color:var(--cy);font-size:22px;filter:drop-shadow(0 0 6px var(--cy))}
+.cr small{display:block;font-size:10px;color:var(--cy);font-weight:600;margin-top:-3px}
+.cr.bump{animation:bump .25s}
+@keyframes bump{50%{transform:scale(1.08)}}
+.sec{flex-direction:column;align-items:flex-end;gap:0;padding:5px 10px;text-align:right}
+.sec b{font-family:var(--fh);font-size:11px;letter-spacing:.14em;color:var(--sc,var(--cy))}
+.sec span{font-size:12px;font-weight:600}
+.row2{position:absolute;left:10px;right:10px;top:62px;display:flex;gap:8px;align-items:center}
+.hp{flex:1;height:14px;border-radius:7px;background:rgba(5,8,16,.85);border:1px solid var(--line2);overflow:hidden;position:relative}
+.hp i{position:absolute;inset:0;width:100%;background:linear-gradient(90deg,#1fd6a0,#3de1ff);box-shadow:0 0 10px #3de1ff;transition:width .2s}
+.hp span{position:absolute;inset:0;font:700 10px/14px var(--fh);text-align:center;color:#fff;text-shadow:0 1px 2px #000}
+.wave{font:700 11px var(--fh);letter-spacing:.06em;padding:4px 9px;border-radius:9px;background:rgba(40,8,14,.85);border:1px solid #6b2230;color:#ffb3bd;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.wave .ic{font-size:14px;color:var(--red)}
+.boss{position:absolute;left:10px;right:10px;top:86px;display:none}
+.boss.on{display:block}
+.boss b{display:block;font:700 11px var(--fh);letter-spacing:.14em;color:#ff8a5c;text-align:center;text-shadow:0 0 8px #ff3b1f;margin-bottom:2px}
+.boss .hp i{background:linear-gradient(90deg,#ff2d3c,#ff9a2e);box-shadow:0 0 10px #ff4d2e}
+#toast{position:absolute;left:50%;top:112px;transform:translate(-50%,-20px);opacity:0;display:flex;gap:10px;align-items:center;min-width:250px;max-width:92%;padding:9px 12px;border-radius:12px;background:linear-gradient(180deg,rgba(18,26,48,.95),rgba(8,10,22,.95));border:1px solid var(--tc);box-shadow:0 0 22px -4px var(--tc),0 8px 20px rgba(0,0,0,.6)}
+#toast.show{animation:toast 2.5s ease forwards}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-20px) scale(.9)}10%{opacity:1;transform:translate(-50%,0) scale(1.03)}16%{transform:translate(-50%,0) scale(1)}85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-10px)}}
+#toast .ti{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:26px;color:var(--tc);background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);border:1px solid var(--tc);flex:none}
+#toast b{display:block;font:700 13px var(--fh);letter-spacing:.06em;color:var(--tc);text-transform:uppercase}
+#toast span{font-size:12px;color:var(--txt)}
+#banner{position:absolute;left:0;right:0;top:40%;text-align:center;opacity:0}
+#banner.show{animation:ban 2.4s ease forwards}
+#banner b{display:block;font:700 34px var(--fh);letter-spacing:.12em;color:#fff;text-shadow:0 0 18px var(--bc,#ff4d5e),0 0 4px var(--bc,#ff4d5e)}
+#banner span{font:600 13px var(--fb);color:var(--bc,#ffb3bd);letter-spacing:.08em}
+@keyframes ban{0%{opacity:0;transform:scale(1.6)}12%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(.96)}}
+#hurt{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(255,30,50,.55));opacity:0;transition:opacity .35s}
+#hint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);font:600 12px var(--fb);color:#cfe;background:rgba(5,10,20,.7);border:1px solid var(--line2);padding:6px 12px;border-radius:20px;white-space:nowrap;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.num{position:absolute;left:0;top:0;font:800 15px var(--fh);color:#fff;text-shadow:0 2px 0 #000,0 0 6px rgba(0,0,0,.9);opacity:0;white-space:nowrap;will-change:transform}
+.num.on{animation:num .8s ease-out forwards}
+@keyframes num{0%{opacity:1;transform:translate(var(--x),var(--y)) translate(-50%,-50%) scale(1.7)}18%{transform:translate(var(--x),calc(var(--y) - 8px)) translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(var(--x),calc(var(--y) - 44px)) translate(-50%,-50%) scale(.9)}}
+.num.crit{color:var(--gold);font-size:21px}
+.num.ore{color:#d6ecff}
+.num.hurt{color:var(--red);font-size:17px}
+.num.gain{color:var(--cy)}
+.num.ref{color:#b98cff}
+.tabs{display:flex;gap:6px;margin-top:12px}
+.tabs button{flex:1;font:700 13px var(--fh);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);background:var(--panel);border:1px solid var(--line);border-radius:12px 12px 4px 4px;padding:9px 6px;cursor:pointer}
+.tabs button.on{color:#fff;border-color:var(--cy);background:linear-gradient(180deg,#14304a,var(--panel));box-shadow:inset 0 2px 0 var(--cy)}
+.tabs i{font-style:normal;background:var(--cy);color:#012;border-radius:8px;padding:0 6px;margin-left:4px;font-size:11px}
+#panel{background:var(--panel);border:1px solid var(--line);border-radius:4px 4px 14px 14px;padding:8px;display:grid;gap:7px;min-height:200px}
+.card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:linear-gradient(180deg,var(--panel2),#0b111f);border:1px solid var(--line)}
+.cic{width:46px;height:46px;border-radius:11px;display:grid;place-items:center;font-size:30px;color:var(--cc,var(--cy));background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.1),rgba(0,0,0,.25));border:1px solid var(--line2);flex:none;position:relative}
+.cic em{position:absolute;right:-5px;bottom:-5px;font:700 10px var(--fh);font-style:normal;background:#0a0f1c;border:1px solid var(--line2);border-radius:7px;padding:0 4px;color:#fff}
+.cb{flex:1;min-width:0}
+.ct{font:700 14px var(--fh);letter-spacing:.03em}
+.ct span{font-size:11px;color:var(--cy);margin-left:4px}
+.cd{font-size:11.5px;color:var(--mut);line-height:1.3;margin-top:1px}
+.buy{font:700 13px var(--fh);min-width:78px;padding:8px 8px;border-radius:10px;border:1px solid #2a3a5a;background:#141c2e;color:#66708a;display:flex;gap:4px;align-items:center;justify-content:center;cursor:pointer}
+.buy .ic{color:var(--cy);font-size:15px}
+.buy.ok{color:#04121a;background:linear-gradient(180deg,#7ff0ff,#22b8e0);border-color:#9ff4ff;box-shadow:0 0 12px -2px var(--cy)}
+.buy.ok .ic{color:#04121a}
+.buy:disabled{cursor:default}
+.card.locked{opacity:.55}
+.card.locked .cic{color:var(--mut)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.slot{border-radius:12px;border:1px dashed var(--line2);min-height:92px;padding:6px;text-align:center;font-size:10.5px;color:var(--mut);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.slot.f{border:1px solid var(--rc);background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--rc) 22%,transparent),#0b111f 75%);color:var(--txt);box-shadow:0 0 14px -6px var(--rc)}
+.slot .ic{font-size:30px;color:var(--rc,var(--mut))}
+.slot b{font:700 11px var(--fh)}
+.badge{font:700 9px var(--fh);letter-spacing:.1em;text-transform:uppercase;padding:1px 6px;border-radius:6px;background:var(--rc);color:#0a0a12}
+.inv .card{border-color:color-mix(in srgb,var(--rc) 55%,var(--line));cursor:pointer}
+.inv .cic{color:var(--rc);border-color:var(--rc)}
+.inv .card.eq{box-shadow:inset 0 0 0 1px var(--rc),0 0 12px -4px var(--rc)}
+.lbl{font:700 11px var(--fh);letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin:4px 2px 0}
+.empty{font-size:12px;color:var(--mut);text-align:center;padding:14px}
+.foot{margin-top:12px;font-size:12.5px;color:var(--mut);line-height:1.45}
+.foot b{color:var(--txt)}
+.credit{margin-top:10px;font-size:10.5px;color:#56607c;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.credit button{font:600 10.5px var(--fb);background:none;border:1px solid #2a3450;color:#7a86a8;border-radius:8px;padding:4px 8px;cursor:pointer}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>Forge-Astre</h1>
+  <p>Inspiré de : <b>Fusion Genesis + Halo Wars + jeux idle</b>. Un minuscule vaisseau qui dévore les astéroïdes, se greffe des modules à vue d'œil et finit à la tête d'un essaim de drones qui minent et combattent seuls.</p>
+</header>
+
+<div class="stage" id="stage">
+  <canvas id="cv"></canvas>
+  <div class="hud">
+    <div id="hurt"></div>
+    <div id="fx"></div>
+    <div class="top">
+      <div class="pill cr" id="crp"><svg class="ic" viewBox="0 0 512 512"><path fill="currentColor" d="m263.563 19.063l-53.875 59.562v90.063l-34.75-60.188l-35.563-17.594l-9.344 43.53l48.376 83.783l-19.97-5.345l-28.75 10.5l19.658 23.5l30.28 8.125l-59.155 15.844l-23.407 27.97l34.25 12.498l66.875-17.937l-27.875 48.28l5.562 62.72l33.813-15.72v33.126l46.812 66.626l46.78-66.625v-72.81l21.626 68.092l35.875 27.344l13.564-43.03l-32.688-102.97l42.875 11.5l26.876-13.78l-17.78-20.22l-64.595-17.312l-.092-.25l82.25-22.03l21.125-24.064l-31.97-16.406l-73.656 19.75l39-67.594l-3.562-55.25l-58.844 18.97V78.624l-39.717-59.563zm-5.72 109.562l22.438 115.03l39.876 12.032l-39.875 12.032l-22.436 115.03l-22.375-114.53l-41.595-12.533l41.594-12.53z"/></svg><div><span id="cr">0</span><small id="crs">+0/s</small></div></div>
+      <div class="pill sec" id="secp"><b id="secn">SECTEUR 1</b><span id="secl">Voile d'Azur</span></div>
+    </div>
+    <div class="row2">
+      <div class="hp" id="hpb"><i id="hpi"></i><span id="hpt">100 / 100</span></div>
+      <div class="wave" id="wave"><svg class="ic" viewBox="0 0 512 512"><path fill="currentColor" d="M257.656 19.625c-65.485.31-130.968 43.688-156.375 129.563C177.4 179.51 212.086 215.23 208.47 236v.063c-2.34 13.46-20.787 20.62-54.47 16.093c-6.255-.098-12.713-1.27-19.094-3.5c-11.202-2.527-23.665-6.108-37.344-10.844c24.63 22.796 53.14 39.59 83.47 50.125c5.516 101.8 24.05 168.38 46.437 199.407c.95-143.2 15.592-215.647 30.186-216.063c14.642-.425 29.205 71.648 30.063 217.314c22.446-30.322 40.966-96.94 46.436-200.28c28.115-9.725 54.978-25.102 79.03-46.345c-9.928 3.08-19.13 5.504-27.592 7.31c-5.366 1.7-10.762 2.68-16.03 2.876c-33.8 4.578-52.314-2.61-54.658-16.094V236c-2.255-12.955 10.413-31.72 38.72-51.375c15.652-10.87 36.077-22.02 61.437-32.594c-24.647-88.774-91.028-132.72-157.407-132.405zM132.47 191.655c-.922.003-1.822.05-2.69.126c-6.93.6-11.378 3.226-13.436 6.564s-2.198 7.545.562 13.156c2.76 5.61 8.615 11.848 16.875 16.313s17.1 6.16 24.032 5.562c6.933-.598 11.38-3.225 13.438-6.563s2.167-7.545-.594-13.156c-2.76-5.61-8.583-11.816-16.844-16.28c-7.227-3.908-14.895-5.73-21.343-5.72zm257.467 0a39 39 0 0 0-2.843.126c-5.796.44-12.305 2.246-18.5 5.595c-8.26 4.465-14.115 10.67-16.875 16.28c-2.762 5.612-2.622 9.82-.564 13.157c2.058 3.338 6.506 5.965 13.438 6.563s15.77-1.098 24.03-5.563s14.084-10.7 16.845-16.312c2.76-5.61 2.65-9.82.592-13.156c-2.058-3.338-6.505-5.965-13.437-6.563a32 32 0 0 0-2.688-.124z"/></svg><span id="wavet">Vague 1</span></div>
+    </div>
+    <div class="boss" id="boss"><b>LE LÉVIATHAN ROUILLÉ</b><div class="hp"><i id="bossi"></i></div></div>
+    <div id="toast"></div>
+    <div id="banner"><b id="bant"></b><span id="bans"></span></div>
+    <div id="hint">Touchez et maintenez pour piloter — le tir est automatique</div>
+  </div>
+</div>
+
+<div class="tabs"><button data-tab="up" class="on">Améliorations</button><button data-tab="mod">Modules<i id="modc">0</i></button></div>
+<div id="panel"></div>
+
+<div class="foot"><b>Dans la version complète :</b> 12 secteurs aux nébuleuses uniques, coques à monter en parangon sans limite, arbre de modules légendaires combinables (lasers qui se divisent, boucliers qui absorbent puis explosent), escadrons de drones spécialisés à commander comme dans un jeu de stratégie, et des flottes-boss géantes en coopération.</div>
+<div class="credit"><span>Icônes : game-icons.net (CC BY 3.0)</span><button id="reset">Recommencer</button></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const ICONS={"crystal-cluster": "<path fill=\"currentColor\" d=\"m263.563 19.063l-53.875 59.562v90.063l-34.75-60.188l-35.563-17.594l-9.344 43.53l48.376 83.783l-19.97-5.345l-28.75 10.5l19.658 23.5l30.28 8.125l-59.155 15.844l-23.407 27.97l34.25 12.498l66.875-17.937l-27.875 48.28l5.562 62.72l33.813-15.72v33.126l46.812 66.626l46.78-66.625v-72.81l21.626 68.092l35.875 27.344l13.564-43.03l-32.688-102.97l42.875 11.5l26.876-13.78l-17.78-20.22l-64.595-17.312l-.092-.25l82.25-22.03l21.125-24.064l-31.97-16.406l-73.656 19.75l39-67.594l-3.562-55.25l-58.844 18.97V78.624l-39.717-59.563zm-5.72 109.562l22.438 115.03l39.876 12.032l-39.875 12.032l-22.436 115.03l-22.375-114.53l-41.595-12.533l41.594-12.53z\"/>", "alien-skull": "<path fill=\"currentColor\" d=\"M257.656 19.625c-65.485.31-130.968 43.688-156.375 129.563C177.4 179.51 212.086 215.23 208.47 236v.063c-2.34 13.46-20.787 20.62-54.47 16.093c-6.255-.098-12.713-1.27-19.094-3.5c-11.202-2.527-23.665-6.108-37.344-10.844c24.63 22.796 53.14 39.59 83.47 50.125c5.516 101.8 24.05 168.38 46.437 199.407c.95-143.2 15.592-215.647 30.186-216.063c14.642-.425 29.205 71.648 30.063 217.314c22.446-30.322 40.966-96.94 46.436-200.28c28.115-9.725 54.978-25.102 79.03-46.345c-9.928 3.08-19.13 5.504-27.592 7.31c-5.366 1.7-10.762 2.68-16.03 2.876c-33.8 4.578-52.314-2.61-54.658-16.094V236c-2.255-12.955 10.413-31.72 38.72-51.375c15.652-10.87 36.077-22.02 61.437-32.594c-24.647-88.774-91.028-132.72-157.407-132.405zM132.47 191.655c-.922.003-1.822.05-2.69.126c-6.93.6-11.378 3.226-13.436 6.564s-2.198 7.545.562 13.156c2.76 5.61 8.615 11.848 16.875 16.313s17.1 6.16 24.032 5.562c6.933-.598 11.38-3.225 13.438-6.563s2.167-7.545-.594-13.156c-2.76-5.61-8.583-11.816-16.844-16.28c-7.227-3.908-14.895-5.73-21.343-5.72zm257.467 0a39 39 0 0 0-2.843.126c-5.796.44-12.305 2.246-18.5 5.595c-8.26 4.465-14.115 10.67-16.875 16.28c-2.762 5.612-2.622 9.82-.564 13.157c2.058 3.338 6.506 5.965 13.438 6.563s15.77-1.098 24.03-5.563s14.084-10.7 16.845-16.312c2.76-5.61 2.65-9.82.592-13.156c-2.058-3.338-6.505-5.965-13.437-6.563a32 32 0 0 0-2.688-.124z\"/>", "shield-reflect": "<path fill=\"currentColor\" d=\"m19.36 19.457l-.38 27.84l267.127 154.75l-58.703 19.916l57.602 19.36L142.12 383.546l-19.214-19.213l-51.47 114.324l123.125-43.482l-17.492-18.95l151.868-151.87l12.433 43.078l22.976-68.5l56.675-16.565l-57.475-15.492l-22.934-79.828l-14.145 48.266l-268.65-155.41l-38.454-.446zM370.614 81.94q-6.796.03-13.51.302c-3.275.134-6.528.32-9.76.547l31.25 108.786l104.05 28.045c6.204-39.085 8.902-80.275 9.18-120.075C456.37 88.82 415.098 82.257 375.15 81.95a404 404 0 0 0-4.537-.01zm-36.87 2.1c-31.99 3.653-61.013 12.153-83.014 25.87l64.493 37.31l18.52-63.18zm148.18 139.997L378.958 254.13l-38.93 116.054l-20.268-70.225l-39.07 39.067c18.814 35.364 46.1 62.287 86.175 77.604c47.473-17.834 78.566-62.795 98.014-121.6c7.323-22.14 12.905-46.11 17.042-70.993z\"/>", "ricochet": "<path fill=\"currentColor\" d=\"M375.8 280.9c48.7 0 88.3 39.5 88.3 88.2c0 48.9-39.6 87.9-88.3 87.9s-88.2-39-88.2-87.9c0-48.7 39.5-88.2 88.2-88.2m-35.2-34l24.9 13.2c-97.1 0-102.8 86.2-102.8 86.2l-12.9-22.4c12.3-36.4 47-71.9 90.8-77m-37.1-19.6c-34.2 7.2-61.3 34.8-72.6 64l8.4 14.5c14.8-31 43.2-59.4 78.7-70.8zm-82.6 46.5l-20.5-35.5l-37.4 42.6l11.4-54l-94.45 8.3l87.25-48.3l-67.53-76.3l83.03 34.3V57.6l34.3 76.9l68.5-69.6l-36.3 98.6L489 147.8v28l-232.1 26.8l26 13.8c-27.2 11.1-49.2 33.1-62 57.4M31 250.4l94.3-60.4L27 216v63l87.6-30.1zm78.1-92.4L27 177v20l100.1-25.1zM301 143.7l153.8-11.9L489 120V94zM290.4 116l-10.8 17.6L489 81V70z\"/>", "shadow-follower": "<path fill=\"currentColor\" d=\"M128.912 21.563c-.507.012-1.01.043-1.504.11C97.753 25.525 74.6 57.76 74.6 96.662c0 21.547 7.39 40.787 18.767 54.5c-61.678 11.593-66.342 115.44-66.342 188.347h42.772l11.348 152.158h108.68L199.86 339.51h40.593c0-73.108 1.47-178.783-65.904-189.22c10.89-13.647 17.893-32.613 17.893-53.628c0-41.496-26.445-74.99-58.923-74.99c-1.523 0-3.087-.146-4.608-.11zm239.828 0c-.507.012-1.01.043-1.504.11c-29.655 3.853-52.808 36.087-52.808 74.99c0 21.547 7.39 40.787 18.767 54.5c-61.678 11.593-66.34 115.44-66.34 188.347h30.323l-10.17-11.422c-.31-51.837 1.858-95.18 24.008-135.484l-1.543 146.906h.152l11.348 152.158h86.013l-66.03-12.006c-11.876-104.37-18.402-205.544-4.09-308.36c0 0 9.455-6.07 24.03-13.396c-14.157-12.08-23.552-33.24-23.552-57.345c0-37.564 22.797-68.013 50.918-68.013c8.887 0 17.24 3.046 24.51 8.392c-10.45-11.98-24.28-19.268-39.424-19.268c-1.523 0-3.087-.146-4.608-.11zm69.192 171.308l1.685 147.214l22.324-.262c.31-51.836-1.86-106.647-24.008-146.95zm1.685 147.214h-.002l.002.006z\"/>", "spiral-bloom": "<path fill=\"currentColor\" d=\"M261.826 23.342q-3.149.021-6.262.09C139.332 25.994 59.928 78.176 39.242 135.382c-11.82 32.69-6.027 67.12 23.305 99.196c19.405 21.22 49.525 41.114 91.818 57.072c-12.872-43.693-18.494-87.863-11.482-132.302l.3.047c1.81-10.37 6.832-20.448 14.112-29.23c29.632-35.742 94.642-59.715 158.1-48.42c77.656 13.824 128.62 37.135 158.263 65.618c-2.933-26.51-18.825-51.028-43.174-71.595c-31.773-26.84-77.54-45.766-122.914-50.266c-15.788-1.566-31.05-2.257-45.744-2.16m23.666 74.465c-47.91-.14-94.163 20.588-113.81 44.287c-5.785 6.978-9.38 13.613-10.584 20.13l.246.038q-.374 2.373-.696 4.748c-.01 4.96 1.412 9.884 4.372 14.87c7.767 13.083 29.18 27.893 70.695 38.186c13.2 3.273 25.47 5.01 36.783 5.705l12.764-82.262l9.785 2.246c29.88 6.86 49.564 16.87 60.648 29.853c5.542 6.492 8.828 14.005 9.086 21.674q.073 2.171-.173 4.302c2.764 38.157 1.664 75.476-5.703 111.287c59.32-12.15 102.336-40.655 118.74-71.587c13.41-25.282 11.35-51.275-13.218-77.035s-73.307-50.04-152.307-64.102c-8.828-1.57-17.756-2.313-26.628-2.34m15.12 68.66l-9.23 59.488c5.397-.3 10.47-.875 15.16-1.705c18.506-3.274 31.014-10.577 36.177-17.23c1.707-2.2 2.666-4.21 3.1-6.157c-.028-.372-.05-.742-.078-1.115l.274-.02c.073-.61.108-1.214.088-1.818c-.098-2.892-1.232-6.198-4.622-10.168c-5.937-6.955-19.125-15.1-40.87-21.275zm-142.034 37.21c.62 31.614 7.182 63.427 17.713 95.532c16.043 5.048 33.555 9.58 52.636 13.472c39.913 7.48 77.113 7.98 110.115 3.54c6.515-28.052 8.834-57.48 8.147-87.95c-9.52 6.876-22.23 11.698-37.39 14.38c-21.557 3.814-48.29 3.063-78.578-4.447c-34.638-8.588-58.302-20.168-72.642-34.527zm-129.83 15.538C37.45 404.402 137.104 495.61 258.788 495.61c123.68 0 224.628-104.89 230.415-237.204c-37.837 57.903-139.786 95.892-263.777 72.637l-.072-.014l-.073-.014c-22.46-4.58-42.96-10.024-61.608-16.205l-1.62.57q-.219-.627-.435-1.255c-51.585-17.38-88.692-40.5-112.863-66.934c-8.195-8.96-14.842-18.344-20.006-27.975z\"/>", "lightning-arc": "<path fill=\"currentColor\" d=\"m192.063 20.375l-44.625 98.563l-36.344-13.657l40.312 47.22l29.47-50.656l17.093 159.437l88.874-159.936l7.906 138.22l74.72-140.408l32.905 9.094l-32.594-57.28l-58.75 91.343L300.657 27.28L216.75 153.657l-24.688-133.28zM61.25 100.813c-22.213 0-40.03 17.785-40.03 40a39.896 39.896 0 0 0 40.03 40.03c.558 0 1.104-.04 1.656-.062l19.5 72.814l-27.812 7.437l4.843 18.064l27.813-7.47l6.656 24.876l-27.812 7.438L70.938 322l27.812-7.438l7.156 26.782l-27.78 7.437l4.81 18.033l27.814-7.438l6.906 25.813l-27.78 7.437l4.843 18.063l27.78-7.438l7.188 26.75l-27.813 7.47l4.844 18.06l27.81-7.467l12.25 45.78h19.345l-13.563-50.593l27.813-7.47l-4.844-18.06l-27.81 7.467l-7.157-26.78l27.78-7.438l-4.812-18.064l-27.81 7.438l-6.907-25.813l27.78-7.436l-4.812-18.063l-27.81 7.47l-7.157-26.78l27.78-7.44l-4.843-18.06l-27.78 7.436l-6.657-24.875l27.78-7.436l-4.843-18.03l-27.78 7.436l-19.564-73.03c12.173-6.842 20.344-19.858 20.344-34.907c0-22.215-17.787-40-40-40zm391.188 0c-22.213 0-40.032 17.785-40.032 40c0 15.052 8.19 28.066 20.375 34.906l-19.56 73.03l-27.814-7.438l-4.844 18.032l27.813 7.47l-6.656 24.842l-27.814-7.437l-4.844 18.06l27.813 7.44l-7.156 26.78l-27.814-7.47l-4.844 18.064l27.813 7.437l-6.906 25.814l-27.814-7.438l-4.844 18.063l27.813 7.436l-7.156 26.78l-27.845-7.467l-4.813 18.06l27.813 7.47l-13.563 50.594h19.313l12.25-45.78l27.813 7.467l4.843-18.06l-27.81-7.47l7.186-26.75l27.813 7.438l4.842-18.063L396 385.187l6.906-25.812l27.813 7.438l4.842-18.032l-27.812-7.467l7.156-26.75L442.72 322l4.842-18.063l-27.812-7.437l6.656-24.875l27.813 7.47l4.842-18.064l-27.812-7.436l19.5-72.813c.562.024 1.12.064 1.688.064c22.212 0 40-17.817 40-40.03c0-22.216-17.788-40-40-40z\"/>", "magnet": "<path fill=\"currentColor\" d=\"M146.063 25.656c-30.86.074-60.556 12.052-85.094 36.313C3.285 119 12.986 194.422 63.905 245.343c12.042 12.04 47.124 35.39 78.75 55.437l36.938-36.967c-23.064-18.33-46.265-37.235-54.375-45.344c-38.193-38.193-42.604-75.96-13.44-105.126c29.167-29.166 66.482-24.61 105.126 14.03c8.09 8.09 26.932 31.048 45.22 53.907l37.03-37.03c-20.045-31.623-43.335-66.74-55.375-78.78c-30.685-26.483-64.868-39.892-97.718-39.814zM309.375 160.47L273.845 196c13.103 16.54 24.525 31.2 29.5 37.656l31.53-31.53s-10.95-18.314-25.5-41.657zm54.125 33.124c-31.963 73.943-90.175 135.65-167.313 169.22c96.67-10.858 166.86-86.763 167.313-169.22m58.438 0C378.812 293.36 300.23 376.616 196.155 421.906c130.426-14.648 225.167-117.06 225.78-228.312zm72.53 0C437.49 325.414 333.7 435.407 196.19 495.25c172.33-19.356 297.47-154.66 298.28-301.656zM194.345 275.5l-35.438 35.438c23.348 14.552 41.656 25.5 41.656 25.5l31.532-31.532a4741 4741 0 0 1-37.75-29.406\"/>", "heavy-fighter": "<path fill=\"currentColor\" d=\"M215.076 20.037L100.752 135.693l52.135 79.313L41.662 378.65L21 491.963l112.848-20.742l162.974-111.69l79.42 52.784L491 297.09zm100.87 21.885l-21.083 21.176L311.73 80.03l21.086-21.17zm130.71 4.252l-84.32 84.668l16.86 16.937l84.33-84.667l-16.87-16.94zm-75.892 8.463l-42.16 42.336l16.867 16.935l42.165-42.334l-16.87-16.937zm67.46 67.746l-42.154 42.33l16.862 16.935l42.166-42.332l-16.873-16.933zm12.66 55.035l-21.08 21.17l16.862 16.935l21.088-21.168zM244.36 244.285c6.307.15 11.87 2.173 15.923 6.242c11.793 11.843 6.347 36.51-12.162 55.098c-18.51 18.585-43.077 24.058-54.87 12.22c-11.793-11.845-6.347-36.515 12.166-55.1c12.146-12.198 26.902-18.746 38.943-18.46\"/>", "spaceship": "<path fill=\"currentColor\" d=\"m265 34l47.898 35.924l61.563 123.123l-8.057 32.23l-24.943-4.158l3.16-10.533l2.842-9.473L256 182.823l-91.463 18.29l6.002 20.006l-24.943 4.156l-8.057-32.228L199.1 69.926L247 34v56h-39l-16 32l64 38l64-38l-16-32h-39zm188.313 169.258l30.3 10.101l-13.478 29.205l-30.016-5.001zm-394.626 0l13.194 34.304l-30.016 5.002l-13.478-29.205zM256 205.32l53.8 58.692L281.306 359h-50.61L202.2 264.012zm25.254.909l43.283 8.658l-8.715 29.052zm-50.508.002l-34.568 37.709l-8.715-29.053zm105.5 32.267L482.5 262.873L429.799 368.28L329.98 259.385zm-160.492 0l6.266 20.887L82.2 368.279L29.5 262.873zm148.205 40.96l72.201 78.765l-84.556-37.582zm-135.918 0l12.355 41.183l-84.556 37.582zm118.348 58.564l28.646 12.732L312.973 439H265v-62h29.695zm-100.778 0L217.305 377H247v62h-47.973l-22.062-88.246zM387.6 374.115l18.105 8.047l-9.984 21.635l-16.387-8.193zm-263.2 0l8.266 21.489l-16.387 8.193l-9.984-21.635zM311 457v30h-30v-30zm-80 0v30h-30v-30z\"/>", "laser-blast": "<path fill=\"currentColor\" d=\"M19.5 18.625v37.78l64.313 64.314l33.437-33.44l-68.656-68.655H19.5zm55.53 0l55.44 55.438l13.218-13.25L101.5 18.624H75.03zM176.438 54.5L52.876 178.063L89.53 214.72L213.126 91.124zM19.5 82.844v23.625l39.28 39.28l11.814-11.813zm187.28 41.062l-84.905 84.906l24.344 24.375l84.905-84.937zm125.345 27.406a24.73 24.73 0 0 0-17.563 7.282c-9.713 9.717-9.713 25.47 0 35.187c9.714 9.718 25.444 9.718 35.157 0s9.712-25.47 0-35.186c-4.858-4.86-11.23-7.28-17.595-7.28zm-87.844 10.25l-16.78 16.782c.252-.004.498-.03.75-.03c13.752 0 27.486 5.262 38.03 15.81c21.093 21.1 21.096 55.055 0 76.157c-21.09 21.1-55 21.1-76.092 0l-.5-.53c-10.39-10.67-15.5-24.498-15.313-38.28l-16.78 16.78c2.906 12.924 9.352 25.194 19.374 35.22c.235.235.48.454.718.686c.136.156.267.315.406.47c-8.723 9.11-8.618 23.566.344 32.53c9.082 9.086 23.823 9.086 32.906 0a23.2 23.2 0 0 0 4.75-6.844c22.125 7.47 43.827 4.068 73.687 12.5l29.783 29.782c-3.636 6.71-2.64 15.265 3.03 20.937s14.23 6.67 20.938 3.033L462.94 495.969h32.03V467L323.157 295.187c-5.594-15.51-7.705-28.616-9.406-40.656c6.178 2.096 13.263.677 18.188-4.25c6.91-6.912 6.91-18.118 0-25.03c-6.542-6.544-16.924-6.847-23.875-1c-3.867-12.71-10.74-25.536-25.188-40.406a55 55 0 0 0-5.22-4.688c-9.666-9.018-21.237-14.86-33.374-17.594zM357.063 262.22c-3.525 0-7.028 1.34-9.718 4.03c-5.38 5.382-5.38 14.118 0 19.5s14.09 5.382 19.47 0s5.378-14.118-.002-19.5a13.75 13.75 0 0 0-9.75-4.03m-129.468 73.09a13.74 13.74 0 0 0-9.75 4.032c-5.38 5.38-5.38 14.087 0 19.47c5.38 5.38 14.12 5.38 19.5-.002s5.38-14.087 0-19.468a13.75 13.75 0 0 0-9.75-4.03z\"/>", "speedometer": "<path fill=\"currentColor\" d=\"M256 54.28c-124.603 0-226 101.398-226 226c0 47.864 14.975 92.293 40.465 128.876l29.79-19.86a188.96 188.96 0 0 1-32.696-84.577H96v-18H66.115c-.07-2.14-.115-4.284-.115-6.44c0-45.378 15.816-86.97 42.236-119.598l17.4 17.4l12.727-12.727l-18.133-18.132C152.735 114.057 197.335 92.8 247 90.498v29.22h18V90.5c49.665 2.302 94.265 23.56 126.77 56.725l-18.133 18.132l12.726 12.727l17.4-17.4c26.42 32.63 42.237 74.22 42.237 119.6c0 2.154-.044 4.3-.115 6.437H416v18h28.44a188.96 188.96 0 0 1-32.694 84.575l29.79 19.86C467.025 372.574 482 328.146 482 280.282c0-124.602-101.397-226-226-226zm15.83 66.23a144 160 0 0 1 74.608 100.062l49.966-17.568a160 160 0 0 0-4.3-7.012l-5.135 5.153l-30.368-30.29l-5.76-5.746l7.85-7.874a160 160 0 0 0-86.862-36.726zm156.15 89.844l-175.332 60.6C240.505 272.618 231 283.155 231 295.72c0 13.7 11.3 25 25 25c6.77 0 12.95-2.764 17.473-7.208zm-16.513 32.322l-60.713 40.72a144 160 0 0 1-56.6 108.323h76.057a160 160 0 0 0 39.763-68.572H398.48v-52.515h17.022a160 160 0 0 0-4.035-27.957zM128 421.72v36h256v-36z\"/>", "delivery-drone": "<path fill=\"currentColor\" d=\"M407 24.98v14.04h16V25zM88.99 25v14.03H105V25zM487 57H344.9v15.96H487zm-320 0H25v15.98h142zm256 33.93h-16.1v27.97l13.7.1h2.4zm-318 .1H88.97v28.07H105zm272 45.87l-.1 32.1h-78.5l-16-32h-52.8l-16 32.1l-78.6-.1v-32H55.03l-12.04 48L199 214.4V208c.1-31.4 25.7-56.9 57.1-57c31.3 0 57 25.6 56.9 57c0 4.1.1 6.4.1 6.4L469 185.1L457 137zM256.1 169c-21.6 0-39 17.4-39.1 39.1c.1 21.5 17.5 38.9 39.1 38.9s39-17.4 38.9-39c.1-21.5-17.3-39-38.9-39m-.2 14c13.8 0 25 11.3 25.1 25c0 13.7-11.3 25.1-25 25c-13.7 0-25.1-11.3-25-24.9c0-13.8 11.3-25 24.9-25.1m-54.7 40.5L215 279h82l13.9-55.4c-6.8 23.9-28.8 41.4-54.8 41.4c-26.1 0-48.1-17.6-54.9-41.5m-35.8 4.2L60.35 321.1l83.85 107.7c5-5 11.3-8.8 18.2-11.1L100.2 318l87.9-73l-3.4-13.4zm181.3.2l-19.4 3.8l-3.3 13.4l87.8 73l-62.2 99.6c7 2.3 13.2 6.2 18.3 11.3l83.8-107.8zM176 433.6c-15 0-26.9 11.9-26.9 26.7c0 14.9 11.9 26.7 27 26.8c14.9-.1 26.9-12 26.9-26.8c-.1-14.8-11.9-26.7-27-26.7m159.9 0c-14.9.1-27 11.9-26.9 26.8c0 14.7 11.9 26.6 27 26.6c15 0 27-11.8 26.9-26.7c.1-14.8-11.9-26.7-27-26.7\"/>", "light-fighter": "<path fill=\"currentColor\" d=\"M215.078 20.037L100.754 135.693l52.133 79.313L21 491.963L296.824 359.53l79.42 52.784L491 297.088L215.078 20.038zm102.037 21.885l-21.082 21.174l16.865 16.933l21.088-21.17l-16.87-16.938zm130.71 4.252l-84.32 84.666l16.862 16.94l84.328-84.667zm-75.893 8.463l-42.157 42.336l16.864 16.933l42.165-42.334zm67.463 67.744l-42.155 42.33l16.862 16.938l42.164-42.334l-16.87-16.933zm12.658 55.038l-21.08 21.17l16.863 16.933l21.088-21.166l-16.87-16.936zm-206.526 66.865c6.308.15 11.87 2.175 15.924 6.244c11.794 11.843 6.35 36.51-12.16 55.098c-18.51 18.585-43.08 24.056-54.872 12.22c-11.793-11.847-6.345-36.517 12.168-55.1c12.146-12.2 26.9-18.747 38.94-18.462\"/>", "cog": "<path fill=\"currentColor\" d=\"M234.875 18.78c-26.087 2.367-51.557 8.56-74.875 18.782c15.37 32.763 14.222 66.706-6.72 82.407c-20.835 15.617-54.055 7.965-81.124-15.69c-16.246 19.452-29.336 41.36-38.875 65.626c33.83 12.333 56.635 37.665 52.94 63.5c-3.698 25.835-32.697 43.74-68.626 46.094c2.338 25.796 8.91 50.778 18.937 73.875c17.81-8.182 35.793-11.09 51.095-8.938c13.032 1.87 23.927 7.015 31.156 16.657c15.817 21.097 7.603 54.713-16.78 81.97c19.516 16.35 42.216 29.444 66.594 39.03c12.33-33.828 37.655-56.634 63.5-52.938c25.844 3.697 43.74 32.696 46.094 68.625c26.087-2.365 51.557-8.555 74.875-18.78c-15.766-32.997-14.26-67.588 6.843-83.406c9.64-7.23 22.568-9.022 35.594-7.125c15.112 2.16 31.19 10.25 45.563 22.78c16.088-19.345 29.4-41.51 38.875-65.594c-33.83-12.332-56.635-37.653-52.938-63.5c3.697-25.846 32.665-43.772 68.594-46.125c-2.36-25.944-8.774-50.663-18.906-73.874c-32.612 15.117-66.66 13.145-82.282-7.687c-15.696-20.944-7.252-53.86 16.688-81c-19.52-16.352-42.248-29.447-66.625-39.032c-12.332 33.828-37.657 56.66-63.5 52.968c-25.846-3.693-43.744-32.696-46.095-68.625zm21.656 95.126c79.626 0 144.376 64.752 144.376 144.375c0 79.626-64.75 144.376-144.375 144.376c-79.624 0-144.374-64.75-144.374-144.375c0-79.624 64.75-144.374 144.375-144.374zm0 18.688c-69.524 0-125.686 56.162-125.686 125.687s56.162 125.69 125.687 125.69s125.69-56.164 125.69-125.69c0-69.522-56.164-125.686-125.69-125.686zm.033 15.125c61.094 0 110.625 49.53 110.625 110.624c0 61.095-49.53 110.625-110.625 110.625s-110.625-49.53-110.625-110.626c0-61.095 49.53-110.625 110.625-110.625z\"/>", "missile-swarm": "<path fill=\"currentColor\" d=\"M17.34 17.38v34.08C37.24 85.91 61.4 120.5 95.03 151c6.97 24.6 23.57 43.7 46.27 53.9c-5.9-8.2-9.4-18.1-9.6-30.1c12 .1 21.9 3.7 30.1 9.6c-10.1-22.5-28.7-39-52.9-46c-40.28-36.2-66.64-78.82-89.03-121.02zm26.96 0C98.65 32.32 173.5 71.74 240.5 124.5l16.3-11.6C205.6 71.81 149.6 38.58 99.97 17.38zm110.1 0c28.4 8.14 52.8 19.57 75.3 32.83c13 21.96 34.1 36.14 58.6 40.15c-7.8-6.38-13.7-15.05-17-26.58c11.7-2.98 22.1-2.09 31.5 1.46c-15.5-19.08-37.8-30.23-63-30.76c-10.3-6.07-21-11.82-32.3-17.1zm171.3 4.96L321 71.62c-6.1 10.46-12.1 20.92-18.2 31.38c-14.6 11.2-26.3 18.7-40.6 29l39.6 22.8h.1l38.3-13.9c37.3 28.7 84.7 43.6 133.5 39.8c-21.2-44.6-57.8-78.2-101.5-96.03l-7-39.5zM194.9 148.8l-17.2 46.4c-8.6 8.4-17.2 17.1-25.7 25.7c-14.9 5.8-31.2 11.8-46.6 17.5l32.3 32.3l40.6-3.5c28.6 37.3 70.5 64 118.6 72.9c-8.9-48.5-35.6-90.5-73.1-119l3.4-40zm123.3 20l-18.2 6.6c17.1 17.7 33.5 38.1 44.3 52.6c1.1 24.4 12.1 46.1 30.6 61.3c-3.5-9.5-4.3-19.9-1.4-31.6c11.6 3.3 20.2 9.3 26.6 17.1c-4.1-25.4-19-47-42.3-59.9c-12-15.9-25.3-31.3-39.6-46.1M17.34 247.2v49.7c14.05 24.6 33.51 44.5 56.99 61c12.88 23.6 34.67 38.8 60.27 43c-7.8-6.4-13.8-15.1-17.1-26.6c11.7-3 22.2-2.1 31.6 1.5c-15-18.5-36.3-29.5-60.47-30.7c-35.62-23.9-60.18-54.2-71.29-97.9M441.3 249l-28.7 40.4c-10.5 6-20.9 12.1-31.4 18.1c-16.1 1.9-33.2 3.3-49.6 4.8l22.9 39.6l40.1 7.1c17.9 43.5 51.5 80.1 95.7 101.2c4-49.2-10.9-96.7-39.9-133.9l13.7-37.7zm-269.4 83.9l-4.6 49.3c-6.1 10.3-12.2 20.9-18.2 31.4c-13 9.6-27 19.4-40.5 28.9l39.6 22.9l38.3-13.9c37.3 28.7 84.6 43.6 133.4 39.8c-21.1-44.7-57.7-78.3-101.4-96.1l-7-39.5z\"/>", "upgrade": "<path fill=\"currentColor\" d=\"m256 29.816l-231 154v106.368l231-154l231 154V183.816zm0 128.043L105 259.783v90.283l151-101.925l151 101.925v-90.283zm0 112l-87 58.725v67.6l87-58l87 58v-67.6zm0 89.957l-87 58v64.368l87-58l87 58v-64.368z\"/>", "padlock": "<path fill=\"currentColor\" d=\"M254.28 17.313c-81.048 0-146.624 65.484-146.624 146.406V236h49.594v-69.094c0-53.658 43.47-97.187 97.03-97.187c53.563 0 97.032 44.744 97.032 97.186V236h49.594v-72.28c0-78.856-65.717-146.407-146.625-146.407zM85.157 254.688c-14.61 22.827-22.844 49.148-22.844 76.78c0 88.358 84.97 161.5 191.97 161.5c106.998 0 191.968-73.142 191.968-161.5c0-27.635-8.26-53.95-22.875-76.78H85.155zM254 278.625c22.34 0 40.875 17.94 40.875 40.28c0 16.756-10.6 31.23-25.125 37.376l32.72 98.126h-96.376l32.125-98.125c-14.526-6.145-24.532-20.62-24.532-37.374c0-22.338 17.972-40.28 40.312-40.28z\"/>"};
+const $=s=>document.querySelector(s);
+const icon=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 512 512">${ICONS[n]||''}</svg>`;
+function fmt(n){if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n)+'';const u=['','k','M','B','T','Qa','Qi','Sx'];let i=0;while(n>=1000&&i<u.length-1){n/=1000;i++}return n.toFixed(n<10?2:n<100?1:0)+u[i]}
+const pct=v=>Math.round(v*100)+' %';
+const rand=(a,b)=>a+Math.random()*(b-a);
+const SAVE_KEY='forgeastre_save_v1';
+
+/* ================= DONNÉES ================= */
+const RAR=[{n:'Commun',c:'#9aa7b8'},{n:'Rare',c:'#3fa0ff'},{n:'Épique',c:'#b45cff'},{n:'Légendaire',c:'#ffa53a'}];
+const MODS={
+  reflect:{n:'Bouclier réfléchissant',ic:'shield-reflect',v:[.25,.4,.55,.75],d:v=>`${pct(v)} de chance de renvoyer un tir ennemi sur son auteur`},
+  ricochet:{n:'Laser ricochet',ic:'ricochet',v:[1,2,3,4],d:v=>`Vos lasers rebondissent sur ${v} cible${v>1?'s':''} de plus`},
+  clone:{n:'Écho fantôme',ic:'shadow-follower',v:[.3,.5,.75,1],d:v=>`Un double spectral de votre vaisseau tire à ${pct(v)} de vos dégâts`},
+  nova:{n:'Cœur de nova',ic:'spiral-bloom',v:[3,5,8,12],d:v=>`Toutes les 5 s, une onde de choc inflige ${v}× vos dégâts autour de vous`},
+  overdrive:{n:'Surcadenceur',ic:'lightning-arc',v:[.2,.35,.55,.85],d:v=>`+${pct(v)} de cadence de tir`},
+  magnet:{n:'Aimant quantique',ic:'magnet',v:[.25,.5,.8,1.2],d:v=>`+${pct(v)} de cristaux récoltés`},
+  swarm:{n:'Nid de chasseurs',ic:'heavy-fighter',v:[1,1,2,3],d:v=>`+${v} chasseur${v>1?'s':''} gratuit${v>1?'s':''} dans votre flotte`}
+};
+const HULLMOD=['Noyau','Ailes d\'interception','Tourelles jumelles','Réacteurs lourds','Nacelles de combat','Anneau de champ','Proue blindée'];
+const SECTORS=[
+  {n:'Voile d\'Azur',a:'#1d5bff',b:'#9b3cff',bg:'#03051a',fog:0x060a22,ast:0x8a8f9c,hs:0x6a8cff,hg:0x2a1050,c:'#3de1ff'},
+  {n:'Nébuleuse Écarlate',a:'#ff2b3b',b:'#ff8a1e',bg:'#160307',fog:0x1c060a,ast:0x9a7b70,hs:0xff7a5a,hg:0x400818,c:'#ff6a4d'},
+  {n:'Jardin d\'Émeraude',a:'#12c97f',b:'#d8d23a',bg:'#02120c',fog:0x04160f,ast:0x7d9284,hs:0x7affc0,hg:0x0a3020,c:'#3dffb0'},
+  {n:'Abysse Violette',a:'#c03cff',b:'#ff3ca8',bg:'#0e0318',fog:0x12061e,ast:0x8e7f9c,hs:0xd08aff,hg:0x300a40,c:'#d08aff'}
+];
+let S;
+function fresh(){return{cr:20,hull:1,laser:0,rate:0,miners:0,hunters:0,hornets:0,dpow:0,rank:0,wave:0,mods:[],equip:[],tot:0}}
+function load(){try{const r=localStorage.getItem(SAVE_KEY);if(r){const o=JSON.parse(r);return Object.assign(fresh(),o)}}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){}}
+S=load();
+const sector=()=>1+Math.floor(S.wave/5);
+const secDef=()=>SECTORS[(sector()-1)%SECTORS.length];
+const secMul=()=>Math.pow(4,sector()-1);
+const slots=()=>1+(S.wave>=2)+(S.wave>=4);
+function modVal(t){let b=0;for(const id of S.equip){const m=S.mods.find(x=>x.id===id);if(m&&m.type===t)b=Math.max(b,MODS[t].v[m.rar])}return b}
+const st={};
+function calcStats(){
+  const rk=1+.08*S.rank;
+  st.dmg=5*Math.pow(1.28,S.laser)*rk*Math.pow(1.15,S.hull-1);
+  st.rate=2.2*(1+.12*S.rate)*(1+modVal('overdrive'));
+  st.guns=Math.min(5,1+Math.floor(S.hull/2));
+  st.range=15+Math.min(S.hull,8)*1.1;
+  st.maxHp=Math.round((80+45*(S.hull-1))*Math.pow(1.25,Math.max(0,S.hull-7))*(sector()>1?Math.pow(3,sector()-1):1));
+  st.scale=Math.min(.75+.14*(S.hull-1),1.7)+Math.max(0,S.hull-7)*.03;
+  st.radius=.9*st.scale+.3;
+  st.crMul=rk*(1+modVal('magnet'));
+  st.ddmg=3*Math.pow(1.3,S.dpow)*rk*Math.pow(1.2,sector()-1);
+  st.speed=8+Math.min(S.hull,8)*.4;
+}
+calcStats();
+const UP=[
+  {k:'hull',n:'Coque',ic:'spaceship',cost:l=>25*Math.pow(2.05,l-1),d:()=>S.hull<HULLMOD.length?`Module suivant : <b style="color:#fff">${HULLMOD[S.hull]}</b> · +PV, +taille, +canons`:'Renfort de coque : +PV, +dégâts, +taille',lv:()=>S.hull},
+  {k:'laser',n:'Lasers',ic:'laser-blast',cost:l=>10*Math.pow(1.45,l),d:()=>`Dégâts : ${fmt(st.dmg)} × ${st.guns} canon${st.guns>1?'s':''}`,lv:()=>S.laser},
+  {k:'rate',n:'Cadence',ic:'speedometer',cost:l=>18*Math.pow(1.55,l),d:()=>`${st.rate.toFixed(1)} tirs/s par canon`,lv:()=>S.rate},
+  {k:'miners',n:'Drone mineur',ic:'delivery-drone',max:6,cost:l=>30*Math.pow(1.9,l),d:()=>'Va miner seul les astéroïdes proches',lv:()=>S.miners},
+  {k:'hunters',n:'Chasseur',ic:'light-fighter',max:6,req:1,cost:l=>60*Math.pow(1.85,l),d:()=>'Drone d\'attaque qui traque les pirates',lv:()=>S.hunters},
+  {k:'dpow',n:'Puissance drones',ic:'cog',req:2,cost:l=>40*Math.pow(1.5,l),d:()=>`Dégâts des drones : ${fmt(st.ddmg)}`,lv:()=>S.dpow},
+  {k:'hornets',n:'Frelon lance-missiles',ic:'missile-swarm',max:4,req:3,cost:l=>180*Math.pow(2,l),d:()=>'Tire des missiles à tête chercheuse',lv:()=>S.hornets},
+  {k:'rank',n:'Rang stellaire',ic:'upgrade',req:5,cost:l=>600*Math.pow(1.35,l),d:()=>'+8 % dégâts et cristaux par rang, sans limite',lv:()=>S.rank}
+];
+
+/* ================= THREE ================= */
+const stage=$('#stage'),canvas=$('#cv');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(1.5,window.devicePixelRatio||1));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(55,.75,.1,800);
+scene.fog=new THREE.Fog(0x060a22,28,74);
+scene.add(new THREE.AmbientLight(0x3a4466,.75));
+const hemi=new THREE.HemisphereLight(0x6a8cff,0x2a1050,.7);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff0dd,1.15);sun.position.set(-20,30,12);scene.add(sun);
+const shipLight=new THREE.PointLight(0x40e0ff,1.3,16);scene.add(shipLight);
+
+function glowTexture(){const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(255,255,255,.75)');g.addColorStop(.6,'rgba(255,255,255,.18)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)}
+const glowTex=glowTexture();
+const spMats={};
+function glow(color,s){if(!spMats[color])spMats[color]=new THREE.SpriteMaterial({map:glowTex,color,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,fog:false});const sp=new THREE.Sprite(spMats[color]);sp.scale.set(s,s,s);return sp}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return`rgba(${n>>16},${n>>8&255},${n&255},${a})`}
+
+/* ciel : sphère nébuleuse + planète lointaine */
+const sky=new THREE.Group();scene.add(sky);
+const skyMat=new THREE.MeshBasicMaterial({side:THREE.BackSide,fog:false,depthWrite:false});
+sky.add(new THREE.Mesh(new THREE.SphereGeometry(300,32,16),skyMat));
+const planetMat=new THREE.MeshStandardMaterial({roughness:1,metalness:0,fog:false});
+const planet=new THREE.Mesh(new THREE.SphereGeometry(20,32,20),planetMat);planet.position.set(-95,-210,-170);sky.add(planet);
+const pring=new THREE.Mesh(new THREE.RingGeometry(26,37,64),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.28,side:THREE.DoubleSide,fog:false,depthWrite:false}));
+pring.position.copy(planet.position);pring.rotation.set(-1.2,.3,.4);sky.add(pring);
+function paintSky(sd){
+  const c=document.createElement('canvas');c.width=1024;c.height=512;const x=c.getContext('2d');
+  x.fillStyle=sd.bg;x.fillRect(0,0,1024,512);x.globalCompositeOperation='lighter';
+  let seed=sector()*977;const r=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  for(let i=0;i<34;i++){const px=r()*1024,py=r()*512,rad=40+r()*190,col=r()<.5?sd.a:sd.b,al=.03+r()*.11;
+    for(const ox of[-1024,0,1024]){const g=x.createRadialGradient(px+ox,py,0,px+ox,py,rad);g.addColorStop(0,hexA(col,al));g.addColorStop(1,hexA(col,0));x.fillStyle=g;x.fillRect(px+ox-rad,py-rad,rad*2,rad*2)}}
+  for(let i=0;i<1600;i++){const a=r();x.fillStyle=`rgba(255,255,255,${a*a*.9})`;x.fillRect(r()*1024,r()*512,a>.93?2:1,a>.93?2:1)}
+  if(skyMat.map)skyMat.map.dispose();skyMat.map=new THREE.CanvasTexture(c);skyMat.needsUpdate=true;
+  const p=document.createElement('canvas');p.width=256;p.height=128;const px=p.getContext('2d');
+  for(let y=0;y<128;y++){const t=Math.sin(y*.13+Math.sin(y*.05)*4)*.5+.5;px.fillStyle=t>.55?sd.a:sd.b;px.fillRect(0,y,256,1);px.fillStyle=`rgba(0,0,0,${.45+.25*Math.sin(y*.37+r()*2)})`;px.fillRect(0,y,256,1)}
+  for(let i=0;i<40;i++){px.fillStyle=`rgba(255,255,255,${r()*.08})`;px.fillRect(r()*256,r()*128,10+r()*60,1+r()*3)}
+  if(planetMat.map)planetMat.map.dispose();planetMat.map=new THREE.CanvasTexture(p);planetMat.needsUpdate=true;
+  pring.material.color.set(sd.b);
+  scene.fog.color.setHex(sd.fog);hemi.color.setHex(sd.hs);hemi.groundColor.setHex(sd.hg);
+}
+
+/* poussière proche pour la parallaxe */
+const DUST=260,dustPos=new Float32Array(DUST*3);
+for(let i=0;i<DUST;i++){dustPos[i*3]=rand(-30,30);dustPos[i*3+1]=rand(-8,1);dustPos[i*3+2]=rand(-30,30)}
+const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(dustPos,3));
+const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({size:.16,color:0xaabbee,transparent:true,opacity:.6,depthWrite:false}));dust.frustumCulled=false;scene.add(dust);
+
+/* particules */
+function makePS(max,size){
+  const g=new THREE.BufferGeometry(),pos=new Float32Array(max*3),col=new Float32Array(max*3);
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  const m=new THREE.PointsMaterial({size,map:glowTex,vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false});
+  const p=new THREE.Points(g,m);p.frustumCulled=false;scene.add(p);
+  return{max,pos,col,g,vel:new Float32Array(max*3),life:new Float32Array(max),ml:new Float32Array(max),base:new Float32Array(max*3),drag:new Float32Array(max),i:0}
+}
+const sparks=makePS(1000,.45),flares=makePS(160,2.6);
+const tmpC=new THREE.Color();
+function emit(ps,p,vx,vy,vz,life,color,drag=1.5){const i=ps.i;ps.i=(i+1)%ps.max;const j=i*3;ps.pos[j]=p.x;ps.pos[j+1]=p.y;ps.pos[j+2]=p.z;ps.vel[j]=vx;ps.vel[j+1]=vy;ps.vel[j+2]=vz;ps.life[i]=ps.ml[i]=life;tmpC.set(color);ps.base[j]=tmpC.r;ps.base[j+1]=tmpC.g;ps.base[j+2]=tmpC.b;ps.drag[i]=drag}
+function burst(p,n,spd,color,life=.6,ps=sparks){for(let k=0;k<n;k++){const a=Math.random()*6.283,b=rand(-1,1),s=spd*rand(.3,1),h=Math.sqrt(1-b*b);emit(ps,p,Math.cos(a)*h*s,b*s*.6,Math.sin(a)*h*s,life*rand(.6,1.2),color,2)}}
+function updPS(ps,dt){for(let i=0;i<ps.max;i++){const j=i*3;if(ps.life[i]<=0)continue;ps.life[i]-=dt;if(ps.life[i]<=0){ps.col[j]=ps.col[j+1]=ps.col[j+2]=0;continue}
+  ps.pos[j]+=ps.vel[j]*dt;ps.pos[j+1]+=ps.vel[j+1]*dt;ps.pos[j+2]+=ps.vel[j+2]*dt;const d=Math.max(0,1-ps.drag[i]*dt);ps.vel[j]*=d;ps.vel[j+1]*=d;ps.vel[j+2]*=d;
+  const f=ps.life[i]/ps.ml[i];ps.col[j]=ps.base[j]*f;ps.col[j+1]=ps.base[j+1]*f;ps.col[j+2]=ps.base[j+2]*f}
+  ps.g.attributes.position.needsUpdate=true;ps.g.attributes.color.needsUpdate=true}
+function explode(p,size,c1,c2){burst(p,Math.round(18*size),9*size,c1,.7);burst(p,Math.round(10*size),5*size,c2,1);for(let k=0;k<Math.ceil(size*2);k++)emit(flares,p,rand(-2,2)*size,rand(0,1),rand(-2,2)*size,.45+.1*size,c1,3)}
+
+/* lasers */
+const beamGeo=new THREE.CylinderGeometry(1,1,1,5,1,true);beamGeo.rotateX(Math.PI/2);
+const beamMats={};const beams=[];
+function beamMat(c){return beamMats[c]||(beamMats[c]=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}))}
+for(let i=0;i<48;i++){const m=new THREE.Mesh(beamGeo,beamMat(0xffffff));m.visible=false;scene.add(m);beams.push({m,life:0,ml:1,w:.1})}
+let beamI=0;const _v=new THREE.Vector3(),_v2=new THREE.Vector3(),_d=new THREE.Vector3();
+function beam(a,b,color,w=.09,life=.1){const o=beams[beamI];beamI=(beamI+1)%beams.length;o.m.material=beamMat(color);o.m.visible=true;
+  o.m.position.copy(a).add(b).multiplyScalar(.5);o.m.lookAt(b);o.len=a.distanceTo(b);o.w=w;o.life=o.ml=life;o.m.scale.set(w,w,o.len);
+  emit(flares,b,0,0,0,.12,color,0);emit(flares,a,0,0,0,.08,color,0)}
+
+/* anneaux d'onde de choc */
+const ringGeo=new THREE.RingGeometry(.85,1,56);ringGeo.rotateX(-Math.PI/2);const rings=[];
+function ring(p,maxR,color,dur=.6){const m=new THREE.Mesh(ringGeo,new THREE.MeshBasicMaterial({color,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));m.position.copy(p);m.position.y+=.1;scene.add(m);rings.push({m,t:0,dur,maxR})}
+
+/* ================= MATÉRIAUX & MODÈLES ================= */
+const M={
+  hull:new THREE.MeshStandardMaterial({color:0xc6d0e0,metalness:.65,roughness:.32,flatShading:true}),
+  dark:new THREE.MeshStandardMaterial({color:0x27324a,metalness:.7,roughness:.4,flatShading:true}),
+  acc:new THREE.MeshStandardMaterial({color:0x0b2a3a,emissive:0x29e0ff,emissiveIntensity:1.5}),
+  glass:new THREE.MeshStandardMaterial({color:0x103040,emissive:0x1aa8ff,emissiveIntensity:.9,metalness:.9,roughness:.1}),
+  gold:new THREE.MeshStandardMaterial({color:0xd9a441,metalness:.85,roughness:.3,flatShading:true}),
+  pir:new THREE.MeshStandardMaterial({color:0x4a2026,metalness:.6,roughness:.45,flatShading:true}),
+  pir2:new THREE.MeshStandardMaterial({color:0x7c3a2c,metalness:.5,roughness:.5,flatShading:true}),
+  pirAcc:new THREE.MeshStandardMaterial({color:0x300,emissive:0xff2a2a,emissiveIntensity:1.6}),
+  cryst:new THREE.MeshStandardMaterial({color:0x0a3040,emissive:0x2ee6ff,emissiveIntensity:1.3,flatShading:true}),
+  ghost:new THREE.MeshBasicMaterial({color:0x7a8cff,transparent:true,opacity:.35,blending:THREE.AdditiveBlending,depthWrite:false})
+};
+const G={box:new THREE.BoxGeometry(1,1,1),cyl:new THREE.CylinderGeometry(1,1,1,8),sph:new THREE.SphereGeometry(1,10,8),cone4:new THREE.ConeGeometry(1,1,4),cone6:new THREE.ConeGeometry(1,1,6),oct:new THREE.OctahedronGeometry(1)};
+function part(geo,mat,x,y,z,sx,sy,sz,rx=0,ry=0,rz=0){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.rotation.set(rx,ry,rz);return m}
+const RX=Math.PI/2;
+function buildShip(t){
+  const g=new THREE.Group();g.ud={guns:[],engines:[],spin:null};
+  g.add(part(G.cyl,M.hull,0,0,0,.42,1.8,.3,RX,0,0));
+  g.add(part(G.cone6,M.hull,0,0,1.3,.42,.9,.3,RX));
+  g.add(part(G.box,M.dark,0,-.05,-.2,.95,.18,1.2));
+  g.add(part(G.sph,M.glass,0,.2,.45,.2,.16,.42));
+  g.add(part(G.box,M.acc,0,.17,-.4,.06,.04,1));
+  g.add(part(G.cyl,M.dark,0,0,-1,.22,.35,.22,RX));
+  g.ud.engines.push(new THREE.Vector3(0,0,-1.25));g.ud.guns.push(new THREE.Vector3(0,0,1.7));
+  if(t>=2){for(const s of[-1,1]){g.add(part(G.box,M.hull,s*.95,-.04,-.25,1.6,.07,.62,0,s*.38,s*-.08));g.add(part(G.box,M.acc,s*1.05,-.0,-.52,1.3,.03,.05,0,s*.38,0));g.add(part(G.box,M.dark,s*1.72,.05,-.55,.12,.25,.7));const l=glow(s<0?0xff4466:0x44ff99,.6);l.position.set(s*1.75,.18,-.25);g.add(l)}}
+  if(t>=3){for(const s of[-1,1]){g.add(part(G.cyl,M.dark,s*.48,.25,.15,.17,.16,.17));g.add(part(G.box,M.gold,s*.48,.3,.5,.06,.06,.65));g.ud.guns.push(new THREE.Vector3(s*.48,.3,.85))}}
+  if(t>=4){for(const s of[-1,1]){g.add(part(G.cyl,M.hull,s*.72,-.05,-.95,.27,1.1,.27,RX));g.add(part(G.cyl,M.acc,s*.72,-.05,-1.52,.2,.06,.2,RX));g.ud.engines.push(new THREE.Vector3(s*.72,-.05,-1.65))}}
+  if(t>=5){for(const s of[-1,1]){g.add(part(G.cyl,M.dark,s*2.05,0,0,.2,1.5,.2,RX));g.add(part(G.cone6,M.gold,s*2.05,0,.95,.2,.45,.2,RX));g.add(part(G.box,M.acc,s*2.05,.16,0,.04,.04,1.1));g.ud.guns.push(new THREE.Vector3(s*2.05,0,1.15))}}
+  if(t>=6){const r=new THREE.Mesh(new THREE.TorusGeometry(1.5,.05,6,32),M.acc);r.rotation.x=RX;r.position.z=-.35;g.add(r);g.ud.spin=r;
+    for(const s of[-1,1])g.add(part(G.box,M.dark,s*1.5,0,-.35,.1,.1,.3))}
+  if(t>=7){g.add(part(G.box,M.hull,0,.45,-.6,.06,.6,1.1,-.2));for(const s of[-1,1])g.add(part(G.cone4,M.gold,s*.36,0,1.55,.1,.7,.1,RX,0,0));g.add(part(G.box,M.acc,0,.62,-.75,.03,.25,.7,-.2))}
+  for(const e of g.ud.engines){const sp=glow(0x55e8ff,t>=4?1.3:1);sp.position.copy(e);g.add(sp);e.sprite=sp}
+  return g;
+}
+function buildPirate(elite){
+  const g=new THREE.Group();
+  g.add(part(G.cone4,M.pir,0,0,.1,.5,1.8,.32,RX,0,0));
+  g.add(part(G.box,M.pir2,0,0,-.35,1.9,.07,.55,0,0,0));
+  for(const s of[-1,1])g.add(part(G.box,M.pir,s*.95,.12,-.45,.08,.35,.6));
+  g.add(part(G.box,M.pirAcc,0,.08,-.35,1.7,.03,.06));
+  const e=glow(0xff3322,.9);e.position.set(0,0,-.85);g.add(e);
+  if(elite){g.add(part(G.box,M.gold,0,.22,0,.12,.12,1));g.scale.setScalar(1.35)}
+  return g;
+}
+function buildBoss(){
+  const g=new THREE.Group();g.ud={turrets:[]};
+  g.add(part(G.box,M.pir,0,0,0,5,1.3,9));
+  g.add(part(G.cone4,M.pir,0,0,6.2,3.4,3.6,1.6,RX,0,0));
+  g.add(part(G.box,M.pir2,0,.95,-1,3.2,.8,5));
+  g.add(part(G.box,M.dark,0,1.9,-2.4,1.5,1.3,1.7));
+  g.add(part(G.box,M.pirAcc,0,2.1,-1.5,1.2,.18,.06));
+  for(const s of[-1,1]){g.add(part(G.box,M.pir2,s*3.2,-.2,-1,1.6,.25,6,0,s*.12,0));g.add(part(G.box,M.pirAcc,s*2.55,.2,0,.06,.1,8));
+    g.add(part(G.cone4,M.gold,s*2.6,0,4.5,.25,1.6,.25,RX));
+    for(const z of[2,-2.5]){const t=new THREE.Group();t.position.set(s*1.7,.75,z);t.add(part(G.cyl,M.dark,0,0,0,.45,.4,.45));t.add(part(G.box,M.gold,s*.12,.15,.7,.12,.12,1.2));t.add(part(G.box,M.gold,-s*.12,.15,.7,.12,.12,1.2));g.add(t);g.ud.turrets.push(t)}}
+  for(const x of[-1.6,0,1.6]){const e=glow(0xff5a1f,2.6);e.position.set(x,0,-4.9);g.add(e)}
+  return g;
+}
+
+/* ================= ENTITÉS ================= */
+const ship=new THREE.Group();scene.add(ship);
+let shipModel=null,ghost=null;const shipVel=new THREE.Vector3();
+const shield=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),new THREE.MeshBasicMaterial({color:0x9b7bff,transparent:true,opacity:.12,blending:THREE.AdditiveBlending,depthWrite:false}));ship.add(shield);shield.visible=false;
+let shieldFlash=0,popT=0;
+function rebuildShip(){if(shipModel)ship.remove(shipModel);shipModel=buildShip(S.hull);ship.add(shipModel);calcStats();ship.scale.setScalar(st.scale);shield.scale.setScalar(2.4);if(ghost){scene.remove(ghost);ghost=null}applyMods()}
+const asteroids=[],pirates=[],bolts=[],missiles=[],shards=[],crates=[],drones=[];
+const astGeos=[0,1,2].map(i=>{const g=new THREE.IcosahedronGeometry(1,1),p=g.attributes.position;for(let k=0;k<p.count;k++){const x=p.getX(k),y=p.getY(k),z=p.getZ(k);const n=1+.26*Math.sin(x*3.1+i*2+y*1.7)*Math.cos(z*2.7+i)+.12*Math.sin(y*5.3+z*4.1+i*3);p.setXYZ(k,x*n,y*n*.82,z*n)}g.computeVertexNormals();return g});
+function spawnAst(initial){
+  const sd=secDef(),size=.7+Math.pow(Math.random(),2)*1.9,rich=Math.random()<.28;
+  const a=Math.random()*6.283,d=initial?rand(7,40):rand(32,44);
+  const mat=new THREE.MeshStandardMaterial({color:sd.ast,roughness:.88,metalness:.15,flatShading:true});mat.color.offsetHSL(rand(-.03,.03),0,rand(-.08,.08));
+  const m=new THREE.Mesh(astGeos[Math.floor(Math.random()*3)],mat);
+  if(rich)for(let k=0;k<4;k++){const c=new THREE.Mesh(G.oct,M.cryst);const dir=new THREE.Vector3(rand(-1,1),rand(-.3,1),rand(-1,1)).normalize();c.position.copy(dir).multiplyScalar(.82);c.scale.set(.16,.42,.16);c.lookAt(dir.multiplyScalar(3));c.rotateX(RX);m.add(c)}
+  const pos=new THREE.Vector3(ship.position.x+Math.cos(a)*d,rand(-.9,-.1),ship.position.z+Math.sin(a)*d);m.position.copy(pos);scene.add(m);
+  const sm=secMul();
+  asteroids.push({kind:'ast',mesh:m,mat,pos,r:size,size,hp:10*Math.pow(size,1.6)*sm,value:4*size*sm*(rich?2.6:1),rich,rot:new THREE.Vector3(rand(-.6,.6),rand(-.6,.6),rand(-.6,.6)),drift:new THREE.Vector3(rand(-.3,.3),0,rand(-.3,.3)),grow:initial?1:0,flash:0})
+}
+const shardGeo=new THREE.OctahedronGeometry(.2);const shardMatC=new THREE.MeshBasicMaterial({color:0x6ff0ff}),shardMatG=new THREE.MeshBasicMaterial({color:0xffd060});
+function spawnShards(p,n,value,gold){if(shards.length>140)n=1;for(let k=0;k<n;k++){const m=new THREE.Mesh(shardGeo,gold?shardMatG:shardMatC);m.position.copy(p);scene.add(m);const a=Math.random()*6.283,s=rand(2,6);shards.push({mesh:m,pos:m.position,vel:new THREE.Vector3(Math.cos(a)*s,rand(1,3),Math.sin(a)*s),t:0,value:value/n,gold})}}
+const crateGeo=new THREE.BoxGeometry(.75,.75,.75);
+function dropCrate(p,rar){const mat=new THREE.MeshStandardMaterial({color:0x222833,metalness:.8,roughness:.3,emissive:RAR[rar].c,emissiveIntensity:.55});const m=new THREE.Mesh(crateGeo,mat);m.add(part(G.box,M.dark,0,0,0,.8,.2,.8));const gl=glow(new THREE.Color(RAR[rar].c).getHex(),3);m.add(gl);m.position.copy(p);m.position.y=.5;scene.add(m);crates.push({mesh:m,pos:m.position,t:0,rar});ring(p,4,new THREE.Color(RAR[rar].c).getHex(),.8)}
+function spawnPirate(elite){const w=S.wave+1,a=Math.random()*6.283,sm=secMul();const m=buildPirate(elite);const pos=new THREE.Vector3(ship.position.x+Math.cos(a)*38,0,ship.position.z+Math.sin(a)*38);m.position.copy(pos);scene.add(m);
+  const hp=14*Math.pow(1.45,w-1)*sm*(elite?3:1);pirates.push({kind:'pir',mesh:m,pos,vel:new THREE.Vector3(),r:elite?1.2:.95,hp,max:hp,dmg:4*Math.pow(1.22,w-1)*Math.pow(3,sector()-1)*(elite?1.6:1),cd:rand(1.5,3),orbit:rand(9,14),dir:Math.random()<.5?1:-1,reward:6*Math.pow(1.4,w-1)*sm*(elite?3:1),elite,flash:0})}
+function spawnBoss(){const a=Math.random()*6.283,sm=secMul();const m=buildBoss();const pos=new THREE.Vector3(ship.position.x+Math.cos(a)*45,0,ship.position.z+Math.sin(a)*45);m.position.copy(pos);scene.add(m);
+  const hp=3200*sm*Math.pow(1.6,sector()-1);pirates.push({kind:'pir',boss:true,mesh:m,pos,vel:new THREE.Vector3(),r:4.6,hp,max:hp,dmg:9*Math.pow(3,sector()-1),cd:3,cd2:8,orbit:17,dir:1,reward:900*sm,flash:0});$('#boss').classList.add('on')}
+
+/* drones */
+const DRONE={miner:{c:0xb6ff4a,geo:()=>part(G.oct,new THREE.MeshStandardMaterial({color:0x2a3a10,emissive:0xa8ff3a,emissiveIntensity:1,flatShading:true}),0,0,0,.3,.18,.3)},
+  hunter:{c:0x4aa8ff,geo:()=>part(G.cone4,new THREE.MeshStandardMaterial({color:0x0e2240,emissive:0x3d9bff,emissiveIntensity:1.1,flatShading:true}),0,0,0,.24,.8,.12,RX)},
+  hornet:{c:0xff8a2a,geo:()=>part(G.cone6,new THREE.MeshStandardMaterial({color:0x40200a,emissive:0xff7a1a,emissiveIntensity:1.1,flatShading:true}),0,0,0,.28,.6,.28,RX)}};
+function syncDrones(){
+  const want={miner:S.miners,hunter:S.hunters+modVal('swarm'),hornet:S.hornets};
+  for(const type in want){let have=drones.filter(d=>d.type===type);
+    while(have.length<want[type]){const g=new THREE.Group();g.add(DRONE[type].geo());const gl=glow(DRONE[type].c,.9);gl.position.z=-.35;g.add(gl);g.position.copy(ship.position);scene.add(g);const d={type,mesh:g,pos:g.position,cd:rand(0,1),ang:Math.random()*6.283,tgt:null};drones.push(d);have.push(d);ring(ship.position,3,DRONE[type].c,.5)}
+    while(have.length>want[type]){const d=have.pop();scene.remove(d.mesh);drones.splice(drones.indexOf(d),1)}}
+}
+function applyMods(){calcStats();shield.visible=modVal('reflect')>0;
+  const cv=modVal('clone');if(cv>0&&!ghost){ghost=shipModel.clone(true);ghost.traverse(o=>{if(o.isMesh)o.material=M.ghost});ghost.scale.setScalar(st.scale*.85);ghost.position.copy(ship.position);scene.add(ghost)}else if(cv<=0&&ghost){scene.remove(ghost);ghost=null}
+  syncDrones()}
+
+/* ================= COMBAT ================= */
+function nearestIn(arr,from,maxD,excl){let b=null,bd=maxD*maxD;for(const e of arr){if(e.dead||(excl&&excl.includes(e)))continue;const d=e.pos.distanceToSquared(from);if(d<bd){bd=d;b=e}}return b}
+const nums=[];for(let i=0;i<28;i++){const d=document.createElement('div');d.className='num';$('#fx').appendChild(d);nums.push(d)}let numI=0,sw=400,sh=533;
+function num(p,txt,cls){_v.copy(p).project(camera);if(_v.z>1)return;const el=nums[numI];numI=(numI+1)%nums.length;el.className='num '+cls;el.textContent=txt;
+  el.style.setProperty('--x',((_v.x*.5+.5)*sw+rand(-10,10))+'px');el.style.setProperty('--y',((-_v.y*.5+.5)*sh-10)+'px');void el.offsetWidth;el.classList.add('on')}
+let shake=0;
+function hit(e,amt,show=true){if(e.dead)return;let crit=false;if(Math.random()<.12){amt*=2.5;crit=true}e.hp-=amt;e.flash=.12;
+  if(show||crit)num(e.pos,fmt(amt),crit?'crit':e.kind==='ast'?'ore':'dmg');if(e.hp<=0)kill(e)}
+let lastKillPos=new THREE.Vector3();
+function kill(e){e.dead=true;scene.remove(e.mesh);
+  if(e.kind==='ast'){explode(e.pos,e.size*.8,0xb0b8c8,e.rich?0x3de1ff:0x8a7a6a);spawnShards(e.pos,Math.min(8,2+Math.round(e.size*2)),e.value,false)}
+  else if(e.boss){for(let k=0;k<5;k++){_v2.set(rand(-3,3),0,rand(-4,4)).add(e.pos);explode(_v2,3,0xffa040,0xff3020)}ring(e.pos,22,0xff8040,1.2);shake=1.4;spawnShards(e.pos,24,e.reward,true);dropCrate(e.pos,Math.random()<.5?3:2);_v2.set(3,0,0).add(e.pos);dropCrate(_v2,rollRar());$('#boss').classList.remove('on')}
+  else{explode(e.pos,e.elite?2.2:1.6,0xffa040,0xff3a2a);ring(e.pos,3,0xff6a30,.4);shake=Math.min(1,shake+.25);spawnShards(e.pos,5,e.reward,true);if(Math.random()<.1)dropCrate(e.pos,rollRar());lastKillPos.copy(e.pos)}}
+function shoot(from,t,dmg,color,bounces,w=.09){_v2.copy(t.pos);_v2.y+=.2;beam(from,_v2,color,w);burst(_v2,3,4,color,.3);const isAst=t.kind==='ast';hit(t,dmg,true);
+  let prev=t;const done=[t];for(let b=0;b<bounces;b++){const nx=nearestIn(isAst?asteroids:pirates,prev.pos,12,done);if(!nx)break;beam(prev.pos,nx.pos,0xc08cff,.07,.14);burst(nx.pos,4,4,0xc08cff,.3);hit(nx,dmg*.6,true);done.push(nx);prev=nx}}
+function pickTargets(from,range,n){const list=[];for(const p of pirates)if(!p.dead){const d=p.pos.distanceTo(from)-p.r;if(d<range+4)list.push([d-100,p])}
+  for(const a of asteroids)if(!a.dead&&a.grow>.6){const d=a.pos.distanceTo(from)-a.r;if(d<range)list.push([d,a])}list.sort((x,y)=>x[0]-y[0]);return list.slice(0,n).map(x=>x[1])}
+let hp,lastHurt=-9,down=0;
+function hurtPlayer(b){
+  const rv=modVal('reflect');
+  if(rv>0&&Math.random()<rv){b.friendly=true;b.vel.multiplyScalar(-1.4);b.mesh.material=boltMatF;b.life=2;shieldFlash=1;num(ship.position,'RENVOYÉ','ref');return false}
+  hp-=b.dmg;lastHurt=time;num(ship.position,'-'+fmt(b.dmg),'hurt');$('#hurt').style.opacity=.8;setTimeout(()=>$('#hurt').style.opacity=0,120);burst(b.pos,6,5,0xff5040,.4);
+  if(hp<=0)playerDown();return true}
+function playerDown(){explode(ship.position,3,0x55e8ff,0xffffff);shake=1.2;for(const p of pirates){p.dead=true;scene.remove(p.mesh);burst(p.pos,8,4,0xff4030)}pirates.length=0;bolts.forEach(b=>scene.remove(b.mesh));bolts.length=0;
+  $('#boss').classList.remove('on');hp=st.maxHp;waveState='calm';waveT=12;spawnQ=0;banner('REPLI D\'URGENCE','Améliorez votre flotte puis revenez','#ff4d5e')}
+const boltGeo=new THREE.SphereGeometry(.17,6,4);boltGeo.scale(1,1,3.2);
+const boltMat=new THREE.MeshBasicMaterial({color:0xff4a3a,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false}),boltMatF=new THREE.MeshBasicMaterial({color:0xc58cff,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false});
+function fireBolt(from,dir,spd,dmg){const m=new THREE.Mesh(boltGeo,boltMat);m.position.copy(from);m.position.y=.2;scene.add(m);const g=glow(0xff3020,1.1);m.add(g);bolts.push({mesh:m,pos:m.position,vel:dir.clone().setY(0).normalize().multiplyScalar(spd),life:3,dmg,friendly:false})}
+const missileGeo=new THREE.ConeGeometry(.1,.45,5);missileGeo.rotateX(RX);const missileMat=new THREE.MeshBasicMaterial({color:0xffc070});
+function fireMissile(from,tgt,dmg){const m=new THREE.Mesh(missileGeo,missileMat);m.position.copy(from);scene.add(m);missiles.push({mesh:m,pos:m.position,vel:new THREE.Vector3(rand(-6,6),4,rand(-6,6)),tgt,life:3.5,dmg})}
+
+/* ================= MODULES & LOOT ================= */
+function rollRar(min=0){const w=S.wave,r=Math.random();let k=r<.04+w*.006?3:r<.16+w*.012?2:r<.5?1:0;return Math.max(k,min)}
+function gainModule(rar){
+  const types=Object.keys(MODS),owned=new Set(S.mods.map(m=>m.type));const nw=types.filter(t=>!owned.has(t));
+  const pool=nw.length&&Math.random()<.75?nw:types;const type=pool[Math.floor(Math.random()*pool.length)];
+  const m={id:Date.now()+Math.floor(Math.random()*1e4),type,rar};S.mods.push(m);
+  if(S.equip.length<slots())S.equip.push(m.id);
+  else{const worse=S.equip.map(id=>S.mods.find(x=>x.id===id)).find(x=>x&&x.type===type&&x.rar<rar);if(worse)S.equip[S.equip.indexOf(worse.id)]=m.id}
+  while(S.mods.length>10){const cand=S.mods.filter(x=>!S.equip.includes(x.id)).sort((a,b)=>a.rar-b.rar)[0];if(!cand)break;S.mods.splice(S.mods.indexOf(cand),1)}
+  const d=MODS[type];toast(`Module ${RAR[rar].n}`,`<b style="color:#fff">${d.n}</b> — ${d.d(d.v[rar])}`,d.ic,RAR[rar].c);
+  applyMods();renderPanel();save()}
+
+/* ================= VAGUES ================= */
+let waveState='calm',waveT=S.wave===0?24:12,spawnQ=0,spawnCd=0,novaT=5,ghostCd=0;
+function banner(t,s,c){const b=$('#banner');b.style.setProperty('--bc',c);$('#bant').textContent=t;$('#bans').textContent=s;b.classList.remove('show');void b.offsetWidth;b.classList.add('show')}
+function startWave(){const w=S.wave+1,boss=w%5===0;waveState='fight';
+  if(boss){banner('VAISSEAU-AMIRAL','Le Léviathan Rouillé entre dans le secteur','#ff7a2e');spawnBoss();spawnQ=2}
+  else{banner('VAGUE '+w,'Pirates en approche','#ff4d5e');spawnQ=3+Math.floor(w*1.4)+(sector()-1)*2}spawnCd=.5}
+function clearWave(){const w=S.wave+1,wasBoss=w%5===0;S.wave++;waveState='calm';waveT=16;
+  const bonus=20*Math.pow(1.5,w)*secMul();S.cr+=bonus;S.tot+=bonus;gainAcc+=bonus;
+  if(S.wave===1){toast('Chasseurs débloqués','Des drones d\'attaque qui traquent les pirates tout seuls','light-fighter','#4aa8ff');dropCrate(lastKillPos,1)}
+  if(S.wave===2){toast('2e emplacement de module','Combinez deux bonus de module','padlock','#b45cff');toast('Puissance drones','Améliorez tous vos drones d\'un coup','cog','#a8ff3a');dropCrate(lastKillPos,rollRar(1))}
+  if(S.wave===3){toast('Frelons lance-missiles','Nouveau drone : missiles à tête chercheuse','missile-swarm','#ff8a2a');dropCrate(lastKillPos,2)}
+  if(S.wave===4){toast('3e emplacement de module','Votre build prend forme','padlock','#b45cff');toast('Alerte','Un vaisseau-amiral pirate a été repéré…','alien-skull','#ff4d5e')}
+  if(wasBoss){const sd=secDef();setTimeout(()=>{paintSky(sd);for(const a of asteroids){a.mat.color.setHex(sd.ast)}banner('SECTEUR '+sector(),sd.n,sd.c);updSector();
+      if(S.wave===5)toast('Rang stellaire débloqué','Progression infinie : chaque rang renforce toute la flotte','upgrade','#ffc548')},1600);calcStats();hp=st.maxHp}
+  renderPanel();save()}
+
+/* ================= ENTRÉES ================= */
+const ray=new THREE.Raycaster(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),ndc=new THREE.Vector2(),aim=new THREE.Vector3();let held=false;const keys={};
+function setAim(e){const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(ndc,camera);ray.ray.intersectPlane(plane,aim)}
+canvas.addEventListener('pointerdown',e=>{held=true;try{canvas.setPointerCapture(e.pointerId)}catch(_){}setAim(e);const h=$('#hint');if(h)h.remove()});
+canvas.addEventListener('pointermove',e=>{if(held)setAim(e)});
+const up=()=>{held=false};canvas.addEventListener('pointerup',up);canvas.addEventListener('pointercancel',up);
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=1});addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=0});
+
+/* ================= BOUCLE ================= */
+let time=0,gainAcc=0,crRate=0,rateT=0,hudT=0,saveT=0,fireT=0;
+const fwd=new THREE.Vector3(0,0,-1),camOff=new THREE.Vector3(0,12.5,12.5),camLook=new THREE.Vector3();
+function update(dt){
+  time+=dt;
+  /* pilotage */
+  const des=_v.set(0,0,0);
+  if(held){des.copy(aim).sub(ship.position);des.y=0;const d=des.length();des.multiplyScalar(d>.6?Math.min(1,d/4)*st.speed/d:0)}
+  const kx=(keys.d||keys.arrowright?1:0)-(keys.q||keys.a||keys.arrowleft?1:0),kz=(keys.s||keys.arrowdown?1:0)-(keys.z||keys.w||keys.arrowup?1:0);
+  if(kx||kz)des.set(kx,0,kz).normalize().multiplyScalar(st.speed);
+  shipVel.lerp(des,1-Math.exp(-(held||kx||kz?4:1.6)*dt));ship.position.addScaledVector(shipVel,dt);
+  if(shipVel.lengthSq()>.5)fwd.lerp(_v2.copy(shipVel).normalize(),1-Math.exp(-6*dt)).normalize();
+  _v2.copy(ship.position).add(fwd);ship.lookAt(_v2);
+  const sc=st.scale*(1+Math.max(0,popT)*.35);popT-=dt*2.5;ship.scale.setScalar(sc);
+  shipModel.rotation.z+=((-shipVel.x*fwd.z+shipVel.z*fwd.x)*.04-shipModel.rotation.z)*.15;
+  if(shipModel.ud.spin)shipModel.ud.spin.rotation.z+=dt*2;
+  for(const e of shipModel.ud.engines){e.sprite.scale.setScalar((S.hull>=4?1.3:1)*(1+Math.random()*.25+shipVel.length()*.04));_v2.copy(e);ship.localToWorld(_v2);emit(sparks,_v2,-fwd.x*3+rand(-.4,.4),rand(-.2,.2),-fwd.z*3+rand(-.4,.4),.35,0x3ad8ff,2)}
+  shipLight.position.copy(ship.position).y=2;
+  shieldFlash=Math.max(0,shieldFlash-dt*3);shield.material.opacity=.1+shieldFlash*.5;
+  if(time-lastHurt>3&&hp<st.maxHp)hp=Math.min(st.maxHp,hp+st.maxHp*.04*dt);
+  /* tir principal */
+  fireT-=dt;
+  if(fireT<=0){const t=pickTargets(ship.position,st.range,st.guns);if(t.length){fireT=1/st.rate;const bn=modVal('ricochet');
+      shipModel.ud.guns.slice(0,st.guns).forEach((gp,i)=>{_v2.copy(gp);ship.localToWorld(_v2);shoot(_v2.clone(),t[i%t.length],st.dmg,0x5ff2ff,bn,.08+st.scale*.03)})}else fireT=.1}
+  /* écho fantôme */
+  if(ghost){_v2.set(-fwd.z,0,fwd.x).multiplyScalar(-2.6*st.scale).addScaledVector(fwd,-1.6*st.scale).add(ship.position);ghost.position.lerp(_v2,1-Math.exp(-4*dt));ghost.quaternion.copy(ship.quaternion);
+    ghostCd-=dt;if(ghostCd<=0){const t=pickTargets(ghost.position,st.range,1)[0];ghostCd=t?1/st.rate:.2;if(t)shoot(ghost.position.clone(),t,st.dmg*modVal('clone'),0x9b8cff,0,.08)}}
+  /* nova */
+  const nv=modVal('nova');if(nv>0){novaT-=dt;if(novaT<=0){novaT=5;ring(ship.position,12,0xffb84a,.7);ring(ship.position,9,0xffffff,.5);shake=Math.max(shake,.35);
+      for(const e of[...pirates,...asteroids])if(!e.dead&&e.pos.distanceTo(ship.position)<12+e.r)hit(e,st.dmg*nv,true)}}
+  /* drones */
+  const nT={miner:0,hunter:0,hornet:0},cnt={miner:0,hunter:0,hornet:0};for(const d of drones)cnt[d.type]++;
+  drones.forEach(d=>{const i=nT[d.type]++;let dest=null;
+    if(d.type==='miner'){if(!d.tgt||d.tgt.dead||d.tgt.pos.distanceTo(ship.position)>26)d.tgt=nearestIn(asteroids.filter(a=>a.pos.distanceTo(ship.position)<22),d.pos,40);
+      if(d.tgt){_d.copy(d.pos).sub(d.tgt.pos).setY(0).normalize().multiplyScalar(d.tgt.r+1.4);dest=_d.add(d.tgt.pos).setY(.6);
+        if(d.pos.distanceTo(d.tgt.pos)<d.tgt.r+3){d.cd-=dt;if(d.cd<=0){d.cd=.5;shoot(d.pos,d.tgt,st.ddmg*1.6,0xb6ff4a,0,.06)}}}}
+    else if(d.type==='hunter'){if(!d.tgt||d.tgt.dead)d.tgt=nearestIn(pirates,ship.position,32);
+      if(d.tgt){d.ang+=dt*1.6;dest=_d.set(Math.cos(d.ang+i),0,Math.sin(d.ang+i)).multiplyScalar(d.tgt.r+3.5).add(d.tgt.pos).setY(.8);
+        if(d.pos.distanceTo(d.tgt.pos)<d.tgt.r+7){d.cd-=dt;if(d.cd<=0){d.cd=.38;shoot(d.pos,d.tgt,st.ddmg,0x4aa8ff,0,.06)}}}}
+    else{d.cd-=dt;if(d.cd<=0){const t=nearestIn(pirates,ship.position,32)||nearestIn(asteroids,ship.position,16);d.cd=t?1.5:.3;if(t){fireMissile(d.pos,t,st.ddmg*4);fireMissile(d.pos,t,st.ddmg*4)}}}
+    if(!dest){const n=Math.max(1,drones.length),a=time*.8+drones.indexOf(d)/n*6.283,r=2.3*st.scale+1+(d.type==='hornet'?.8:0);dest=_d.set(Math.cos(a)*r,d.type==='hornet'?1.4:.7,Math.sin(a)*r).add(ship.position)}
+    const prev=_v.copy(d.pos);d.pos.lerp(dest,1-Math.exp(-(d.type==='hunter'?3.5:2.6)*dt));d.pos.y+=Math.sin(time*4+i)*.004;
+    prev.sub(d.pos).negate();if(prev.lengthSq()>1e-5){prev.add(d.pos);d.mesh.lookAt(prev)}});
+  /* pirates */
+  for(let i=pirates.length-1;i>=0;i--){const p=pirates[i];if(p.dead){pirates.splice(i,1);continue}
+    const to=_v.copy(ship.position).sub(p.pos);to.y=0;const dist=to.length();to.normalize();
+    const spd=p.boss?3.2:6.5;const desv=_v2.copy(to);if(dist<p.orbit)desv.set(-to.z*p.dir,0,to.x*p.dir).addScaledVector(to,(dist-p.orbit)*.15);desv.multiplyScalar(spd);
+    p.vel.lerp(desv,1-Math.exp(-(p.boss?.8:2)*dt));p.pos.addScaledVector(p.vel,dt);
+    if(p.boss){_v2.copy(p.pos).add(to);p.mesh.lookAt(_v2);for(const t of p.mesh.ud.turrets)t.rotation.y+=dt*.8;
+      p.cd-=dt;if(p.cd<=0&&dist<34){p.cd=2.1;for(let k=-3;k<=3;k++){const a=Math.atan2(to.z,to.x)+k*.13;fireBolt(p.pos,_v2.set(Math.cos(a),0,Math.sin(a)),14,p.dmg)}burst(p.pos,10,6,0xff6020)}
+      p.cd2-=dt;if(p.cd2<=0){p.cd2=9;spawnPirate(false);spawnPirate(false)}}
+    else{_v2.copy(p.pos).add(p.vel);p.mesh.lookAt(_v2);p.cd-=dt;if(p.cd<=0&&dist<26){p.cd=rand(1.7,2.6);_v2.copy(ship.position).addScaledVector(shipVel,.35).sub(p.pos);fireBolt(p.pos,_v2,17,p.dmg)}}
+    if(p.flash>0){p.flash-=dt;p.mesh.scale.setScalar((p.elite?1.35:1)*(1+p.flash))}
+    if(dist>70&&!p.boss){p.pos.copy(ship.position).addScaledVector(to,-36)}}
+  if(pirates.some(p=>p.boss)){const b=pirates.find(p=>p.boss);$('#bossi').style.width=Math.max(0,b.hp/b.max*100)+'%'}
+  /* tirs ennemis */
+  for(let i=bolts.length-1;i>=0;i--){const b=bolts[i];if(!b)continue;b.pos.addScaledVector(b.vel,dt);b.life-=dt;b.mesh.lookAt(_v2.copy(b.pos).add(b.vel));let gone=b.life<=0;
+    if(!gone&&!b.friendly&&down<=0&&b.pos.distanceTo(ship.position)<st.radius+(shield.visible?.6:0)){gone=hurtPlayer(b)}
+    if(!gone&&b.friendly){const t=nearestIn(pirates,b.pos,3);if(t&&t.pos.distanceTo(b.pos)<t.r+.4){hit(t,b.dmg*3+st.dmg*2,true);burst(b.pos,10,6,0xc58cff);gone=true}}
+    if(gone){scene.remove(b.mesh);bolts.splice(i,1)}}
+  for(let i=missiles.length-1;i>=0;i--){const m=missiles[i];m.life-=dt;if(m.tgt.dead){m.tgt=nearestIn(pirates,m.pos,25)||m.tgt}
+    _v2.copy(m.tgt.pos).sub(m.pos).normalize().multiplyScalar(17);m.vel.lerp(_v2,1-Math.exp(-3.5*dt));m.pos.addScaledVector(m.vel,dt);m.mesh.lookAt(_v2.copy(m.pos).add(m.vel));
+    emit(sparks,m.pos,rand(-.3,.3),rand(-.3,.3),rand(-.3,.3),.4,0xff8a2a,3);
+    let gone=m.life<=0;if(!m.tgt.dead&&m.pos.distanceTo(m.tgt.pos)<m.tgt.r+.4){hit(m.tgt,m.dmg,true);explode(m.pos,.8,0xffb050,0xff5020);gone=true}
+    if(gone){scene.remove(m.mesh);missiles.splice(i,1)}}
+  /* astéroïdes */
+  for(let i=asteroids.length-1;i>=0;i--){const a=asteroids[i];if(a.dead){asteroids.splice(i,1);continue}
+    a.mesh.rotation.x+=a.rot.x*dt;a.mesh.rotation.y+=a.rot.y*dt;a.pos.addScaledVector(a.drift,dt);
+    if(a.grow<1)a.grow=Math.min(1,a.grow+dt*.8);let s=a.size*a.grow;
+    if(a.flash>0){a.flash-=dt;const f=a.flash/.12;a.mat.emissive.setRGB(.5*f,.75*f,1*f);s*=1+f*.06}else a.mat.emissive.setRGB(0,0,0);
+    a.mesh.scale.setScalar(s);
+    if(a.pos.distanceTo(ship.position)>58){scene.remove(a.mesh);asteroids.splice(i,1)}}
+  while(asteroids.length<22)spawnAst(false);
+  /* cristaux & caisses */
+  for(let i=shards.length-1;i>=0;i--){const s=shards[i];s.t+=dt;s.mesh.rotation.y+=dt*5;s.mesh.rotation.x+=dt*3;
+    if(s.t<.45){s.pos.addScaledVector(s.vel,dt);s.vel.multiplyScalar(1-3*dt);s.vel.y-=6*dt}
+    else{_v2.copy(ship.position).sub(s.pos);const d=_v2.length();_v2.multiplyScalar(Math.min(40,8+s.t*30)/Math.max(d,.01));s.pos.addScaledVector(_v2,dt);
+      if(d<.9*st.scale){const v=s.value*st.crMul;S.cr+=v;S.tot+=v;gainAcc+=v;emit(flares,s.pos,0,1,0,.2,s.gold?0xffd060:0x6ff0ff,2);scene.remove(s.mesh);shards.splice(i,1);crBump=true}}}
+  for(let i=crates.length-1;i>=0;i--){const c=crates[i];c.t+=dt;c.mesh.rotation.y+=dt*2;c.mesh.rotation.x=Math.sin(c.t*2)*.3;
+    if(c.t>1.1){_v2.copy(ship.position).sub(c.pos);const d=_v2.length();c.pos.addScaledVector(_v2.normalize(),Math.min(d,dt*(6+c.t*8)));if(d<1.2*st.scale){burst(c.pos,30,8,new THREE.Color(RAR[c.rar].c).getHex(),.8);ring(ship.position,5,new THREE.Color(RAR[c.rar].c).getHex(),.6);scene.remove(c.mesh);crates.splice(i,1);gainModule(c.rar)}}}
+  /* effets */
+  for(const b of beams)if(b.life>0){b.life-=dt;if(b.life<=0)b.m.visible=false;else{const f=b.life/b.ml;b.m.scale.set(b.w*f,b.w*f,b.len)}}
+  for(let i=rings.length-1;i>=0;i--){const r=rings[i];r.t+=dt;const f=r.t/r.dur;r.m.scale.setScalar(.5+f*r.maxR);r.m.material.opacity=1-f;if(f>=1){scene.remove(r.m);r.m.material.dispose();rings.splice(i,1)}}
+  updPS(sparks,dt);updPS(flares,dt);
+  for(let i=0;i<DUST;i++){const j=i*3;let dx=dustPos[j]-ship.position.x,dz=dustPos[j+2]-ship.position.z;if(dx>30)dustPos[j]-=60;else if(dx<-30)dustPos[j]+=60;if(dz>30)dustPos[j+2]-=60;else if(dz<-30)dustPos[j+2]+=60}dustGeo.attributes.position.needsUpdate=true;
+  /* caméra */
+  const k=1+(st.scale-.75)*.55;_v2.copy(camOff).multiplyScalar(k).add(ship.position);camera.position.lerp(_v2,1-Math.exp(-3*dt));
+  if(shake>0){camera.position.x+=rand(-1,1)*shake*.5;camera.position.y+=rand(-1,1)*shake*.3;shake=Math.max(0,shake-dt*2.2)}
+  camLook.lerp(_v2.copy(ship.position).setZ(ship.position.z-2.5),1-Math.exp(-5*dt));camera.lookAt(camLook);sky.position.copy(camera.position);
+  /* vagues */
+  if(waveState==='calm'){waveT-=dt;if(waveT<=0)startWave()}
+  else{if(spawnQ>0){spawnCd-=dt;if(spawnCd<=0){spawnQ--;spawnCd=.7;const w=S.wave+1;spawnPirate(w>=4&&spawnQ%3===0)}}
+    else if(pirates.length===0)clearWave()}
+  /* HUD */
+  rateT+=dt;if(rateT>=1){crRate=crRate*.6+gainAcc/rateT*.4;gainAcc=0;rateT=0}
+  hudT-=dt;if(hudT<=0){hudT=.2;updHud()}
+  saveT+=dt;if(saveT>6){saveT=0;save()}
+}
+let crBump=false;
+function updHud(){$('#cr').textContent=fmt(S.cr);$('#crs').textContent='+'+fmt(crRate)+'/s';if(crBump){const e=$('#crp');e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump');crBump=false}
+  $('#hpi').style.width=Math.max(0,hp/st.maxHp*100)+'%';$('#hpt').textContent=fmt(Math.max(0,hp))+' / '+fmt(st.maxHp);
+  const w=S.wave+1;$('#wavet').textContent=waveState==='calm'?(w%5===0?'Amiral dans ':'Vague '+w+' dans ')+Math.ceil(waveT)+' s':(w%5===0?'Amiral':'Vague '+w)+' · '+(pirates.length+spawnQ)+' pirate'+(pirates.length+spawnQ>1?'s':'');
+  document.querySelectorAll('.buy[data-c]').forEach(b=>{const ok=S.cr>=+b.dataset.c;b.classList.toggle('ok',ok);b.disabled=!ok})}
+function updSector(){const sd=secDef();$('#secn').textContent='SECTEUR '+sector();$('#secl').textContent=sd.n;$('#secp').style.setProperty('--sc',sd.c)}
+
+/* ================= INTERFACE ================= */
+let tab='up';
+function renderPanel(){calcStats();const P=$('#panel');$('#modc').textContent=S.mods.length;
+  if(tab==='up'){P.innerHTML=UP.map(u=>{const lv=u.lv(),locked=u.req&&S.wave<u.req,maxed=u.max&&lv>=u.max;const c=u.cost(u.k==='hull'?S.hull:lv);
+    if(locked)return`<div class="card locked"><div class="cic">${icon('padlock')}</div><div class="cb"><div class="ct">${u.n}</div><div class="cd">Se débloque après la ${u.req===5?'défaite du vaisseau-amiral':'vague '+u.req}</div></div></div>`;
+    return`<div class="card"><div class="cic">${icon(u.ic)}<em>${lv}</em></div><div class="cb"><div class="ct">${u.n}${u.max?`<span>${lv}/${u.max}</span>`:''}</div><div class="cd">${u.d()}</div></div>${maxed?'<button class="buy" disabled>MAX</button>':`<button class="buy" data-buy="${u.k}" data-c="${c}">${icon('crystal-cluster')}${fmt(c)}</button>`}</div>`}).join('')}
+  else{const sl=slots();let h='<div class="lbl">Emplacements équipés</div><div class="slots">';
+    for(let i=0;i<3;i++){const id=S.equip[i],m=id&&S.mods.find(x=>x.id===id);
+      if(i>=sl)h+=`<div class="slot">${icon('padlock')}Vague ${i===1?2:4}</div>`;
+      else if(m)h+=`<div class="slot f" style="--rc:${RAR[m.rar].c}" data-mod="${m.id}">${icon(MODS[m.type].ic)}<b>${MODS[m.type].n}</b><span class="badge">${RAR[m.rar].n}</span></div>`;
+      else h+=`<div class="slot">${icon('cog')}Libre</div>`}
+    h+='</div><div class="lbl">Soute · touchez pour équiper / retirer</div><div class="inv" style="display:grid;gap:6px">';
+    if(!S.mods.length)h+='<div class="empty">Aucun module. Détruisez des pirates pour récupérer des caisses de modules.</div>';
+    for(const m of S.mods.slice().sort((a,b)=>b.rar-a.rar)){const d=MODS[m.type],eq=S.equip.includes(m.id);
+      h+=`<div class="card ${eq?'eq':''}" style="--rc:${RAR[m.rar].c}" data-mod="${m.id}"><div class="cic">${icon(d.ic)}</div><div class="cb"><div class="ct">${d.n} <span class="badge">${RAR[m.rar].n}</span></div><div class="cd">${d.d(d.v[m.rar])}</div></div><span style="font:700 11px var(--fh);color:${eq?RAR[m.rar].c:'var(--mut)'}">${eq?'ÉQUIPÉ':'—'}</span></div>`}
+    P.innerHTML=h+'</div>'}
+  updHud()}
+$('#panel').addEventListener('click',e=>{const b=e.target.closest('[data-buy]');if(b){buy(b.dataset.buy);return}
+  const m=e.target.closest('[data-mod]');if(m){const id=+m.dataset.mod,ix=S.equip.indexOf(id);if(ix>=0)S.equip.splice(ix,1);else{if(S.equip.length>=slots())S.equip.shift();S.equip.push(id)}applyMods();renderPanel();save()}});
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));renderPanel()}));
+function buy(k){const u=UP.find(x=>x.k===k),lv=u.lv(),c=u.cost(k==='hull'?S.hull:lv);if(S.cr<c||(u.max&&lv>=u.max)||(u.req&&S.wave<u.req))return;S.cr-=c;S[k]++;
+  if(k==='hull'){const old=st.maxHp;rebuildShip();hp+=st.maxHp-old;popT=1;ring(ship.position,6*st.scale,0x3de1ff,.7);burst(ship.position,40,10,0x8ff4ff,.8);
+    toast(S.hull<=HULLMOD.length?'Nouveau module de coque':'Coque renforcée',S.hull<=HULLMOD.length?`<b style="color:#fff">${HULLMOD[S.hull-1]}</b> greffé · ${st.guns} canon${st.guns>1?'s':''}`:`Tier ${S.hull} · ${fmt(st.maxHp)} PV`,'spaceship','#3de1ff')}
+  else if(k==='miners'||k==='hunters'||k==='hornets')syncDrones();
+  else calcStats();renderPanel();save()}
+let resetArm=0;$('#reset').addEventListener('click',()=>{const b=$('#reset');if(Date.now()-resetArm<3000){try{localStorage.removeItem(SAVE_KEY)}catch(e){}location.reload();return}resetArm=Date.now();b.textContent='Toucher encore pour confirmer';setTimeout(()=>b.textContent='Recommencer',3000)});
+const toastQ=[];let toastBusy=false;
+function toast(t,s,ic,c){toastQ.push({t,s,ic,c});if(!toastBusy)nextToast()}
+function nextToast(){const q=toastQ.shift();if(!q){toastBusy=false;return}toastBusy=true;const el=$('#toast');el.style.setProperty('--tc',q.c||'#3de1ff');el.innerHTML=`<div class="ti">${icon(q.ic)}</div><div><b>${q.t}</b><span>${q.s}</span></div>`;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');setTimeout(nextToast,2600)}
+
+/* ================= DÉMARRAGE ================= */
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;sw=w;sh=h;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(stage);resize();
+rebuildShip();hp=st.maxHp;paintSky(secDef());updSector();
+for(let i=0;i<22;i++)spawnAst(true);
+camera.position.copy(camOff);camera.lookAt(0,0,-2.5);
+renderPanel();
+let last=performance.now(),acc=0,raf=0;
+function loop(now){raf=requestAnimationFrame(loop);const el=now-last;if(el<1000/30-1)return;last=now;const dt=Math.min(.05,el/1000);update(dt);renderer.render(scene,camera)}
+raf=requestAnimationFrame(loop);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);save()}else{last=performance.now();raf=requestAnimationFrame(loop)}});
+</script>
+
+</body></html>

@@ -1,0 +1,744 @@
+{
+ "version": "1.0.0",
+ "rev": 1,
+ "apk": {
+  "versionCode": 1,
+  "versionName": "1.0",
+  "url": "apk/NovaApp.apk",
+  "taille": 12239343
+ },
+ "firebase": {
+  "apiKey": "",
+  "projectId": ""
+ },
+ "groupes": [
+  {
+   "id": "principaux",
+   "nom": "Tes jeux principaux"
+  },
+  {
+   "id": "nova-city",
+   "nom": "Nova City"
+  },
+  {
+   "id": "titans",
+   "nom": "Nova Titan et Nova Inferno"
+  },
+  {
+   "id": "prototypes",
+   "nom": "Prototypes du 18 nov."
+  },
+  {
+   "id": "demos",
+   "nom": "Démos du 31 oct."
+  }
+ ],
+ "jeux": [
+  {
+   "id": "canards",
+   "nom": "1 Milliard de Canards",
+   "groupe": "principaux",
+   "genre": "Clicker idle",
+   "desc": "Tire sur les canards, ton chien les ramène au congélateur. Vends ta récolte, améliore ton fusil, tes chiens et ton équipe jusqu'à attraper 1 milliard de canards.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": true,
+   "taille": 85303,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 85303
+    }
+   ]
+  },
+  {
+   "id": "ricochets",
+   "nom": "Ricochets",
+   "groupe": "principaux",
+   "genre": "Incrémental",
+   "desc": "Fais ricocher ta pierre le plus loin possible, améliore ton lancer et débloque de nouveaux lacs. L'oiseau attrape ta pierre et la relâche plus loin.",
+   "version": 1,
+   "orientation": "paysage",
+   "nouveau": false,
+   "taille": 131048,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 131048
+    }
+   ]
+  },
+  {
+   "id": "dino-survie",
+   "nom": "Dino Survie",
+   "groupe": "principaux",
+   "genre": "Survie 3D",
+   "desc": "Incarne un dinosaure en 3D : mange, grandis, fais éclore des œufs et collectionne les espèces.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 6647496,
+   "fichiers": [
+    {
+     "p": "assets/bark_brown_02.jpg",
+     "t": 82309
+    },
+    {
+     "p": "assets/brown_mud_leaves_01.jpg",
+     "t": 90146
+    },
+    {
+     "p": "assets/brown_mud_leaves_01_n.jpg",
+     "t": 124279
+    },
+    {
+     "p": "assets/burned_ground_01.jpg",
+     "t": 115448
+    },
+    {
+     "p": "assets/burned_ground_01_n.jpg",
+     "t": 71582
+    },
+    {
+     "p": "assets/coast_sand_01.jpg",
+     "t": 63050
+    },
+    {
+     "p": "assets/coast_sand_01_n.jpg",
+     "t": 76173
+    },
+    {
+     "p": "assets/cracked_red_ground.jpg",
+     "t": 38898
+    },
+    {
+     "p": "assets/cracked_red_ground_n.jpg",
+     "t": 77550
+    },
+    {
+     "p": "assets/dead_tree_trunk_02.json",
+     "t": 256970
+    },
+    {
+     "p": "assets/drom_diff.jpg",
+     "t": 332653
+    },
+    {
+     "p": "assets/drom_eye.jpg",
+     "t": 7768
+    },
+    {
+     "p": "assets/drom_nrm.jpg",
+     "t": 135997
+    },
+    {
+     "p": "assets/fern_02.json",
+     "t": 81940
+    },
+    {
+     "p": "assets/forrest_ground_01.jpg",
+     "t": 81825
+    },
+    {
+     "p": "assets/forrest_ground_01_n.jpg",
+     "t": 112259
+    },
+    {
+     "p": "assets/m_apato.json",
+     "t": 249595
+    },
+    {
+     "p": "assets/m_drom.json",
+     "t": 1505225
+    },
+    {
+     "p": "assets/m_stego.json",
+     "t": 309808
+    },
+    {
+     "p": "assets/m_trex.json",
+     "t": 242463
+    },
+    {
+     "p": "assets/m_trice.json",
+     "t": 234130
+    },
+    {
+     "p": "assets/m_velo.json",
+     "t": 199574
+    },
+    {
+     "p": "assets/namaqualand_boulder_02.json",
+     "t": 252373
+    },
+    {
+     "p": "assets/palm_bark.jpg",
+     "t": 39075
+    },
+    {
+     "p": "assets/palm_bark_n.jpg",
+     "t": 89978
+    },
+    {
+     "p": "assets/pine_bark.jpg",
+     "t": 54921
+    },
+    {
+     "p": "assets/pine_bark_n.jpg",
+     "t": 88611
+    },
+    {
+     "p": "assets/quiver_tree_02.json",
+     "t": 228751
+    },
+    {
+     "p": "assets/rock_moss_set_01.json",
+     "t": 122930
+    },
+    {
+     "p": "assets/rocky_trail.jpg",
+     "t": 76743
+    },
+    {
+     "p": "assets/rocky_trail_n.jpg",
+     "t": 122818
+    },
+    {
+     "p": "assets/shrub_02.json",
+     "t": 107102
+    },
+    {
+     "p": "assets/shrub_03.json",
+     "t": 121340
+    },
+    {
+     "p": "assets/shrub_04.json",
+     "t": 110961
+    },
+    {
+     "p": "assets/snow_02.jpg",
+     "t": 30592
+    },
+    {
+     "p": "assets/snow_02_n.jpg",
+     "t": 69564
+    },
+    {
+     "p": "assets/tree_stump_01.json",
+     "t": 292585
+    },
+    {
+     "p": "index.html",
+     "t": 349510
+    }
+   ]
+  },
+  {
+   "id": "ascension",
+   "nom": "Ascension contre l'IA",
+   "groupe": "principaux",
+   "genre": "Quiz de calcul",
+   "desc": "Grimpe les étapes en battant l'IA au calcul mental : tables, additions, soustractions… avant la fin du temps.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 54930,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 54930
+    }
+   ]
+  },
+  {
+   "id": "ile-nova",
+   "nom": "Île Nova Resort",
+   "groupe": "principaux",
+   "genre": "Monde libre 3D",
+   "desc": "Balade-toi partout sur l'île : buggy, scooter, jet-ski, hydravion, parachute et activités du resort.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 159015,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 159015
+    }
+   ]
+  },
+  {
+   "id": "nova-dropper",
+   "nom": "Nova Dropper",
+   "groupe": "principaux",
+   "genre": "Tycoon 3D",
+   "desc": "Lâche des cubes, achète les boutons et grimpe les 6 paliers de prestige, du Multiplicateur jusqu'à l'Éternité.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 36474,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 36474
+    }
+   ]
+  },
+  {
+   "id": "turbo-kart",
+   "nom": "Turbo Kart Royaume",
+   "groupe": "principaux",
+   "genre": "Course en live",
+   "desc": "Des dizaines de karts s'affrontent sur le circuit vu du dessus, les cadeaux déclenchent des objets.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 20755,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 20755
+    }
+   ]
+  },
+  {
+   "id": "processeur-max",
+   "nom": "Processeur Max",
+   "groupe": "principaux",
+   "genre": "Idle",
+   "desc": "Améliore les cœurs, la fréquence et les ventilateurs pour entraîner l'IA sans faire surchauffer le processeur.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 16984,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 16984
+    }
+   ]
+  },
+  {
+   "id": "nova-city",
+   "nom": "Nova City",
+   "groupe": "nova-city",
+   "genre": "Gestion",
+   "desc": "Bâtis ton empire quartier par quartier dans la ville néon.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 25955,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 25955
+    }
+   ]
+  },
+  {
+   "id": "nova-city-diablo",
+   "nom": "Nova City · Diablo urbain",
+   "groupe": "nova-city",
+   "genre": "Action RPG",
+   "desc": "Ton boss se bat seul contre les vagues de Vipères : lance tes compétences et ramasse le butin.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 27567,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 27567
+    }
+   ]
+  },
+  {
+   "id": "nova-city-guerre",
+   "nom": "Nova City · Guerre de rue",
+   "groupe": "nova-city",
+   "genre": "Stratégie",
+   "desc": "Envoie tes unités prendre les quartiers du gang rival.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 23908,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 23908
+    }
+   ]
+  },
+  {
+   "id": "nova-city-gta",
+   "nom": "Nova City · GTA",
+   "groupe": "nova-city",
+   "genre": "Action",
+   "desc": "Fonce dans les rues néon de Nova City.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 25184,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 25184
+    }
+   ]
+  },
+  {
+   "id": "nova-arcana",
+   "nom": "Nova Arcana",
+   "groupe": "titans",
+   "genre": "Tap RPG",
+   "desc": "Tape pour attaquer les monstres, avec le rendu au choix : 3D, dessiné ou pixel.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 43179,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 43179
+    }
+   ]
+  },
+  {
+   "id": "nova-titan-neon",
+   "nom": "Nova Titan : Neon City",
+   "groupe": "titans",
+   "genre": "Tap RPG",
+   "desc": "Tape les titans de Neon City avec tes compagnons.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 43060,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 43060
+    }
+   ]
+  },
+  {
+   "id": "royaume-titans",
+   "nom": "Royaume des Titans",
+   "groupe": "titans",
+   "genre": "Tap RPG",
+   "desc": "La version fantasy : chevalier, mage et compagnons contre les titans.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 43075,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 43075
+    }
+   ]
+  },
+  {
+   "id": "nova-titan-concept",
+   "nom": "Nova Titan (concept)",
+   "groupe": "titans",
+   "genre": "Concept",
+   "desc": "La présentation du projet Nova Titan, avec sa scène 3D jouable.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 12288449,
+   "fichiers": [
+    {
+     "p": "GLTFLoader.js",
+     "t": 96550
+    },
+    {
+     "p": "SkeletonUtils.js",
+     "t": 11872
+    },
+    {
+     "p": "index.html",
+     "t": 66731
+    },
+    {
+     "p": "mj/Barbarian.glb.json",
+     "t": 1118607
+    },
+    {
+     "p": "mj/Knight.glb.json",
+     "t": 1178141
+    },
+    {
+     "p": "mj/Mage.glb.json",
+     "t": 1102663
+    },
+    {
+     "p": "mj/Rogue.glb.json",
+     "t": 1128362
+    },
+    {
+     "p": "mj/Rogue_Hooded.glb.json",
+     "t": 1103795
+    },
+    {
+     "p": "mj/Skeleton_Mage.glb.json",
+     "t": 1268119
+    },
+    {
+     "p": "mj/Skeleton_Minion.glb.json",
+     "t": 1338552
+    },
+    {
+     "p": "mj/Skeleton_Rogue.glb.json",
+     "t": 1355044
+    },
+    {
+     "p": "mj/Skeleton_Warrior.glb.json",
+     "t": 1403383
+    },
+    {
+     "p": "mj/banner_patternA_white.gltf.glb.json",
+     "t": 33143
+    },
+    {
+     "p": "mj/barrel_large.gltf.glb.json",
+     "t": 58646
+    },
+    {
+     "p": "mj/box_stacked.gltf.glb.json",
+     "t": 195541
+    },
+    {
+     "p": "mj/chest_gold.glb.json",
+     "t": 185711
+    },
+    {
+     "p": "mj/floor_tile_large.gltf.glb.json",
+     "t": 37075
+    },
+    {
+     "p": "mj/floor_tile_large_rocks.gltf.glb.json",
+     "t": 50783
+    },
+    {
+     "p": "mj/pillar_decorated.gltf.glb.json",
+     "t": 82875
+    },
+    {
+     "p": "mj/torch_mounted.gltf.glb.json",
+     "t": 43880
+    },
+    {
+     "p": "mj/wall.gltf.glb.json",
+     "t": 70463
+    },
+    {
+     "p": "mj/wall_arched.gltf.glb.json",
+     "t": 91769
+    },
+    {
+     "p": "mj/wall_cracked.gltf.glb.json",
+     "t": 184138
+    },
+    {
+     "p": "scene.js",
+     "t": 10400
+    },
+    {
+     "p": "shots/boss.jpg",
+     "t": 25210
+    },
+    {
+     "p": "shots/clone.jpg",
+     "t": 23332
+    },
+    {
+     "p": "shots/loot.jpg",
+     "t": 23664
+    }
+   ]
+  },
+  {
+   "id": "nova-inferno",
+   "nom": "Nova Inferno",
+   "groupe": "titans",
+   "genre": "Action RPG 3D",
+   "desc": "Action-RPG en 3D : 3 classes, failles, légendaires, sets et fusions de compétences.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 565254,
+   "fichiers": [
+    {
+     "p": "data.js",
+     "t": 94359
+    },
+    {
+     "p": "game.js",
+     "t": 279423
+    },
+    {
+     "p": "icons.js",
+     "t": 156378
+    },
+    {
+     "p": "index.html",
+     "t": 35094
+    }
+   ]
+  },
+  {
+   "id": "button-simulator",
+   "nom": "Nova Button Simulator 3D",
+   "groupe": "prototypes",
+   "genre": "Simulateur",
+   "desc": "Marche sur les boutons pour multiplier ton argent, comme sur Roblox.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 24647,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 24647
+    }
+   ]
+  },
+  {
+   "id": "nova-survivors",
+   "nom": "Nova Survivors",
+   "groupe": "prototypes",
+   "genre": "Survie arcade",
+   "desc": "Survis 10 minutes à la horde des Vipères et fusionne tes armes.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 41318,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 41318
+    }
+   ]
+  },
+  {
+   "id": "cendrelame",
+   "nom": "Cendrelame",
+   "groupe": "demos",
+   "genre": "Idle RPG",
+   "desc": "Idle RPG dark fantasy : héros autonomes, légendaires, failles et parangon.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 135207,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 135207
+    }
+   ]
+  },
+  {
+   "id": "faille-neon",
+   "nom": "Faille Néon",
+   "groupe": "demos",
+   "genre": "Idle RPG",
+   "desc": "Action-RPG idle cyberpunk : tape, les drones frappent seuls, ramasse le butin.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 22519,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 22519
+    }
+   ]
+  },
+  {
+   "id": "forge-astre",
+   "nom": "Forge-Astre",
+   "groupe": "demos",
+   "genre": "Idle spatial",
+   "desc": "Pilote ton vaisseau, équipe-toi et repousse les vagues.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 80208,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 80208
+    }
+   ]
+  },
+  {
+   "id": "fiefs-braise",
+   "nom": "Fiefs de Braise",
+   "groupe": "demos",
+   "genre": "Stratégie",
+   "desc": "Récolte, construis et développe ton royaume.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 141000,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 141000
+    }
+   ]
+  },
+  {
+   "id": "megapole",
+   "nom": "Mégapole Inc.",
+   "groupe": "demos",
+   "genre": "Tycoon",
+   "desc": "Monte tes affaires, embauche des gérants et joue en bourse.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 120728,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 120728
+    }
+   ]
+  },
+  {
+   "id": "terres-echo",
+   "nom": "Terres d'Écho",
+   "groupe": "demos",
+   "genre": "RPG",
+   "desc": "Explore et combats dans un monde ouvert.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 42583,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 42583
+    }
+   ]
+  },
+  {
+   "id": "fuyards-kara",
+   "nom": "Fuyards de Kara",
+   "groupe": "demos",
+   "genre": "Runner",
+   "desc": "Cours, esquive et équipe-toi : un runner avec du butin à la Diablo.",
+   "version": 1,
+   "orientation": "portrait",
+   "nouveau": false,
+   "taille": 141984,
+   "fichiers": [
+    {
+     "p": "index.html",
+     "t": 141984
+    }
+   ]
+  }
+ ]
+}

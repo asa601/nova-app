@@ -1,0 +1,722 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cendrelame</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Barlow+Condensed:wght@500;600;700&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#09080c;--pan:#16121b;--pan2:#201a27;--line:#3a2f45;--line2:#5c4a69;--txt:#efe8dc;--mut:#9a90a3;--gold:#f4c35a;--ember:#ff7b2e;--blood:#d8343a;--xp:#8a6bff;--c0:#bdb7ac;--c1:#6d8dff;--c2:#f5d547;--c3:#ff8b1f;--c4:#39e27c;--fd:'Cinzel',Georgia,'Times New Roman',serif;--fn:'Barlow Condensed','Arial Narrow',system-ui,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);margin:0;color:var(--txt);font-family:var(--fn)}
+body{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 22px;overflow-x:hidden}
+.wrap{max-width:460px;margin:0 auto}
+.intro h1{font-family:var(--fd);font-weight:800;font-size:26px;margin:0;letter-spacing:.06em;background:linear-gradient(#ffe3a6,#ff8a2a 70%,#b8441a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro p{margin:2px 0 10px;font-size:15px;line-height:1.3;color:var(--mut)}.intro b{color:var(--txt);font-weight:600}
+.game{background:linear-gradient(#1a1520,#0f0c13);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);user-select:none;-webkit-user-select:none}
+.ic{width:1em;height:1em;fill:currentColor;vertical-align:-.14em;flex:none}
+.topbar{display:flex;align-items:center;gap:10px;padding:8px 10px;background:linear-gradient(#251d2c,#17121c);border-bottom:1px solid var(--line)}
+.lvl{position:relative;width:46px;height:46px;flex:none}
+.lvl svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.lvl b{position:absolute;inset:6px;border-radius:50%;background:radial-gradient(#3a2d48,#1a1322);display:grid;place-items:center;font-size:17px;border:1px solid var(--line2)}
+.lvl b.para{color:#9fe4ff;font-size:14px}
+.stg{flex:1;min-width:0}
+.stg small{display:block;font-size:12px;color:var(--mut);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stg div{font-family:var(--fd);font-size:17px;font-weight:600}
+.res{text-align:right;font-size:18px;font-weight:700}
+.res .gold{color:var(--gold)}.res .souls{color:#9fe4ff;font-size:15px}
+.scene{position:relative;aspect-ratio:10/8.6;background:#120f16;overflow:hidden;touch-action:manipulation;cursor:pointer}
+.scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mhud{position:absolute;left:0;right:0;top:0;padding:8px 12px 0;pointer-events:none;text-align:center;background:linear-gradient(rgba(5,3,8,.65),transparent)}
+.mname{font-family:var(--fd);font-size:14px;font-weight:600;text-shadow:0 2px 3px #000;letter-spacing:.04em}
+.mname.boss{color:#ff8a5a;font-size:16px}
+.hpbar{position:relative;height:14px;margin:4px auto 0;max-width:300px;border-radius:7px;background:#1b0d10;border:1px solid #000;box-shadow:0 0 0 1px #5a2a2f,inset 0 2px 4px #000;overflow:hidden}
+.hpbar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+#hpChip{background:#fff7;transition:width .45s ease .1s}
+#hpFill{background:linear-gradient(#ff5a50,#b3121c 60%,#7a0a12)}
+.hpbar span{position:relative;font-size:11px;font-weight:700;line-height:14px;text-shadow:0 1px 2px #000}
+.prog{display:flex;justify-content:center;gap:4px;margin-top:5px;height:12px;align-items:center}
+.prog i{width:16px;height:5px;border-radius:3px;background:#ffffff22;box-shadow:inset 0 1px 1px #000}
+.prog i.on{background:var(--gold);box-shadow:0 0 6px #f4c35a88}
+.prog .ic{color:#ff6a4a;font-size:13px}
+.btimer{max-width:220px;margin:5px auto 0;height:6px;background:#0008;border-radius:3px;overflow:hidden;display:none}
+.btimer i{display:block;height:100%;background:linear-gradient(90deg,#ff3b2f,#ffb13b)}
+.btimer.on{display:block}
+.rtxt{font-size:13px;color:#ff9ad2;font-weight:700;margin-top:3px;text-shadow:0 1px 2px #000}
+.fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.num{position:absolute;font-weight:700;font-size:20px;color:#fff;text-shadow:0 2px 0 #000,0 0 6px #000;animation:numUp .9s ease-out forwards;white-space:nowrap;transform:translate(-50%,-50%)}
+.num.crit{font-size:30px;color:#ffd23a;text-shadow:0 0 10px #ff5a00,0 2px 0 #5a1b00}
+.num.merc{font-size:15px;color:#d5dcff}
+.num.shadow{font-size:18px;color:#c79bff;text-shadow:0 0 8px #6a1fff,0 2px 0 #000}
+.num.big{font-size:32px;color:#ff7a3a;text-shadow:0 0 12px #ff2a00,0 2px 0 #300}
+.num.elec{font-size:20px;color:#9feaff;text-shadow:0 0 10px #2a9fff,0 2px 0 #000}
+.num.gold{font-size:17px;color:var(--gold)}
+.num.lvl{font-family:var(--fd);font-size:22px;color:#cbb8ff;text-shadow:0 0 12px #6a3cff,0 2px 0 #000;animation-duration:1.6s}
+.num.loot{font-size:16px;animation-duration:1.8s}
+@keyframes numUp{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}14%{transform:translate(-50%,-62%) scale(1.25);opacity:1}30%{transform:translate(-50%,-72%) scale(1)}100%{transform:translate(calc(-50% + var(--dx,0px)),-280%) scale(.85);opacity:0}}
+.legbar{position:absolute;left:8px;bottom:8px;display:flex;gap:5px;pointer-events:none}
+.leg{position:relative;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:20px;color:#ffb35a;background:radial-gradient(#3a2412,#150d08);border:1px solid #ff8b1f88;box-shadow:0 0 8px #ff8b1f44}
+.leg.set{color:#5ef59a;border-color:#39e27c88;background:radial-gradient(#123a22,#08150d)}
+.leg.hot{box-shadow:0 0 14px #ffb35a;animation:pulse .5s infinite alternate}
+.leg small{position:absolute;right:-3px;bottom:-4px;font-size:10px;font-weight:700;background:#000c;border-radius:4px;padding:0 3px;color:#fff}
+@keyframes pulse{to{transform:scale(1.1)}}
+.bossbtn{position:absolute;right:10px;bottom:10px;font:700 14px var(--fn);color:#fff;border:1px solid #ff6a4a;border-radius:10px;padding:7px 12px;background:linear-gradient(#b8301f,#6a140c);box-shadow:0 0 14px #ff3a2a88;letter-spacing:.04em;cursor:pointer}
+.banner{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;min-width:250px;max-width:92%;text-align:center;padding:10px 16px 11px;border-radius:12px;background:linear-gradient(#2a1d33f0,#140e19f0);border:1px solid var(--bc,#f4c35a);box-shadow:0 0 30px var(--bg2,#f4c35a55),inset 0 0 20px #0008;transition:all .3s cubic-bezier(.3,1.6,.5,1)}
+.banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.banner .ic{font-size:30px;color:var(--bc,#f4c35a);display:block;margin:0 auto 2px}
+.banner small{display:block;font-size:11px;letter-spacing:.2em;color:var(--bc,#f4c35a);font-weight:700}
+.banner b{display:block;font-family:var(--fd);font-size:17px}
+.banner p{margin:3px 0 0;font-size:13px;color:#d8cfe0;line-height:1.25}
+.taphint{position:absolute;left:50%;bottom:16%;transform:translateX(-50%);font-family:var(--fd);font-size:14px;color:#fff;text-shadow:0 0 8px #ff7b2e,0 2px 2px #000;animation:pulse .7s infinite alternate;pointer-events:none}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .9s}
+.stats{display:flex;justify-content:space-between;padding:6px 12px;font-size:14px;color:var(--mut);background:#100c14;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stats b{color:var(--txt);font-size:15px}
+.tabs{display:flex;background:#130f17}
+.tab{flex:1;position:relative;border:0;background:none;color:var(--mut);font:600 12px var(--fn);padding:7px 0 6px;border-bottom:2px solid transparent;cursor:pointer;letter-spacing:.03em}
+.tab .ic{display:block;margin:0 auto 1px;font-size:22px}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);background:linear-gradient(transparent,#f4c35a14)}
+.tab.lock{opacity:.4}
+.tab .dot{position:absolute;top:5px;right:22%;width:8px;height:8px;border-radius:50%;background:#ff4a3a;box-shadow:0 0 6px #ff4a3a}
+.panel{height:330px;overflow-y:auto;padding:8px 8px 12px;background:linear-gradient(#18131d,#0f0c12);overscroll-behavior:contain}
+.phead{display:flex;align-items:center;justify-content:space-between;margin:2px 4px 8px;font-family:var(--fd);font-size:14px;color:#d9c9a8}
+.mult button{font:700 12px var(--fn);color:var(--mut);background:#211a28;border:1px solid var(--line);padding:3px 8px;border-radius:6px;margin-left:3px;cursor:pointer}
+.mult button.on{color:#1a1206;background:var(--gold);border-color:var(--gold)}
+.row,.item{display:flex;align-items:center;gap:9px;padding:7px;margin-bottom:6px;border-radius:11px;background:linear-gradient(#231c2b,#1a1520);border:1px solid var(--line);box-shadow:inset 0 1px 0 #ffffff0a}
+.row.locked{opacity:.45}
+.fr{position:relative;width:46px;height:46px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:30px;color:var(--c,#ddd);background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--c,#888) 30%,#1a1420),#0e0b12 75%);border:1px solid color-mix(in srgb,var(--c,#888) 60%,#000);box-shadow:inset 0 0 10px #000,0 0 6px color-mix(in srgb,var(--c,#888) 25%,transparent)}
+.fr .il{position:absolute;right:2px;bottom:1px;font-size:10px;font-style:normal;font-weight:700;color:#fff;text-shadow:0 1px 1px #000}
+.info{flex:1;min-width:0;line-height:1.15}
+.info b{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info small{display:block;font-size:13px;color:var(--mut)}
+.info small em{font-style:normal;color:#e9dfc8}
+.buy,.btn{flex:none;min-width:84px;border:1px solid #c98a2a;border-radius:10px;padding:5px 8px;background:linear-gradient(#f2b54a,#c06a14);color:#1d1004;font:700 14px var(--fn);cursor:pointer;box-shadow:0 2px 0 #6a3a08,inset 0 1px 0 #ffe2a0;line-height:1.1}
+.buy small{display:block;font-size:11px;opacity:.8}
+.buy:disabled,.btn:disabled{filter:grayscale(1) brightness(.55);cursor:default}
+.btn.ghost{background:#2a2231;color:var(--txt);border-color:var(--line2);box-shadow:none;min-width:0}
+.btn.blue{background:linear-gradient(#8a6bff,#4a2ec0);color:#fff;border-color:#a28aff;box-shadow:0 2px 0 #2a1a70}
+.btn.big{width:100%;padding:10px;font-size:16px}
+.co{color:#7a4a08}
+.slots{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:8px}
+.slot .fr{width:100%;height:auto;aspect-ratio:1;font-size:26px}
+.slot .fr.empty{color:#4a4052;--c:#3a3040}
+.r0{--c:var(--c0)}.r1{--c:var(--c1)}.r2{--c:var(--c2)}.r3{--c:var(--c3)}.r4{--c:var(--c4)}
+.item{align-items:flex-start;border-color:color-mix(in srgb,var(--c) 40%,var(--line))}
+.item .info b{color:var(--c);white-space:normal}
+.st{font-size:13px;color:#cfc6d6}
+.eff{margin:3px 0 0;font-size:13px;color:#ffb35a;line-height:1.2}.eff.set{color:#5ef59a}
+.acts{display:flex;flex-direction:column;gap:4px;align-items:stretch}
+.acts .btn{min-width:72px;font-size:13px;padding:4px 6px}
+.up{color:#5ef59a;font-weight:700;font-size:13px;text-align:center}.dn{color:#ff6a5a;font-weight:700;font-size:13px;text-align:center}
+.box{padding:10px;border-radius:12px;background:linear-gradient(#251d2c,#18131d);border:1px solid var(--line);margin-bottom:8px}
+.box h3{margin:0 0 4px;font-family:var(--fd);font-size:15px;color:#ffcf8a;display:flex;align-items:center;gap:6px}
+.box p{margin:0 0 8px;font-size:14px;color:var(--mut);line-height:1.25}
+.bar{height:8px;border-radius:4px;background:#0009;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#c06a14,#f4c35a)}
+.lockmsg{text-align:center;padding:50px 20px;color:var(--mut);font-size:15px}
+.lockmsg .ic{font-size:44px;display:block;margin:0 auto 8px;color:#5a4a66}
+.credit{font-size:11px;color:#6a6072;text-align:center;margin-top:8px}
+.full{font-size:14px;color:var(--mut);line-height:1.35;margin-top:10px}.full b{color:var(--txt)}
+</style>
+<div class="wrap">
+<div class="intro"><h1>CENDRELAME</h1><p><b>Inspiré de : Tap Titans 2 + Diablo 3.</b> Un idle RPG dark fantasy où chaque légendaire réécrit ta façon de jouer : clone d'ombre, pluie de météores, chaînes d'éclairs… et une montée sans fin, des niveaux au Parangon.</p></div>
+<div class="game" id="game">
+ <div class="topbar">
+  <div class="lvl"><svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="21" fill="none" stroke="#2a2133" stroke-width="4"/><circle id="xpRing" cx="23" cy="23" r="21" fill="none" stroke="var(--xp)" stroke-width="4" stroke-linecap="round" stroke-dasharray="132" stroke-dashoffset="132"/></svg><b id="lvlNum">1</b></div>
+  <div class="stg"><small id="zoneName">Forêt maudite</small><div id="stageName">Étape 1</div></div>
+  <div class="res"><div class="gold" id="goldBox"></div><div class="souls" id="soulsBox" hidden></div></div>
+ </div>
+ <div class="scene" id="scene">
+  <canvas id="cv"></canvas>
+  <div class="mhud"><div class="mname" id="mName">&nbsp;</div><div class="hpbar"><i id="hpChip"></i><i id="hpFill"></i><span id="hpTxt"></span></div><div class="prog" id="prog"></div><div class="btimer" id="bTimer"><i id="bTimerI"></i></div><div class="rtxt" id="rTxt"></div></div>
+  <div class="fx" id="fx"></div>
+  <div class="legbar" id="legBar"></div>
+  <button class="bossbtn" id="bossBtn" hidden>Défier le boss</button>
+  <div class="taphint" id="tapHint">Touche pour frapper</div>
+  <div class="banner" id="banner"></div>
+  <div class="flash" id="flash"></div>
+ </div>
+ <div class="stats"><span>Frappe <b id="tapTxt">1</b></span><span>Critique <b id="critTxt">5%</b></span><span>Alliés <b id="dpsTxt">0</b>/s</span></div>
+ <nav class="tabs" id="tabs"></nav>
+ <div class="panel" id="panel"></div>
+</div>
+<p class="full"><b>Dans la version complète :</b> 6 classes de héros jouables, plus de 80 légendaires et 12 sets aux synergies cumulables, des Failles supérieures à 150 paliers avec classement, le craft et les gemmes, des événements saisonniers et un mode coop à 4 contre les boss mondiaux.</p>
+<p class="credit">Icônes : game-icons.net (CC BY 3.0)</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+const ICONS={"broadsword":"<path fill=\"currentColor\" d=\"m491.844 22.533l-83.42 14.865L196.572 249.25c3.262 4.815 5.37 10.72 5.37 16.932c0 5.863-1.71 11.35-4.643 15.996a53 53 0 0 0-16.027-2.477c-15.724 0-29.904 6.89-39.69 17.796l-9.112-9.113l17.237-17.237a546 546 0 0 1-13.19-17.6l-19.443 19.44l-13.215-13.215l21.828-21.827a548 548 0 0 1-12.792-20.068L72.093 258.68l58.314 58.314a53 53 0 0 0-2.49 16.063a52.9 52.9 0 0 0 4.592 21.564l-72.14 72.14l-14.56-14.56L21.013 437l14.558 14.56l-8.607 8.608l27.246 27.246l8.606-8.61l14.56 14.56l24.798-24.8l-14.557-14.556l72.158-72.16a52.9 52.9 0 0 0 21.498 4.562a53 53 0 0 0 16.063-2.49l58.363 58.363L296.5 401.48a549 549 0 0 1-20.068-12.793l-21.83 21.83L241.39 397.3l19.442-19.44a550 550 0 0 1-17.603-13.194l-17.238 17.238l-9.16-9.16c10.905-9.785 17.795-23.965 17.795-39.69c0-5.346-.806-10.51-2.285-15.39c4.703-3.04 10.288-4.817 16.265-4.816c6.21 0 11.776 1.77 16.52 4.955L476.98 105.95zm-66.227 53.012l13.215 13.215l-191.684 191.68l-13.214-13.213zM181.273 298.39c19.257 0 34.665 15.41 34.665 34.665c0 19.256-15.408 34.666-34.665 34.666s-34.666-15.41-34.666-34.665s15.41-34.666 34.666-34.666\"/>","crossed-swords":"<path fill=\"currentColor\" d=\"M19.75 14.438c59.538 112.29 142.51 202.35 232.28 292.718l3.626 3.75l.063-.062c21.827 21.93 44.04 43.923 66.405 66.25c-18.856 14.813-38.974 28.2-59.938 40.312l28.532 28.53l68.717-68.717c42.337 27.636 76.286 63.646 104.094 105.81l28.064-28.06c-42.47-27.493-79.74-60.206-106.03-103.876l68.936-68.938l-28.53-28.53c-11.115 21.853-24.413 42.015-39.47 60.593c-43.852-43.8-86.462-85.842-130.125-125.47c-.224-.203-.432-.422-.656-.625C183.624 122.75 108.515 63.91 19.75 14.437zm471.875 0c-83.038 46.28-154.122 100.78-221.97 161.156l22.814 21.562l56.81-56.812l13.22 13.187l-56.438 56.44l24.594 23.186c61.802-66.92 117.6-136.92 160.97-218.72zm-329.53 125.906l200.56 200.53a403 403 0 0 1-13.405 13.032L148.875 153.53zm-76.69 113.28l-28.5 28.532l68.907 68.906c-26.29 43.673-63.53 76.414-106 103.907l28.063 28.06c27.807-42.164 61.758-78.174 104.094-105.81l68.718 68.717l28.53-28.53c-20.962-12.113-41.08-25.5-59.937-40.313c17.865-17.83 35.61-35.433 53.157-52.97l-24.843-25.655l-55.47 55.467c-4.565-4.238-9.014-8.62-13.374-13.062l55.844-55.844l-24.53-25.374c-18.28 17.856-36.602 36.06-55.158 54.594c-15.068-18.587-28.38-38.758-39.5-60.625z\"/>","shadow-follower":"<path fill=\"currentColor\" d=\"M128.912 21.563c-.507.012-1.01.043-1.504.11C97.753 25.525 74.6 57.76 74.6 96.662c0 21.547 7.39 40.787 18.767 54.5c-61.678 11.593-66.342 115.44-66.342 188.347h42.772l11.348 152.158h108.68L199.86 339.51h40.593c0-73.108 1.47-178.783-65.904-189.22c10.89-13.647 17.893-32.613 17.893-53.628c0-41.496-26.445-74.99-58.923-74.99c-1.523 0-3.087-.146-4.608-.11zm239.828 0c-.507.012-1.01.043-1.504.11c-29.655 3.853-52.808 36.087-52.808 74.99c0 21.547 7.39 40.787 18.767 54.5c-61.678 11.593-66.34 115.44-66.34 188.347h30.323l-10.17-11.422c-.31-51.837 1.858-95.18 24.008-135.484l-1.543 146.906h.152l11.348 152.158h86.013l-66.03-12.006c-11.876-104.37-18.402-205.544-4.09-308.36c0 0 9.455-6.07 24.03-13.396c-14.157-12.08-23.552-33.24-23.552-57.345c0-37.564 22.797-68.013 50.918-68.013c8.887 0 17.24 3.046 24.51 8.392c-10.45-11.98-24.28-19.268-39.424-19.268c-1.523 0-3.087-.146-4.608-.11zm69.192 171.308l1.685 147.214l22.324-.262c.31-51.836-1.86-106.647-24.008-146.95zm1.685 147.214h-.002l.002.006z\"/>","meteor-impact":"<path fill=\"currentColor\" d=\"M63.813 18.156L166.72 231.75l.436-.22c19.154 38.026 58.547 64.19 103.938 64.19c64.132 0 116.344-52.204 116.344-116.345c0-13.892-2.45-27.23-6.938-39.594l.25-.093l-1.875-4.125a115 115 0 0 0-3.97-8.656q-.107-.218-.217-.437L325.156 18.155h-20.53l28.812 63.032a115.8 115.8 0 0 0-31.25-13.907l-22.47-49.124h-20.5l20.657 45.22c-2.9-.22-5.828-.345-8.78-.345c-6.296 0-12.474.502-18.5 1.47l-21.22-46.344h-20.53l23.28 50.907a116 116 0 0 0-21.22 9.624l-27.686-60.53h-20.532L197.313 89.5a117.4 117.4 0 0 0-19.782 20.813l-42.155-92.157h-20.5l51.03 111.656c-5.242 11.087-8.81 23.124-10.31 35.782L84.562 18.156h-20.75zm428.937 228.75l-65.406 3.22l17.687 19.186l47.72 36.594zM20.53 266.28v68.5l72.376-35.842l39.5-26.344zm387 6.47l33.97 64l51.22 61.75l.03-69.063l-57.5-44.093zm-39.5 25.656l29.595 103.5l.125-.062l41.875 92.72l53.094-.002v-66.75l-62.25-75.062zm-232.467 2.938l-19.25 6.844l-95.782 47.468v98.125l84.345-103.655l.03.03l30.657-48.81zm177.218 3.53l-.28 112.376l10.156 77.313h96.47l-38.407-85.032l.092-.03l-68.03-104.625zm-54.342 8.876L224.5 416.594l-10.25 77.97l89.53-.002l-11.03-84.062l-34.313-96.75zm-94.657 1.625L93.47 393.75l-71.064 87.313l-1.875-1.532v15.033h81.94l40.5-104.063l20.81-75.125zm36.126 4.875l-35.062 65.563l-.063.156l-42.25 108.592h72.845l10.03-76.187l-5.5-98.125z\"/>","chain-lightning":"<path fill=\"currentColor\" d=\"M362.906 29.53c-11.523 11.09-23.063 23.04-34.5 34.5l-.594-11.374l-.5-8.593l-4.03 4.5l-34.063 37.78a36 36 0 0 1 4.186 4.5l28.625-31.75l.595 11.344v.032l.5 8.56l4.03-4.5l35.75-45zm-102.5 7.345c-.202.007-.543.063-1.47.063c-9.874 0-18.81 10.648-18.81 24.906c0 7.198 2.404 13.675 6 18.187l3.843 4.782l-6.095.938c-11.23 1.74-17.873 10.124-21.47 22.78c-3.375 11.884-3.442 27.175-1 42.032h15.657l.218 3.344l3.595 54.5H275.5l4.063-54.53l.25-3.314h16.5c2.712-15.118 2.154-30.222-1.594-41.906c-3.986-12.42-11.072-20.653-21.22-22.562l-5.938-1.125l3.875-4.657c3.758-4.533 6.282-11.065 6.282-18.438c0-13.375-7.965-23.773-16.94-24.938l-.374-.062zm-123 21.438l42.78 38.437l4.72 3.75l-.937-8.53l.03-.032l-1.313-11.282l32.813 25.97c.006-.023.025-.042.03-.064a56 56 0 0 1 2.095-6.03l-37.938-30.063l-4.75-3.75l.938 8.53v.03l1.344 11.314c-13.194-9.388-26.6-19.27-39.814-28.28zm167.188 62.968c.752 6.547.817 13.456.187 20.5l59.19 49.876l-28.845 2.47v.03l-21.72 2l11.72 9.906l9.156 7.72l-9.78 51.843l-1.125 5.938l7.125-4.813v.03l9.406-6.436c-2.196 16.04-4.71 32.486-6.562 48.375L347.53 253l1.126-5.938l-7.125 4.782h-.03l-9.375 6.406l7.563-39.938l62.5 52.657c1.763-5.292 4.22-10.092 7.437-14.095l-57.656-48.563l28.874-2.437v-.03l21.75-2l-11.75-9.876l-43.72-36.845l38.313-7.906l-6.25 9.5v.03l-4.656 7.188l5.908-1.22l55.437-15.124c-15.856 2.117-32.22 4.91-48.22 7.375l6.25-9.5v-.032l4.69-7.188l-5.908 1.22l-51.5 10.655l-36.593-30.844zm-131.78.657l-12.97 56l-1 5.938l7.03-4.938l9.25-6.593l-5.843 35.125l-35.905 73.03c4.675 2.935 8.446 7.525 10.906 13.094l30.19-61.406l9.343 27.406l.03.03L191 280.22l6.78-13.783l3.876-7.875l42.125-19.343l-3.936 10.686l-2.938 8.063l5.5-2.533l50.625-27.187c-14.973 5.627-30.302 12.03-45.342 18.03l3.968-10.655v-.03l2.938-8.064l-5.5 2.532l-43.156 19.813l26.937-54.78L230.812 164l-37.28 75.844l-9.345-27.406l-.03-.032l-6.407-18.5l4.844-29.125l1-5.936l-7.03 4.937l-9.25 6.626c1.84-16.085 3.996-32.543 5.5-48.47M-7.064 164.47l-12.188 9.655l19.844 25.03l.062-24.968zm503.718 3.655c-3.743 7.56-7.457 15.157-11.187 22.625l-4.158-10.625l-3.187-7.97l-2.406 5.532l-12.47 28.532a32 32 0 0 1 3.906 6.31l10.688-24.468l4.16 10.595v.03l3.188 7.94l2.406-5.5l9.03-24.782l.032-8.22zm-481.03 25l-.032 24.97L57.53 271l-28.75-3.313l-.03.032l-13.25-1.44l-.03 9.69l1.124 1.405l61.312 77.375c.087-.323.16-.65.25-.97c1.575-5.542 3.888-10.66 6.97-14.967l-42.69-53.875l28.752 3.343h.03l21.72 2.376l-9.532-12.03l-48.687-61.407l38.343 13.874l5.656 2.03l-3.595-7.78h.03L70.31 215.03c15.484 4.726 31.297 9.83 46.688 14.19l-52.75-22.907l-5.656-2.032l3.593 7.782h-.03L67 222.375l-39.5-14.28zm430.655 10.688c-.198.007-.57.062-1.5.062c-9.875 0-18.78 10.68-18.78 24.938c0 7.197 2.405 13.643 6 18.156l3.813 4.78l-6.063.938c-11.23 1.74-17.904 10.124-21.5 22.78c-3.376 11.885-3.414 27.204-.97 42.063h15.658l.218 3.314l3.594 54.5h34.625l4.063-54.53l.218-3.283h16.499c2.72-15.128 2.19-30.244-1.562-41.936c-3.985-12.42-11.07-20.654-21.22-22.563l-5.937-1.124l3.844-4.656c3.758-4.532 6.314-11.064 6.314-18.438c0-13.375-7.964-23.773-16.938-24.937l-.375-.063zm-323.25 80.28c-.198.008-.57.063-1.5.063c-9.875 0-18.78 10.65-18.78 24.906c0 7.198 2.405 13.675 6 18.188l3.813 4.78l-6.063.94c-11.23 1.74-17.904 10.123-21.5 22.78c-3.378 11.89-3.418 27.196-.97 42.063H99.69l.218 3.312l3.594 54.5h34.625l4.063-54.53l.218-3.283h16.499c2.72-15.13 2.19-30.245-1.562-41.937c-3.985-12.42-11.07-20.653-21.22-22.563l-5.936-1.125l3.843-4.656c3.758-4.53 6.314-11.063 6.314-18.436c0-13.375-7.964-23.773-16.938-24.938l-.375-.062zm275.94 25.688l-30.908 23.845l1.438-11.28l1.03-8.5l-4.78 3.655l-43.22 37.906c13.325-8.852 26.82-18.553 40.126-27.78l-1.47 11.312h.033l-1.064 8.53l4.78-3.687l34.908-26.936c-.356-2.35-.643-4.706-.875-7.063zM167.81 382.03c-.058 2.353-.22 4.737-.437 7.126l37.03 25.313l4.97 3.405l-1.53-8.438l-2.095-11.187c13.81 8.453 27.848 17.358 41.656 25.438l-45.344-35.375l-4.968-3.407l1.53 8.438l2.095 11.187zm293.594.44l6.688 36.686l1.062 5.938l4.938-7.03l6.47-9.377c3.712 15.76 7.27 32.007 11.248 47.5l-6.78-57.093l-1.063-5.938l-4.94 7l-6.467 9.375l-4.938-27.06zM80.312 404.936l-18.5 36.938l-3.593-10.813h-.032l-2.75-8.125l-2.688 5.407l-22.53 52.875c8.167-13.754 16.134-28.352 24.124-42.44l3.562 10.814l.032.03l2.75 8.126l2.687-5.406l23.78-47.406z\"/>","magic-portal":"<path fill=\"currentColor\" d=\"m88.418 17.17l-66.12 475.242h18.866l66.12-475.242H88.42zm315.7 0l66.023 475.242h18.87L422.988 17.17zm-56.26.24l-132.422.37c-59.343 41.506-78.325 97.982-61.596 168.03c-22.324-31.34-32.747-63.248-33.59-98.234l-26.684 191.78c1.05-3.64 2.25-7.31 3.653-11.012l-3.843 12.385l-4.934 35.454c.41 37.954 18.614 69.416 40.91 87.406c-18.52-6.774-35.355-15.287-49.25-27.445l-9.207 66.152c43.032 20.635 88.614 24.346 120.56 17.78c-33.542 18.813-71.344 29.428-125.382 16.886l-2.13 15.3h217.568c73.664-14.515 117.318-55.617 129.045-89.216c3.54 30.568-2.754 60.093-37.473 89.215h73.242l-41.553-299.11c-15.226-35.307-51.106-59.122-74.695-59.718c10.876-3.615 21.615-5.918 32.305-5.78c11.61.15 23.16 3.2 34.76 10.56l-4.207-30.278c-21.365-18.958-46.472-31.023-68.92-35.954c6.54-.477 13.043-.73 19.513-.685c15.23.104 30.273 1.868 45.18 6.21l-4.224-30.398C331.8 45.105 287.813 60.384 263.44 79.407c13.68-23.55 44.533-47.68 84.417-61.998zm-81.323 33.065c-68.785 37.085-71.87 82.26-36.1 122.146c-7.626-69.52 80.94-110.016 118.96-59.032c-40.867-20.17-77.79 7.84-76.21 47.723c23.234-23.997 98.678-13.267 79.795 36.19c-11.3-33.297-56.74-30.094-63.648-13.77c-14.75 34.866 64.34 14.582 98.117 66.284c-18.85-10.875-47.74.482-39.22 14.59c32.28 53.45 84.53 113.185 13.3 147.025c23.57-38.677 10.786-65.734-21.85-81.43c25.644 66.744-5.1 163.717-103.81 133.19c62.83-11.442 78.355-62.576 57.263-83.425c-23.617 60.37-122.14 97.174-181.444 38.453c58.693 22.535 99.285 7.31 120.644-26.39c-35.89 21.435-95.375 6.933-113.994-42.977c28.694 29.187 67.102 37.963 91.195 20.356c13.217-9.658 8.303-25.06-8.55-29.402c-24.53-6.32-61.988-12.852-76.563-36.588c21.722 6.003 43.444 10.698 65.166-3.375c-33.985-22.07-81.546-50.75-50.348-100.278c1.008 35.15 17.23 56.557 53.197 48.254c9.285-2.142 16.8-15.472 8.55-23.373c-61.138-58.54-47.58-160.406 65.548-174.168z\"/>","wanted-reward":"<path fill=\"currentColor\" d=\"M75.1 27.19L74 163.1l10.7 9.9l-10.9 11.2l-.3 32.9l23.7 20.4L73.3 249l-2 235.8l27.9-.2l13-28.5s23.6 21.4 24 19.9c.3-1.5 82-9.4 82-9.4l9 17l213.5-1.9l-.1-106.3l-22.9-18.7l22.8-10.3l-.3-282.93l-34.3-35.34l-276.5-.77l-9.7 26.4l-11-26.46zm194.3 8.7a16.18 9.811 64.69 0 1 13.2 11.03a16.18 9.811 64.69 0 1-2 18.81a16.18 9.811 64.69 0 1-10.5-3.09l-22.8 8.58l-5.1-5.51l20.7-16.41a16.18 9.811 64.69 0 1 3.9-12.82a16.18 9.811 64.69 0 1 2.6-.59M101.7 93.51h12l8.4 39.69l8.3-39.69h12.1l8.4 39.69l8.4-39.69h11.9l-11.5 54.59h-14.4l-8.9-41.5l-8.7 41.5h-14.4zm86.9 0h15l18 54.59H209l-3.1-9.9h-19.6l-3.1 9.9h-12.6zm39.4 0h14l17.6 37.39V93.51h11.9v54.59h-14l-17.7-37.5v37.5H228zm50 0h44.8v10.59h-16.1v44h-12.5v-44H278zm51.3 0h33.8v10.59h-21.3v10.2h20v10.6h-20v12.6h22v10.6h-34.5zm45.5 0H388c7.4 0 12.9.59 16.5 1.79q5.4 1.755 9.3 6c2.3 2.4 4 5.3 5.1 8.5s1.7 6.9 1.7 10.9c0 4.2-.6 7.8-1.7 11.1c-1.1 3.2-2.8 6-5.1 8.5c-2.6 2.8-5.7 4.8-9.4 6c-3.6 1.2-9.1 1.8-16.4 1.8h-13.2zm12.6 10.59v33.4h4.4c5.2 0 9.1-1.5 11.8-4.3c2.7-2.9 4-7 4-12.5c0-5.4-1.3-9.5-4-12.3s-6.6-4.3-11.8-4.3zm-191.3 2.2l-6.7 21.7h13.3zm184.2 60.4l-.5 205.7l-251.6-.5l3.4-194.7l.2-8.7zm-18 18.2l-212.9 1.4l-2.8 167.6l41 .1c4.5-15.5 11.5-31.7 43.8-36.9a34.89 48.56 0 0 1-11.6-36.2a34.89 48.56 0 0 1 .5-7.3l-49.7.4l-.2-18l47.6-.4c5-13.6 4.8-28.8 4.9-44.5c25.5 6.5 41 6.1 60.4 0c-.2 14.8.5 28.7 6.4 43.8l46.9-.4l.2 18l-47.7.4a34.89 48.56 0 0 1 .5 8a34.89 48.56 0 0 1-12 36.6c25.9 5.4 40.5 20.5 44.8 36.8l39.4.1zM152.9 392.7l206.3.8v18l-206.3-.8zm112.7 39.8l93.7.8l-.2 18l-93.7-.8z\"/>","two-coins":"<path fill=\"currentColor\" d=\"M264.4 95.01c-35.6-.06-80.2 11.19-124.2 34.09C96.27 152 61.45 182 41.01 211.3c-20.45 29.2-25.98 56.4-15.92 75.8c10.07 19.3 35.53 30.4 71.22 30.4c35.69.1 80.29-11.2 124.19-34c44-22.9 78.8-53 99.2-82.2c20.5-29.2 25.9-56.4 15.9-75.8c-10.1-19.3-35.5-30.49-71.2-30.49m91.9 70.29c-3.5 15.3-11.1 31-21.8 46.3c-22.6 32.3-59.5 63.8-105.7 87.8c-46.2 24.1-93.1 36.2-132.5 36.2c-18.6 0-35.84-2.8-50.37-8.7l10.59 20.4c10.08 19.4 35.47 30.5 71.18 30.5c35.7 0 80.3-11.2 124.2-34.1c44-22.8 78.8-52.9 99.2-82.2c20.4-29.2 26-56.4 15.9-75.7zm28.8 16.8c11.2 26.7 2.2 59.2-19.2 89.7c-18.9 27.1-47.8 53.4-83.6 75.4c11.1 1.2 22.7 1.8 34.5 1.8c49.5 0 94.3-10.6 125.9-27.1c31.7-16.5 49.1-38.1 49.1-59.9s-17.4-43.4-49.1-59.9c-16.1-8.4-35.7-15.3-57.6-20m106.7 124.8c-10.2 11.9-24.2 22.4-40.7 31c-35 18.2-82.2 29.1-134.3 29.1c-21.2 0-41.6-1.8-60.7-5.2c-23.2 11.7-46.5 20.4-68.9 26.1c1.2.7 2.4 1.3 3.7 2c31.6 16.5 76.4 27.1 125.9 27.1s94.3-10.6 125.9-27.1c31.7-16.5 49.1-38.1 49.1-59.9z\"/>","bow-arrow":"<path fill=\"currentColor\" d=\"M331.734 20.443a4.4 4.4 0 0 0-1.802.327c-27.736 11.543-47.295 57.495-29.899 76.671c33.52 38.946 72.835 55.573 90.147 128.434c2.607 20.15 1.218 40.094 0 60.25c-17.312 72.861-56.627 89.488-90.147 128.434c-17.396 19.176 2.163 65.128 29.899 76.671c9.038 3.762 28.025-26.165 21.752-25.209c-16.34 2.491-37.8-20.941-28.387-28.93c38.47-32.65 105.49-100.055 100.277-135.552c-2.211-15.057-9.35-30.36-15.574-45.539c6.225-15.18 13.363-30.482 15.574-45.54c5.214-35.496-61.806-102.901-100.277-135.552c-9.412-7.988 12.047-31.42 28.387-28.93c5.881.897-10.44-25.35-19.95-25.535M152 24.23l-21.441 53.602L152 99.273l21.441-21.441zm-9 91.497v296.546l9-9l9 9V115.727l-2.637 2.636l-6.363 6.364zm160 9.847v260.824l18-17.53V143.104zM152 428.727l-23 23v38.546l23-23l23 23v-38.546z\"/>","fire-ray":"<path fill=\"currentColor\" d=\"M12.195 20.94v39.128c76.452 73.026 151.387 152.574 187.47 215.5c12.6 21.978 38.114 72.972 49.056 118.557c-31.424-3.388-64.762-14.633-96.36-33.873c11.605 19.025 25.57 37.838 42.632 54.898c83.895 83.897 200.548 103.142 260.473 43.217c59.927-59.927 40.678-176.574-43.22-260.47c-17.062-17.063-35.872-31.028-54.895-42.633c21.316 35.01 33.27 71.947 35.04 106.29c-47.3-13.436-103.76-38.565-127.316-51.976C201.59 173.434 121.32 98.073 47.818 20.938H12.195zM374.89 285.866c47.63 0 86.557 36.296 90.727 82.817c-12.225-22.7-36.207-38.133-63.797-38.133c-39.995 0-72.42 32.423-72.42 72.42c0 5.462.61 10.78 1.758 15.897c2.835-21.18 21.098-37.674 43.018-37.674c23.866 0 43.414 19.55 43.414 43.414c0 23.866-19.548 43.413-43.414 43.413c-1.59 0-3.157-.093-4.703-.262c.114.057.225.12.34.176c-48.052-2.623-86.028-42.24-86.028-90.96c0-50.428 40.677-91.107 91.104-91.107z\"/>","hooded-assassin":"<path fill=\"currentColor\" d=\"M332.031 66.13c-28.807-.01-55.439 14.149-67.88 40.65c20.79 1.744 16 55.07 16 55.07c-11.814 16.687-24.73 33.186-36.589 50.146c0 0-99.046 132.283-178.378 168.025c-28.049 22.593-33.305 36.532-44.137 52.649c-4.877 9.54 9.257 14.324 11.701 13.2c22.726-10.461 25.176-20.866 47.07-35.675c12.805-5.026 23.839-15.9 31.854-11.049c34.962 20.86 107.556 44.28 118.271 38.706c17.857-9.263-5.78-43.585 16.174-89.057c31.97-3.352 58.916-.885 88.332-12.094c3.483 50.279 10.106 54.59 6.766 107.092l71.2 1.045l.698-14.61l-41.814-11.105c11.528-56.054 11.816-78.996 4.672-127.996c-.956-6.622-53.746-8.275-81.012-3.79c24.449-24.202 40.274-45.24 47.506-68.44l.027.189c7.637 15.923 30.083 33.958 35.336 37.125c27.704 11.048 38.214 7.982 62.955 3.887c4.907-.784 27.47 24.537 44.807 9.597c2.642-20.238 16.522-20.369-4.938-32.71c-4.847-2.73-27.063 7.462-31.418 6.898c-20.21-2.481-30.954-5.211-58.45-12.703c-10.23-13.187-32.676-56.136-55.43-59.744c6.535-14.15 28.226-53.108 73.664-66.237c-20.943-26.54-49.925-39.057-76.987-39.068zm82.405 46.722c-46.658 19.516-58.266 50.4-58.266 50.4l9.916 7.644s9.646-4.765 48.35-58.044m23.04 160.005l-4.658 11.418c5.233-.083 10.425.47 15.328 1.608c-12.774 30.856-23.938 59.635-28.181 93.094l-.908 7.558l4.863-5.889c20.805-25.671 32.303-55.25 44.95-85.78c4.203 2.656 8.24 5.885 12.071 9.35l4.78-11.374l-20.518-8.526l-31.767 66.579l24.062-69.713z\"/>","lightning-arc":"<path fill=\"currentColor\" d=\"m192.063 20.375l-44.625 98.563l-36.344-13.657l40.312 47.22l29.47-50.656l17.093 159.437l88.874-159.936l7.906 138.22l74.72-140.408l32.905 9.094l-32.594-57.28l-58.75 91.343L300.657 27.28L216.75 153.657l-24.688-133.28zM61.25 100.813c-22.213 0-40.03 17.785-40.03 40a39.896 39.896 0 0 0 40.03 40.03c.558 0 1.104-.04 1.656-.062l19.5 72.814l-27.812 7.437l4.843 18.064l27.813-7.47l6.656 24.876l-27.812 7.438L70.938 322l27.812-7.438l7.156 26.782l-27.78 7.437l4.81 18.033l27.814-7.438l6.906 25.813l-27.78 7.437l4.843 18.063l27.78-7.438l7.188 26.75l-27.813 7.47l4.844 18.06l27.81-7.467l12.25 45.78h19.345l-13.563-50.593l27.813-7.47l-4.844-18.06l-27.81 7.467l-7.157-26.78l27.78-7.438l-4.812-18.064l-27.81 7.438l-6.907-25.813l27.78-7.436l-4.812-18.063l-27.81 7.47l-7.157-26.78l27.78-7.44l-4.843-18.06l-27.78 7.436l-6.657-24.875l27.78-7.436l-4.843-18.03l-27.78 7.436l-19.564-73.03c12.173-6.842 20.344-19.858 20.344-34.907c0-22.215-17.787-40-40-40zm391.188 0c-22.213 0-40.032 17.785-40.032 40c0 15.052 8.19 28.066 20.375 34.906l-19.56 73.03l-27.814-7.438l-4.844 18.032l27.813 7.47l-6.656 24.842l-27.814-7.437l-4.844 18.06l27.813 7.44l-7.156 26.78l-27.814-7.47l-4.844 18.064l27.813 7.437l-6.906 25.814l-27.814-7.438l-4.844 18.063l27.813 7.436l-7.156 26.78l-27.845-7.467l-4.813 18.06l27.813 7.47l-13.563 50.594h19.313l12.25-45.78l27.813 7.467l4.843-18.06l-27.81-7.47l7.186-26.75l27.813 7.438l4.842-18.063L396 385.187l6.906-25.812l27.813 7.438l4.842-18.032l-27.812-7.467l7.156-26.75L442.72 322l4.842-18.063l-27.812-7.437l6.656-24.875l27.813 7.47l4.842-18.064l-27.812-7.436l19.5-72.813c.562.024 1.12.064 1.688.064c22.212 0 40-17.817 40-40.03c0-22.216-17.788-40-40-40z\"/>","soul":"<path fill=\"currentColor\" d=\"M256 25.932c-18.969 0-36.639 20.557-36.639 48.636s17.67 48.639 36.639 48.639s36.639-20.56 36.639-48.639S274.969 25.932 256 25.932M112 96s-96.965 62.813-86.373 112c4.048 18.799 41.31 39.417 46.246 58.002C84.117 312.107 16 352.297 16 400c0 11.926 32 96 32 96h96s-56.606-68.165-64-96c-10.71-40.318 45.454-95.328 38.748-136.502c-3.637-22.333-60.928-38.58-65.207-60.799C45.86 162.815 112 96 112 96m288 0s66.14 66.815 58.459 106.7c-4.279 22.218-61.57 38.465-65.207 60.798C386.546 304.672 442.71 359.682 432 400c-7.394 27.835-64 96-64 96h96s32-84.074 32-96c0-47.703-68.117-87.893-55.873-133.998c4.936-18.585 42.198-39.203 46.246-58.002C496.965 158.813 400 96 400 96m-176.305 34.914c-7.531.938-14.474 2.207-20.377 3.781c-6.898 1.84-12.352 4.169-15.353 6.227s-2.887 2.84-2.965 3.078l-21.922 67.225l71.442-62.866c3.617-3.872 7.91-5.767 12.35-6.154c-8.625-1.654-16.465-5.619-23.175-11.29zm64.61 0c-6.71 5.673-14.55 9.637-23.174 11.291c4.438.387 8.732 2.282 12.35 6.154l71.44 62.866L327 144c-.077-.238.036-1.02-2.965-3.078s-8.455-4.387-15.353-6.227c-5.903-1.574-12.846-2.843-20.377-3.78zM248.9 160.168c-.775.02-1.214.472-1.693 1.002l-96.047 84.516c.035.363.12 1.072.676 2.29c1.273 2.793 4.4 6.867 8.143 10.182s8.164 5.924 11.09 6.85c1.36.43 2.201.438 2.51.42l84.482-95.395c2.32-2.62-5.414-10.054-9.16-9.865zm27.532 11.242c-.438 3.648-1.972 7.254-4.897 10.557l-3.514 3.967l70.4 79.494c.309.018 1.15.01 2.51-.42c2.926-.926 7.347-3.535 11.09-6.85c3.744-3.315 6.87-7.39 8.143-10.181c.556-1.219.64-1.928.676-2.291zM256 199.508l-69.328 78.283C185.42 279.205 185 285.147 185 288c0 29.279 12.608 45.893 26.4 59.764c6.897 6.935 14.093 12.911 20.112 19.302c6.018 6.392 11.51 13.895 11.49 23.58c-.028 14.149-8.246 24.081-14.522 33.522S217 442.561 217 456.127c0 4.379 2.635 8.86 9.313 13.918c6.677 5.058 16.85 9.835 28.226 13.648c11.237 3.767 23.68 6.63 35.23 8.612c-4.423-3.207-8.762-6.284-13.123-9.66c-7.37-5.707-14.087-11.304-18.853-17.329c-2.383-3.012-4.468-6.146-5.307-10.48c-.838-4.334.892-10.302 4.518-13.545c11.397-10.194 26.32-13.929 37.21-19.365c5.446-2.718 9.754-5.65 12.481-8.934C309.422 409.71 311 406.17 311 400c0-15.156-6.774-23.149-12.645-32.934c-2.935-4.892-6.078-10.847-5.195-18.252s5.71-13.8 13.268-19.843c6.642-5.311 11.513-8.68 14.781-13.67S327 302.933 327 288c-.446-2.88-.42-8.795-1.672-10.209z\"/>","padlock":"<path fill=\"currentColor\" d=\"M254.28 17.313c-81.048 0-146.624 65.484-146.624 146.406V236h49.594v-69.094c0-53.658 43.47-97.187 97.03-97.187c53.563 0 97.032 44.744 97.032 97.186V236h49.594v-72.28c0-78.856-65.717-146.407-146.625-146.407zM85.157 254.688c-14.61 22.827-22.844 49.148-22.844 76.78c0 88.358 84.97 161.5 191.97 161.5c106.998 0 191.968-73.142 191.968-161.5c0-27.635-8.26-53.95-22.875-76.78H85.155zM254 278.625c22.34 0 40.875 17.94 40.875 40.28c0 16.756-10.6 31.23-25.125 37.376l32.72 98.126h-96.376l32.125-98.125c-14.526-6.145-24.532-20.62-24.532-37.374c0-22.338 17.972-40.28 40.312-40.28z\"/>","star-medal":"<path fill=\"currentColor\" d=\"M41 27.7v46h430v-46zm32 64v112.5l62 20.7V91.7zm80 0v139.2l79.3 26.4c-10.4 7.5-17.3 19.7-17.3 33.4c0 21 16.1 38.5 36.5 40.7l-22.3 43.7l-58.2 9.3l41.6 41.7l-9.1 58.2l52.5-26.7l52.5 26.7l-9.1-58.2l41.6-41.7l-58.2-9.3l-22.3-43.7c20.4-2.2 36.5-19.7 36.5-40.7c0-13.7-6.9-25.9-17.3-33.4l79.3-26.4V91.7h-94v159c-2.9-.6-5.9-1-9-1s-6.1.4-9 1v-159zm224 0v133.2l62-20.7V91.7zm-121 176c12.8 0 23 10.2 23 23s-10.2 23-23 23s-23-10.2-23-23s10.2-23 23-23\"/>","crowned-skull":"<path fill=\"currentColor\" d=\"m92.406 13.02l-.164 156.353c3.064.507 6.208 1.38 9.39 2.627c36.496 14.306 74.214 22.435 111.864 25.473l43.402-60.416l42.317 58.906c36.808-4.127 72.566-12.502 105.967-24.09c3.754-1.302 7.368-2.18 10.818-2.6l1.523-156.252l-75.82 95.552l-34.084-95.55l-53.724 103.74l-53.722-103.74l-35.442 95.55l-72.32-95.55h-.006zm164.492 156.07l-28.636 39.86l28.634 39.86l28.637-39.86zM86.762 187.55c-2.173-.08-3.84.274-5.012.762c-2.345.977-3.173 2.19-3.496 4.196c-.645 4.01 2.825 14.35 23.03 21.36c41.7 14.468 84.262 23.748 126.778 26.833l-17.75-24.704c-38.773-3.285-77.69-11.775-115.5-26.596c-3.197-1.253-5.877-1.77-8.05-1.85zm333.275.19c-2.156.052-5.048.512-8.728 1.79c-33.582 11.65-69.487 20.215-106.523 24.646l-19.264 26.818c40.427-2.602 80.433-11.287 119.22-26.96c15.913-6.43 21.46-17.81 21.36-22.362c-.052-2.276-.278-2.566-1.753-3.274c-.738-.353-2.157-.71-4.313-.658zm-18.117 47.438c-42.5 15.87-86.26 23.856-130.262 25.117l-14.76 20.547l-14.878-20.71c-44.985-1.745-89.98-10.23-133.905-24.306c-12.78 28.51-18.94 61.14-19.603 93.44c37.52 17.497 62.135 39.817 75.556 64.63C177 417.8 179.282 443.62 174.184 467.98c7.72 5.007 16.126 9.144 24.98 12.432l5.557-47.89l18.563 2.154l-5.935 51.156c9.57 2.21 19.443 3.53 29.377 3.982v-54.67h18.69v54.49c9.903-.638 19.705-2.128 29.155-4.484l-5.857-50.474l18.564-2.155l5.436 46.852c8.747-3.422 17.004-7.643 24.506-12.69c-5.758-24.413-3.77-49.666 9.01-72.988c13.28-24.234 37.718-46 74.803-64.29c-.62-33.526-6.687-66.122-19.113-94.23zm-266.733 47.006c34.602.23 68.407 12.236 101.358 36.867c-46.604 33.147-129.794 34.372-108.29-36.755q3.472-.135 6.933-.11zm242.825 0q3.46-.023 6.93.11c21.506 71.128-61.684 69.903-108.288 36.757c32.95-24.63 66.756-36.637 101.358-36.866zM255.164 332.14c11.77 21.725 19.193 43.452 25.367 65.178h-50.737c4.57-21.726 13.77-43.45 25.37-65.18z\"/>","black-knight-helm":"<path fill=\"currentColor\" d=\"M256 16c-36.446 0-73.264 13.433-139.97 40h279.94C329.263 29.433 292.445 16 256 16M95.344 72L64 448c56 28 112 31.5 168 31.938V240H112v-48h288v48H280v239.938C336 479.5 392 476 448 448L416.656 72zm64.875 88a8 8 0 0 1 7.78 8a8 8 0 0 1-16 0a8 8 0 0 1 8.22-8m48 0a8 8 0 0 1 7.78 8a8 8 0 0 1-16 0a8 8 0 0 1 8.22-8m48 0a8 8 0 0 1 7.78 8a8 8 0 0 1-16 0a8 8 0 0 1 8.22-8m48 0a8 8 0 0 1 7.78 8a8 8 0 0 1-16 0a8 8 0 0 1 8.22-8m48 0a8 8 0 0 1 7.78 8a8 8 0 0 1-16 0a8 8 0 0 1 8.22-8M248 240v240q4 .002 8 0c4-.002 5.333.002 8 0V240zm-120 48h16v16h-16zm32 0h16v16h-16zm32 0h16v16h-16zm112 0h16v16h-16zm32 0h16v16h-16zm32 0h16v16h-16zm-240 32h16v16h-16zm32 0h16v16h-16zm32 0h16v16h-16zm112 0h16v16h-16zm32 0h16v16h-16zm32 0h16v16h-16zm-240 32h16v16h-16zm32 0h16v16h-16zm32 0h16v16h-16zm112 0h16v16h-16zm32 0h16v16h-16zm32 0h16v16h-16z\"/>","chest-armor":"<path fill=\"currentColor\" d=\"M156.7 25.83L89 39.38c-.1 58.57-1.74 119.32-43.49 167.22C104.4 246.5 189 260.7 247 248.8v-99L108.3 88.22l7.4-16.44L256 134.2l140.3-62.42l7.4 16.44L265 149.8v99c58 11.9 142.6-2.3 201.5-42.2c-41.8-47.9-43.4-108.65-43.5-167.22l-67.7-13.55c-12.9 13.88-20.6 28.15-32.9 40.53C308.9 79.78 289.5 89 256 89s-52.9-9.22-66.4-22.64c-12.3-12.38-20-26.65-32.9-40.53M53.88 232.9C75.96 281 96.07 336.6 102.7 392.8l65 22.8c4.2-52.7 28.2-104 63.7-146.1c-55.1 6.3-122.7-5.8-177.52-36.6m404.22 0c-54.8 30.8-122.4 42.9-177.5 36.6c35.5 42.1 59.5 93.4 63.7 146.1l65.2-22.9c6.6-56.8 26.6-111.8 48.6-159.8M256 269c-40.5 43.1-67.7 97.9-70.7 152.7l61.7 21.6V336h18v107.3l61.7-21.6c-3.1-54.8-30.2-109.6-70.7-152.7m151.7 143.4L297 451.1v18.8l110.2-44.1c.1-4.5.3-8.9.5-13.4m-303.3.1c.3 4.5.4 8.9.5 13.4l110.1 44v-18.7zM279 457.4l-23 8.1l-23-8v19.6l23 9.2l23-9.2z\"/>","gauntlet":"<path fill=\"currentColor\" d=\"M123.153 24.602c-11.349.764-48.792 83.005-63.545 132.174c-8.046 26.818 2.983 74.734 41.723 106.45c8.813-1.502 16.946-3.047 24.434-4.626c-22.473-24.22-39.048-50.488-47.772-82.059l-1.021-3.699l1.963-3.299c26.135-43.925 37.681-68.548 50.85-112.24l3.849-12.773l10.402 8.351c14.624 11.743 23.72 18.084 32.098 21.809c-14.428-22.99-31.841-41.36-52.46-50.06a2.2 2.2 0 0 0-.52-.028zm19.791 50.203c-11.724 36.176-24.141 62.49-46.508 100.379c9.004 29.978 25.746 54.616 49.733 78.65c18.744-4.857 32.588-9.929 43.383-14.978c16.875-7.894 26.514-15.73 36.92-23.701c-6.532-34.91-18.944-80.14-38.018-118.375c-14.754-2.769-27.196-8.373-45.51-21.975m90.094 158.008c-9.156 7.022-19.796 14.833-35.861 22.347c-17.365 8.123-40.947 15.887-76.29 22.793c35.349 28.759 64.905 62.213 112.643 82.157c2.79-15.613 10.509-29.532 20.61-39.782c9.547-9.688 21.609-16.383 34.252-16.82c2.202-5.202 5.378-10.557 10.593-14.93c6.41-5.374 15.626-8.323 26.932-8.156a35 35 0 0 1 4.807-5.424c-7.384-1.603-16.19-3.168-27.145-5.586zm120.275 50.299c-.04.009-.084.012-.125.021c-11.264 3.729-12.514 6.776-16.947 16.078c-8.484-1.005-19.247-2.081-25.69 3.16c-6.017 6.313-7.279 12.696-9.685 20.715c-14.012-3.276-25.77 1.842-33.904 9.877c-8.032 8.15-14.35 20.016-16.082 32.65c5.926 2.628 12.109 4.214 18.139 5.727c12.69-15.498 32.27-33.513 50.66-36.851c12.995-13.444 28.669-18.08 41.183-19.891a60 60 0 0 1 11.764-8.4c-6.632-11.786-12.405-18.622-19.313-23.086m-232.011 18.882c-1.967 12.934-7.997 24.573-.64 46.305c32.36 70.655 41.042 23.73 93.735 22.953c-38.944-18.938-66.126-45.737-93.095-69.258m267.765 17.102c-4.87.972-9.343 3.536-13.062 6.28c9.197 12.249 16.987 27.313 23.28 43.81c7.916-2.052 14.75-4.612 21.103-7.506c-6.473-26.762-18.951-37.976-31.32-42.584zm-29.935 13.906c-7.676 1.509-15.588 4.36-22.774 10.35c8.367 8.844 20.976 24.773 26.053 43.283c7.632-1.268 15.91-3.698 21.006-8.576c-6.608-17.858-15.058-33.73-24.285-45.057m-38.139 19.668c-14.313 5.357-25.257 14.981-34.674 25.938l19.383 26.324c13.696-1.49 26.639-6.254 39.39-13.299c-4.69-15.098-18.62-32.912-24.447-38.607zm108.848 24.365c-6.679 3.099-13.973 5.985-22.237 8.375c6.323 10.32 11.618 21.138 15.602 32.543c7.703-3.07 14.902-6.372 21.264-10.082c-3.964-11.28-8.68-22.055-14.63-30.836zM164.687 408.39l49.638 43.377c11.274-13.516 27.044-23.94 42.492-33.942l-22.02-25.32c-24.334-8.01-52.756 2.355-70.11 15.885M391.9 394.153c-6.866 5.056-14.143 7.727-21.795 9.377c5.371 9.31 10.375 19.502 14.354 29.755c7.946-2.139 15.451-4.432 22.344-7.775c-3.648-10.897-8.68-21.303-14.903-31.357m-39.88 14.105c-11.759 6.313-24.191 11.162-37.42 13.545l13.316 27.447c14.663-2.177 28.099-3.684 39.666-9.746c-4.195-10.706-9.777-21.706-15.563-31.246zm98.017 17.156c-6.627 3.604-13.647 6.703-20.846 9.534c2.83 7.167 5.28 14.119 7.21 20.757c10.397-1.435 20.263-5.912 18.179-13.869c-1.423-5.296-2.923-10.83-4.543-16.422M268.82 431.54c-16.062 10.564-31.09 20.975-40.728 32.256l1.392 1.217c16.648 14.548 36.256 20.475 44.95 9.13c8.522-11.12 10.536-24.116-5.614-42.603m144.01 10.957c-7.166 3.334-14.4 5.634-21.465 7.58c3.051 6.991 5.842 13.849 8.244 20.48c9.2-.457 17.732-4.025 19.33-10.442c-1.622-5.49-3.688-11.409-6.109-17.618m-38.437 13.69c-12.724 6.396-25.866 8.467-38.184 10.154l6 12.367c10.038 10.705 32.656 11.336 42.21 2.944c-2.654-7.907-6.1-16.516-10.026-25.465\"/>","metal-boot":"<path fill=\"currentColor\" d=\"m269 23.95l-87.7.1c1.1 61.4-2.4 116.05-14 159.45c-9 34-23.6 61.6-45.2 79c-.1 9.5-.8 19-2.1 28.6c-3.1 22.9-13.5 43.2-22.75 65c23.55-1.3 43.55-11.6 65.35-24.8c20.6-12.5 42.4-27.5 68.9-37.8c-.2-1.4-.4-2.9-.4-4.2c-1.9-23.7.1-52.2 4.1-83.2C243 147.6 257.9 81.05 269 23.95m-105.7.1H80.65c-1.6 36.5 10.1 76.15 21.65 119.15c8.3 30.4 16.5 62.3 19 95.7c12.6-14.3 21.8-34.4 28.6-60c10.8-40.6 14.4-94.15 13.4-154.85m41.8 14.9h.1a9 9 0 0 1 9 9a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 8.9-9m-2.4 52.5h.1a9 9 0 0 1 9 8.95a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 8.9-8.95m-5.9 56.25h.1a9 9 0 0 1 9 9a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 8.9-9m-16 60.6h.1a9 9 0 0 1 9 9a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 8.9-9m-32 48.1h.1a9 9 0 0 1 9 9a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 8.9-9m85.7 55.3c-22.6 9.6-42.3 22.9-62.6 35c-24.6 14.9-50.5 27.9-81.85 27.5c-8.2 22.7-13.8 48-10 79.9h82.35c13.2-41.4 42.9-78 95.1-106.8c-1.4-1-2.9-2.1-4.3-3.2c-9.6-7.6-15.3-18.8-18.7-32.4m40.2 46.7c-52.1 26.2-80.4 58.5-93.6 95.7h127.4c0-14.3.6-29 3.9-43.6c2.6-11.5 7-22.9 14-33.9c-16.1-3.3-33.5-8.1-51.7-18.2m70.8 21.8c-8.2 10.9-12.8 22.3-15.5 34.3c-2.8 12.5-3.5 25.8-3.5 39.6h104c-2-17.8-12.5-39.8-28.1-52.1c-17.8-13.9-36-17.9-56.9-21.8m8.3 10.5a9 9 0 0 1 9 9a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 9-9m-254.05 35h.1a9 9 0 0 1 8.95 9a9 9 0 0 1-8.95 9a9 9 0 0 1-9-9a9 9 0 0 1 8.9-9m44.85.6h.1a9 9 0 0 1 9 9a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 8.9-9m201.5.1a9 9 0 0 1 9 9a9 9 0 0 1-9 9a9 9 0 0 1-9-9a9 9 0 0 1 9-9M72.05 470v18.1H440V470z\"/>","ring":"<path fill=\"currentColor\" d=\"M255.157 123c-68.66 0-137.1 18.922-182.867 55.275c.234 14.35 1.818 35.624 9.332 48.23c110.634-60.336 236.436-60.336 347.07 0c7.513-12.606 9.098-33.88 9.332-48.23C392.257 141.922 323.817 123 255.157 123m199.81 76.057c-.324 2.98-.718 6.02-1.246 9.082c-2.226 12.93-6.213 26.458-15.99 35.98c-14.436 18.637-40.806 30.462-72.858 38.603C332.392 290.973 293.79 295 255.157 295s-77.235-4.028-109.715-12.277c-31.907-8.104-58.17-19.868-72.648-38.36c-11.983-11.982-16.234-28.786-17.77-43.857c-13.73 27.256-11.503 62.122.672 98.648C69.988 342.03 129.406 389 255.156 389s185.17-46.97 199.462-89.846l.1-.297l.12-.287c15.134-36.712 15.61-71.983.13-99.513z\"/>","gem-pendant":"<path fill=\"currentColor\" d=\"M29.018 18.875c-2.63 10.297.047 21.72 8.044 29.72c10.035 10.034 25.46 11.696 37.29 5a605 605 0 0 0 17.357 15.12a30.6 30.6 0 0 0-.522 5.597c0 17.024 14.008 31 31.03 31c4.917 0 9.576-1.17 13.72-3.24a689 689 0 0 0 17.482 11.48a30.7 30.7 0 0 0-.732 6.635c0 17.024 14.008 31 31.03 31c7.577 0 14.55-2.772 19.964-7.345l13.873 8.125a28 28 0 0 0-.414 4.732v38.904L114.07 255.27v160.064l138.284 80.053l138.283-80.053V255.27L286.59 195.037V156.7c0-.983-.067-1.946-.172-2.897c5.393-3.07 10.655-6.08 15.697-8.994c5.226 3.992 11.736 6.377 18.762 6.377c17.023 0 31-13.976 31-31c0-1.867-.176-3.695-.498-5.476a621 621 0 0 0 17.978-12.298c3.97 1.855 8.38 2.9 13.02 2.9c17.023 0 31.03-13.976 31.03-31a30.7 30.7 0 0 0-.553-5.78a912 912 0 0 0 16.318-14.116c11.6 5.714 26.135 3.778 35.736-5.822c7.998-7.998 10.675-19.42 8.045-29.72H452.54c4.018 4.888 3.736 11.916-.85 16.5c-4.887 4.888-12.55 4.89-17.437 0c-4.585-4.585-4.867-11.614-.85-16.5h-20.414c-1.915 7.5-1 15.592 2.72 22.528a890 890 0 0 1-12.034 10.434c-5.575-5.288-13.083-8.555-21.297-8.555c-17.024 0-31.03 14.01-31.03 31.032c0 5.45 1.438 10.583 3.948 15.05a601 601 0 0 1-12.797 8.673c-5.6-5.48-13.24-8.88-21.62-8.88c-17.025 0-31.032 14.01-31.032 31.032c0 3.166.484 6.225 1.383 9.11c-4.23 2.445-8.744 5.028-13.247 7.605a28 28 0 0 0-3.246-2.716c-6.692-4.768-14.72-6.882-22.714-7.014c-7.996-.132-16.15 1.718-22.97 6.504a26 26 0 0 0-2.337 1.85c-4.367-2.573-8.764-5.164-12.947-7.622c.642-2.47.984-5.056.984-7.716c0-17.024-14.007-31.032-31.03-31.032c-7.977 0-15.29 3.075-20.812 8.094a692 692 0 0 1-13.248-8.596a30.66 30.66 0 0 0 3.56-14.34c0-17.025-13.977-31.033-31-31.033c-8.26 0-15.804 3.304-21.388 8.642a586 586 0 0 1-13.79-12.067c3.063-6.575 3.715-14.03 1.94-20.98H68.568c4.018 4.887 3.736 11.915-.85 16.5c-4.887 4.887-12.55 4.888-17.437 0c-4.584-4.586-4.865-11.615-.848-16.5H29.018zm93.2 43.094c6.924 0 12.313 5.42 12.313 12.343s-5.387 12.312-12.31 12.312c-6.926 0-12.345-5.39-12.345-12.313s5.42-12.343 12.344-12.343zm260.157 0c6.924 0 12.344 5.42 12.344 12.343s-5.42 12.312-12.345 12.312c-6.924 0-12.344-5.39-12.344-12.313s5.42-12.343 12.345-12.343zM183.72 107.843c6.922 0 12.343 5.42 12.343 12.344s-5.42 12.312-12.344 12.312c-6.926 0-12.345-5.39-12.345-12.313s5.42-12.343 12.344-12.343zm137.155 0c6.924 0 12.313 5.42 12.313 12.344s-5.39 12.312-12.313 12.312s-12.344-5.39-12.344-12.313s5.42-12.343 12.345-12.343zm-69.164 38.013c4.695.078 9.355 1.536 12.18 3.55c2.826 2.012 4.01 3.805 4.01 7.292v27.52l-15.546-9l-16.526 9.565V156.7c0-4.09 1.258-5.835 3.953-7.725c2.696-1.89 7.237-3.195 11.93-3.118zm-8.122 56.03v32.728l-74.182 43.21l-28.558-16.462zm18.687.67l102.16 59.138l-28.624 16.502l-73.533-42.83zm-9.988 48.62l72.256 42.085l-.002 84.316l-72.253 42.086l-72.256-42.086l.003-84.314l72.254-42.088zm.465 18.33l-56.883 98.15v.724l56.566 32.977L309 368.38v-66.085zm-119.994 8.764l28.586 16.48v84.027l-28.586 16.48V278.272zm239.19.668l-.003 115.648l-28.715-16.553v-82.54zM333.493 393.99l28.414 16.38l-99.63 57.677v-32.574zm-161.77.375l71.864 41.86v32.494l-100.21-58.013l28.345-16.342z\"/>","mailed-fist":"<path fill=\"currentColor\" d=\"M215.75 21.063c-1.306 0-2.582.045-3.813.125a44 44 0 0 0-5.5.718L171.47 82.5a53 53 0 0 1 13.31-1.688c21.424 0 39.93 12.778 48.407 31.094l39.188-67.844c-4.546-5.766-14.702-13.066-26.97-17.53c-9.74-3.546-20.516-5.473-29.655-5.47zm85.72 17.53c-1.583-.03-3.07.047-4.47.188l-44.53 77.157a53 53 0 0 1 15.218-2.25c20.817 0 38.924 12.05 47.718 29.532l43.156-74.782c-4.125-6.924-13.916-15.663-25.78-21.532c-10.44-5.163-22.204-8.138-31.313-8.312zm-162.5 29.344c-10.902.22-21.355 4.083-32.5 12.22C96.044 87.766 85.3 99.3 74.187 114.5L122 130.78l34.656-60.03c-5.398-1.782-10.563-2.693-15.5-2.813c-.73-.017-1.46-.014-2.187 0zM370.312 85.5L325.5 163.156c5.325-1.817 11.015-2.844 16.938-2.844c20.334 0 38.045 11.61 46.906 28.532l36.97-64c-3.564-8.5-12.897-19.255-24.19-27.03C391.22 90.3 378.678 85.84 370.313 85.5zm-185.532 14c-19.27 0-34.718 15.448-34.718 34.75s15.45 34.75 34.72 34.75s34.687-15.445 34.687-34.75c0-19.302-15.418-34.75-34.69-34.75zM58.53 128.938C48.27 179.428 49.268 231.032 64.595 275c.186.536.372 1.06.562 1.594l.188-.22l7.125 10.22c.872 1.25 1.81 2.52 2.78 3.78c-.837-41.212 10.51-89.245 37.438-143L58.53 128.94zm209.157 3.437c-19.27 0-34.687 15.416-34.687 34.72c0 19.3 15.417 34.75 34.688 34.75c19.27 0 34.718-15.446 34.718-34.75s-15.448-34.72-34.72-34.72zm169.282 12.688l-41.783 72.375c-.048.614-.087 1.235-.156 1.843a49.5 49.5 0 0 1 13.44-1.874c21.296 0 39.572 13.55 46.717 32.438l36.532-63.25c-3.43-8.86-12.62-20.092-23.783-28.313c-10.62-7.82-22.842-12.6-30.968-13.218zm-303.72 3.218C99.888 212.04 89.896 266.26 95.344 308.876c.133 1.044.286 2.063.437 3.094c20.05 17.924 47.18 35.918 76.25 51.717c40.17 21.83 84.096 39.88 118.064 50.125c42.028-15.246 84.304-46.497 119.156-96.468c-.26.004-.52.03-.78.03c-27.474 0-49.94-22.483-49.94-49.968c0-1.24.068-2.468.158-3.687a52.6 52.6 0 0 1-16.25 2.592c-28.306 0-51.592-22.493-52.907-50.5a52.9 52.9 0 0 1-21.842 4.72c-25.675 0-47.22-18.35-52.25-42.595c-8.685 6.134-19.27 9.75-30.657 9.75c-24.53 0-45.332-16.764-51.53-39.406zM342.438 179c-19.033 0-34.282 15.25-34.282 34.313s15.25 34.312 34.28 34.312c19.034 0 34.252-15.246 34.252-34.313c0-19.063-15.218-34.312-34.25-34.312m66.03 57.125c-17.362 0-31.25 13.888-31.25 31.28c0 17.394 13.888 31.283 31.25 31.283c17.364 0 31.25-13.886 31.25-31.282c0-17.393-13.886-31.28-31.25-31.28zM64.907 307.25a506 506 0 0 0-20.344 28.47c3.222 9.158 10.11 19.44 20.657 29.967c13.9 13.877 33.814 28.027 57.81 41.063c41.59 22.59 95.45 41.855 152.032 52.53a312 312 0 0 0 8.22-28.25c-35.365-10.748-79.208-28.665-120.188-50.936c-39.39-21.407-75.667-46.16-98.188-72.844zM32.72 354.563c-4.446 7.515-8.483 14.866-12.126 22.093c1.467 9.07 7.963 20.19 19.593 31.72c12.248 12.14 29.84 24.596 51.094 36.062c41.084 22.16 95.78 40.72 152.22 49.187h17.375a304 304 0 0 0 7.47-16.563c-57.277-11.12-111.46-30.63-154.25-53.875c-25.16-13.666-46.376-28.622-62.064-44.28c-7.912-7.9-14.49-16.006-19.31-24.344zm-14.47 57.53v34.094c1.047 2.302 3.192 5.48 6.875 8.97c5.26 4.982 13.178 10.427 22.844 15.53c18.88 9.97 44.434 18.675 70.624 22.938H161c-28.807-9.095-55.546-20.318-78.594-32.75c-22.413-12.09-41.336-25.303-55.375-39.22c-3.173-3.145-6.107-6.326-8.78-9.56zm0 61.782v19.75h34.344c-4.66-2.048-9.133-4.183-13.344-6.406c-7.93-4.19-15.012-8.627-21-13.345z\"/>","on-target":"<path fill=\"currentColor\" d=\"M107.563 21.406c122.47 187.613 107.72 216.17-74.97 55.813c83.344 103.73 183.05 185.66 287.876 260.75c-47.685 54.762-65.51 116.2-39.283 141.374c27.95 26.827 95.317 2.292 150.25-54.938s76.668-125.547 48.72-152.375c-26.4-25.338-87.652-4.57-140.657 46.033C267.523 213.846 194.602 110.56 107.562 21.406zm324.906 266.781c9.865-.14 18.234 2.508 24.25 8.282c21.386 20.528 4.908 72.768-37.126 116.56c-42.035 43.794-93.957 62.81-115.344 42.283c-19.952-19.15-6.325-65.992 29.72-107.75c3.706 2.625 7.405 5.264 11.124 7.875c-26.5 31.075-36.24 65.542-21.406 79.78c16.03 15.39 54.65 1.294 86.156-31.53c31.507-32.825 44-71.99 27.97-87.375c-15.205-14.592-50.578-2.533-81.064 26.75c-2.594-3.763-5.187-7.52-7.78-11.282c28.526-27.297 60.18-43.263 83.5-43.592zm-22.033 37.375c5.66-.08 10.457 1.44 13.907 4.75c12.267 11.774 2.827 41.758-21.28 66.875c-24.11 25.118-53.89 36.024-66.158 24.25c-11.245-10.793-3.876-36.93 16-60.562c5.976 4.173 11.97 8.327 17.97 12.47c-9.746 11-14.027 22.66-9.563 27.124c4.904 4.903 18.483-.735 30.343-12.595s17.498-25.47 12.594-30.375c-4.778-4.778-17.8.476-29.438 11.72q-6.316-9.138-12.625-18.283c16.46-15.875 34.774-25.184 48.25-25.375z\"/>","fire-bowl":"<path fill=\"currentColor\" d=\"M282.344 15.5C205.347 26.1 179.64 117.517 196.47 178.188c21.46 77.357-72.35 84.35-51.876-38.5c-27.153 44.283-34.75 83.65-29.28 116.843c.016.096.043.188.06.283c6.086 32.673 23.263 58.04 46.595 76.562c14.994 11.903 32.572 20.854 51.25 26.688c-59.82-145.108 153.65-144.51 89.593 3.875c20.82-4.818 39.963-13.81 55.312-27c20.46-17.582 34.67-42.43 37.688-76.313c1.43-24.45-2.34-53.204-12.875-86.563c-26.74 103.853-85.32 79.05-31.344-53.03c-95.86 83.26-108.066-17.42-69.25-105.532zm130.53 258.063c-1.06 6.353-2.47 12.473-4.25 18.312c14.737 5.447 26.477 11.677 34.376 17.938c9.02 7.148 12.5 13.61 12.5 19.28c0 5.673-3.48 12.164-12.5 19.313c-9.02 7.15-23.072 14.23-40.844 20.188c-35.544 11.915-85.786 19.53-141.25 19.53s-105.674-7.615-141.22-19.53c-17.77-5.958-31.822-13.04-40.842-20.188c-9.02-7.15-12.5-13.64-12.5-19.312s3.48-12.133 12.5-19.28c6.886-5.46 16.706-10.874 28.875-15.783a144 144 0 0 1-6.69-17.467c-13.486 5.386-24.878 11.545-33.81 18.625c-10.75 8.52-18.33 18.99-19.407 30.968h-.157v9.344c0 44.85 24.787 85.116 63.47 113.625c38.68 28.51 91.436 45.78 149.5 45.78c58.062 0 110.817-17.27 149.5-45.78c38.68-28.51 63.468-68.774 63.468-113.625h-.063c.416-2.088.658-4.224.658-6.406c0-13.205-7.945-24.7-19.563-33.906c-10.634-8.43-24.763-15.56-41.75-21.625z\"/>","recycle":"<path fill=\"currentColor\" d=\"M255.875 19.75c-15.54.336-30.444 4.193-44.97 10.5l22.47 42c7.42-2.652 15.023-4.442 22.5-4.5c25.633 0 52.754 13.658 73.47 49.47l16.624 28.874l20.217-11.656l43.407 75.187l-53.5 30.844l107.812 62.186V178.312l-33.062 19.063l-59.5-104.156c-27.476-47.506-71.07-73.848-115.47-73.47zm-75.22 57.844L72.813 139.78l32.282 18.595l-56.156 98.313c-25.153 43.508-26.934 92.827-6 131.968c8.675 16.22 21.838 29.508 37.5 40.47l24-40.47c-8.042-6.36-14.9-13.912-19.5-22.5c-12.51-23.402-13.322-54.64 4.5-85.47l13.624-23.436l-19.687-11.375l43.313-75.03l53.968 31.093V77.594zm255.157 267.562c-1.564 7.687-3.835 14.362-7.5 21c-12.83 23.206-38 40.5-77.968 40.5h-24.438v22.906h-86.78V367.5L131.31 429.656l107.813 62.188v-37.22h111.22c54.52 0 98.506-25.648 119.967-64.468c7.566-13.695 11.738-29.242 13.5-45h-48z\"/>","sands-of-time":"<path fill=\"currentColor\" d=\"M115.063 21.97v9.343c0 101.953 38.158 189.648 96.343 222.093v6.094c-58.186 32.445-96.344 120.14-96.344 222.094v9.344H401.81v-9.344c0-102.552-38.804-190.274-97.53-222.188V253.5c58.722-31.917 97.53-119.64 97.53-222.188V21.97H115.06zM134 40.655h248.875c-2.477 96.445-42.742 175.523-91.938 198.906l-5.343 2.532v28.751l5.344 2.53c49.193 23.383 89.456 102.438 91.937 198.876H134c2.456-95.898 42.125-175.078 90.875-198.938l5.25-2.562v-28.594l-5.25-2.562c-48.748-23.86-88.42-103.04-90.875-198.938zm213.656 86.125c-57.607 27.81-124.526 27.84-177.562 4.095C184.748 181.78 213.91 218.012 248.22 224a12.18 12.18 0 0 0-2.47 7.344c0 6.76 5.488 12.25 12.25 12.25s12.25-5.49 12.25-12.25c0-2.72-.907-5.218-2.406-7.25c35.426-5.88 65.488-44.07 79.812-97.313zM258 258.626c-6.762 0-12.25 5.488-12.25 12.25s5.488 12.25 12.25 12.25s12.25-5.488 12.25-12.25s-5.488-12.25-12.25-12.25m0 39.28c-6.762 0-12.25 5.49-12.25 12.25c0 6.763 5.488 12.25 12.25 12.25s12.25-5.487 12.25-12.25c0-6.76-5.488-12.25-12.25-12.25m0 39.533c-6.762 0-12.25 5.488-12.25 12.25c0 6.76 5.488 12.25 12.25 12.25s12.25-5.49 12.25-12.25c0-6.762-5.488-12.25-12.25-12.25m.125 39.906c-23.21.28-46.19 25.77-75.813 75.656h153c-30.523-51.003-53.977-75.936-77.187-75.656\"/>","hourglass":"<path fill=\"currentColor\" d=\"M92.656 19.188v41.5h331.72v-41.5zM119.5 79.374V433.53h22.28V79.376H119.5zm46.594 0c3.212 43.324 13.312 82.022 27.78 110.906c17.685 35.304 40.845 54.75 64.064 54.75s46.346-19.446 64.03-54.75c14.47-28.883 24.57-67.58 27.782-110.905H166.094zm209.156 0V433.53h22.28V79.376h-22.28zm-117.313 185.22c-23.218 0-46.378 19.415-64.062 54.717c-14.835 29.614-25.098 69.562-28.03 114.22H350c-2.933-44.658-13.197-84.606-28.03-114.22c-17.686-35.302-40.814-54.718-64.033-54.718zM92.657 452.218v41.467h331.718V452.22H92.655z\"/>","sparkles":"<path fill=\"currentColor\" d=\"M237.4 20.73c-6.1 42.1-26.8 64.2-63.9 64c31.6 4.5 63.8 8 63.9 64.07c-.6-46.1 24.5-63.07 64.1-64.07c-38-1.5-64.9-16.3-64.1-64m127.8 11.58c-9.1 14.25-20.8 21.29-38.9 10.28c14.9 11.79 18.6 24.76 10.2 38.97c8.9-11.18 17.5-22.73 39-10.27c-17.8-10.06-18.8-23.57-10.3-38.98M59.68 41.69c-2.7 18.8-12 28.6-28.5 28.5c14.1 2 28.4 3.6 28.5 28.52c-.3-20.5 10.9-28.12 28.5-28.52c-16.9-.7-28.9-7.3-28.5-28.5M431 66.28c-2.7 18.8-12 28.6-28.5 28.5c14.1 2 28.4 3.6 28.5 28.52c-.3-20.5 10.9-28.12 28.5-28.52c-16.9-.7-28.9-7.3-28.5-28.5M120.3 116.4c-15.8 53.7-47.76 48-79.35 43.4C76.6 170 90.3 197.1 84.28 239.2c12.66-46 42.62-52.6 79.42-43.4c-37.6-12.1-56.9-35.4-43.4-79.4m187 5c-8.8 61.6-39.3 94-93.6 93.7c46.2 6.5 93.6 11.7 93.6 93.7c-.8-67.3 35.9-92.2 93.8-93.7c-55.5-2.2-94.9-23.9-93.8-93.7m136.8 38.3c-13.1 21.6-29.5 28.8-49.7 20.1c16.3 9.7 33 19.1 20.1 49.6c10.3-25.2 27.9-28.7 49.7-20c-20.3-9.7-31.6-23.9-20.1-49.7M50.7 243.2c9.16 16.7 7.63 30.1-5.61 40c12.46-6.9 24.85-14.3 39.91 5.6c-12.57-16.2-8.2-29 5.61-40c-13.92 9.7-27.47 11.6-39.91-5.6m137.2.3c11.4 26.8-.5 41.3-21.7 50.9c22.7-8.5 40.8-4.5 50.9 21.7c-12.7-31.8 4.8-41.2 21.7-50.9c-21 8.5-37.8.9-50.9-21.7m228 12.6c-26.6 64.7-68.7 91.7-127.8 76.4c48.6 19.8 98.8 38.5 76.4 127.9c17.5-73.7 64.4-90.7 127.9-76.5c-59.9-17.5-96.9-52-76.5-127.8M99.94 295.5c15.66 57.8.86 98.1-47.32 118.5c43.46-11.8 87.38-25.2 118.68 47.4c-26.4-59.3-3.4-95.4 47.3-118.8c-50 19.2-93.1 15-118.66-47.1m169.36 61c-21.8 20.6-43 23.6-63.2 7.3c15.5 16.3 31.6 32.4 7.2 63.3c19.8-25.6 41.2-24.1 63.3-7.3c-20.2-17.4-28.6-37.5-7.3-63.3M443.2 404c-2.7 18.8-12 28.6-28.5 28.5c14.1 2 28.4 3.6 28.5 28.5c-.3-20.5 10.9-28.1 28.5-28.5c-16.9-.7-28.9-7.3-28.5-28.5m-169.7 36c-2.7 18.8-12 28.6-28.5 28.5c14.1 2 28.4 3.6 28.5 28.5c-.3-20.5 10.9-28.1 28.5-28.5c-16.9-.7-28.9-7.3-28.5-28.5\"/>","open-treasure-chest":"<path fill=\"currentColor\" d=\"M410.365 101.005c8.21-22.26 16.21-31.12 20.33-34.45c3.06-2.48 5.73-3.42 7.92-2.81c4 1.13 8.49 7.45 11.88 16.89c10.89 30.34 10 84.28-.93 129.51zm-286 72.92c7.52-31 10.28-66.13 7.77-94.92l-43.6-4.86zm289.46-113l-301.2-33.53c-2.5-.28-5.24 1.46-7.11 3c-3.67 3-10.42 10.32-17.66 27.64l308.68 34.34c5.16-13.25 11.02-23.89 17.31-31.43zm-228.78 298.71v-70.72l10.76 1.19l42.24 5.18v70.51zm16-40.34a13 13 0 0 0 5.34 10.29l-2.34 24.42l17 1.74l-4-25a9.54 9.54 0 0 0 5-9.15a13.64 13.64 0 0 0-11.06-12.59s.17.1.13.1c-5.95-.68-11.07 3.9-10.07 10.1zm53 64.45l-85-9.84v-86.72l-1.05-.09a8.14 8.14 0 0 1-7.27 6.71a8 8 0 0 1 5.23 8.9a8 8 0 0 1-8 6.66c8.453 4.004 4.341 16.778-4.86 15.1a8 8 0 0 1-8 13.8a8.01 8.01 0 0 1-12.28 10.29v.09a8 8 0 0 1-3.86 8.37l9.13 5.35v14.25l-12 7.13l-12-7.12v-14.26l8.15-4.82a8.21 8.21 0 0 1-5.07-5.92a.4.4 0 0 1 0-.1a8 8 0 0 1-15.18-5c-6.851 7.214-18.094-2.065-12.31-10.16c-8.346 4.519-16.217-6.676-9.14-13c-9.17 2.661-14.453-10.083-6.09-14.69a8 8 0 0 1-3.21-15.67c-9.294-1.047-9.548-14.463-.3-15.86c-.669-.164-1.264-.473-1.83-.76l-17.24-1.86l.6 167.11l309.18 34.49l-.6-165.83l-107-13.05zm140.06-164l4.72 1.91l.91.58l38.72 4.31l-23.26-64.77l-12.82 37c-.16.46-3.41 9.8-8.27 20.99zm-208.54-39.74l5 5.49l12.75-11.15l21.45-2.28l16.61 15.35l10.51 8.73l18.54-9.29l3.44.5c.12-.67.25-1.34.38-2c3.08-16.1 7.35-30.16 7.53-30.75l13.39-43.91l16.88 42.71l8.42 21.42l10.66-12.39l22.14-25.73l5.78 33.45l3.29 19.1l17.1-9.64l35.09-19.79l-18.48-51.4l-247.86-27.61c2.51 34.94-1.85 77.32-12.39 112h2.32l7-12.86h40.46zm-111.29 97.39c7.6 2.1 7.9 12.766.43 15.29c7.737.867 9.802 11.153 3 14.94c7.653-.548 11.614 8.947 5.84 14c7.313-2.115 13.168 6.216 8.7 12.38c6.288-3.518 13.657 2.417 11.56 9.31c4.53-4.723 12.506-2.304 13.65 4.14c2.057-5.713 9.48-7.141 13.51-2.6c-1.285-6.404 5.23-11.566 11.17-8.85c-4.564-5.77.425-14.123 7.67-12.84c-6.419-4.541-3.122-14.648 4.74-14.53c-7.316-3.503-5.375-14.415 2.7-15.18a8 8 0 0 1-5.38-8l-76.43-8.26c-.41.19-.746.15-1.16.2m367.54 139.08l-.59-163.86l-8.67 7l-55.51 46.79l.58 162zm-26.23-165.2l-24.11-15.27l-4.18-1.69c-5.91 11.52-13.39 23-22.66 27.88c-5.44 2.88-12.22 4.34-20.16 4.34c-11.13 0-24.75-2.91-37.35-8c-10-4-23.3-11-30.26-21.34c-4.9-7.29-6.64-17.77-5.31-32.92l-21.78 10.93l-19-15.8l-11.42-10.53l-9.16 1l-20.45 17.83l-11-11.7h-24.21l-17.61 32l-5.7-7.2l-4.42 4.85l-10.76 16.35l-12.29 4.91L97.611 256h-12.2l-2.776 6.005l76.9 8.21a8.15 8.15 0 0 1 2-2.9a8 8 0 0 1 10.31-.46a2 2 0 0 1-.14-.24c-4.955-8.368 6.459-16.62 12.87-9.375c6.412 7.245-3.167 17.571-10.87 11.635a8 8 0 0 1 1.12 2.89l22.62 2.44l168.54 20.57l51.49-43.38zm-28.34-57.73l-36.88 20.79l-7.14-41.47l-28 32.51l-18.13-46.11s-16.65 54.58-7 69c7.69 11.45 35.42 22.25 54.33 22.25c5 0 9.43-.76 12.67-2.48c13.8-7.31 30.15-54.49 30.15-54.49m-317.08 270.8v-.2c0-3.77-8.21-6.83-18.33-6.83s-18.33 3.06-18.33 6.83c0 3.21 6 5.9 14 6.63v.2c0 3.77 8.21 6.83 18.33 6.83s18.33-3.06 18.33-6.83c-.01-3.21-5.98-5.9-14-6.63m350 6.63c-10.13 0-18.33 3.06-18.33 6.83s8.21 6.83 18.33 6.83s18.33-3.06 18.33-6.83s-8.25-6.8-18.38-6.8zm40-16.28c-10.13 0-18.33 3.06-18.33 6.83s8.21 6.83 18.33 6.83s18.33-3.06 18.33-6.83s-8.22-6.83-18.34-6.83z\"/>","backpack":"<path fill=\"currentColor\" d=\"m186.438 20.56l-13.184 26.365q10.202-.39 20.47-.686l3.84-7.68h116.874l3.77 7.54q10.258.281 20.456.66l-13.102-26.2H186.437zm69.56 42.742c-45.757.056-91.452 1.566-135.38 4.363c-3.24 50.58-8.4 100.987-.786 145.824c89.297 12.395 180.102 12.985 272.764-.054c7.055-30.988 5.117-84.68-1.04-145.89c-43.974-2.893-89.73-4.3-135.558-4.244zm153.783 5.54c6.42 64.12 9.113 119.825-1.135 155.22l-1.61 5.56l-5.726.842c-98.8 14.528-195.613 13.81-290.605.002l-6.285-.914l-1.246-6.23c-9.89-49.49-4.085-102.785-.664-154.42c-4.89.354-9.765.72-14.602 1.107c-8.596 58.568-9.39 116.957-.05 175.292c110.24 12.088 222.275 12.205 336.203-.01c8.502-57.83 8.29-116.25-.017-175.313c-4.725-.4-9.485-.776-14.262-1.14zM255.966 92.3c32.526-.025 65.067 2.746 97.574 8.39l7.46 1.295v7.572c0 15.554 1.683 35.105-12.69 50.25c-9.912 10.444-25.655 17.337-51.31 20.585v18.164h-82v-18.452c-23.992-3.37-39.352-10.175-49.363-20.185C150.807 145.093 151 125.56 151 109.56v-7.594l7.484-1.278c32.444-5.54 64.955-8.362 97.48-8.386zm.012 17.994c-28.96.022-57.913 2.444-86.858 6.996c.265 12.28 1.635 22.296 9.243 29.904c5.914 5.914 16.952 11.416 36.637 14.582v-29.22h82v29.51c21.367-3.115 32.66-8.755 38.254-14.65c7.033-7.41 7.696-17.502 7.73-30.124c-29-4.63-58.006-7.02-87.007-6.998zM233 150.56v30h46v-30zm209.674 92.42a619 619 0 0 1-1.61 10.87c.214 2.352.42 4.706.63 7.06L471 290.213v-22.24l-28.326-24.995zm-373.485.12L41 267.973v22.24l29.318-29.318c.205-2.327.406-4.655.616-6.982a542 542 0 0 1-1.745-10.813m354.634 20.397a1638 1638 0 0 1-30.824 2.967v74.095h16v66h-16v80.615c10.318-.633 20.63-1.313 30.928-2.082c9.445-74.01 6.478-147.698-.104-221.596zm-335.576.03C81.725 338.09 78.58 412.1 88.06 485.1q15.487 1.184 30.94 2.145V406.56h-16v-66h16v-74.024a1537 1537 0 0 1-30.752-3.01zm286.752 4.4q-15.021 1.14-30 1.992v70.64h30zm-238 .085v72.547h30v-70.55a1557 1557 0 0 1-30-1.997m190 2.825c-47.65 2.173-94.984 2.19-142 .078v19.314c23.95-5.165 47.8-7.652 71.516-7.59c23.638.06 47.145 2.654 70.484 7.626v-19.43zM68.05 288.62L41 315.67v56.89h23.06c.376-27.987 1.88-55.975 3.99-83.94m375.948.047c2.12 27.872 3.61 55.83 3.957 83.892H471v-56.89zm-187.52 11.95c-23.68-.063-47.487 2.577-71.478 8.052v31.89h16v18.443c17.033 5.346 31.73 8.493 46 9.426v-2.87h18v2.868c14.27-.932 28.967-4.08 46-9.425V340.56h16v-31.866c-23.42-5.267-46.907-8.016-70.523-8.078zM121 358.558v30h22v-23h18v23h22v-30zm208 0v30h22v-23h18v23h22v-30zM201 377.8v28.76h-16v15.857c48.528 10.865 95.713 10.664 142 .045V406.56h-16V377.8c-16.332 4.747-31.283 7.52-46 8.326v11.433h-18v-11.434c-14.717-.806-29.668-3.58-46-8.326zM41 390.56v14h23.14q-.134-7-.163-14zm407.012 0a935 935 0 0 1-.18 14H471v-14zM137 406.56v19.798c6.137 7.214 11.222 9.77 14.934 9.844c3.734.075 8.697-2.122 15.066-9.79V406.56h-6v7h-18v-7zm208 0v19.798c6.137 7.214 11.222 9.77 14.934 9.844c3.734.075 8.697-2.122 15.066-9.79V406.56h-6v7h-18v-7zm-304 16v35.154c5.596 5.51 8.677 8.25 11.846 9.306c2.454.818 7.713 1.15 15.045 1.317c-1.544-15.25-2.586-30.51-3.204-45.778H41zm406.27 0c-.628 15.224-1.674 30.483-3.21 45.78c7.358-.168 12.635-.5 15.094-1.32c3.17-1.056 6.25-3.795 11.846-9.306V422.56zM185 440.842v49.498c47.55 1.51 94.877 1.446 142-.074V440.9c-46.316 10.03-93.74 10.185-142-.057zm-48 9.123v38.318q15.015.809 30 1.408v-39.678c-4.86 2.786-10.01 4.293-15.43 4.184c-5.192-.104-10.036-1.624-14.57-4.232m208 0v39.654c10.01-.403 20.01-.878 30-1.412v-38.194c-4.86 2.786-10.01 4.293-15.43 4.184c-5.192-.104-10.036-1.624-14.57-4.232\"/>","treasure-map":"<path fill=\"currentColor\" d=\"M227.4 34.7c-10.1 0-20.2.2-30.2.5l6.1 65.6l-61.1-62.5c-31.3 2.5-62.5 6.6-93.8 12.5l34.2 28.4l-48-.6c35.1 100.2 6.9 182.6-.3 292.1L130 476.5c10-1.3 19.9-2.4 29.6-3.3l21.5-42.2l18.6 28.8l41.5-33.5l.8 43c82.9-.2 157.7 9.1 235.7 7.9c-28.2-73-31.2-143.6-31.9-209.2l-33.3-19.1l32.7-33.9c-.4-21.3-1.3-42-3.6-61.9l-57.4.7l50.2-41.7c-3.8-15.5-9-30.4-16.1-44.7l-29.5-23.9C335 38 281.2 34.6 227.4 34.7m58.7 37c10.6 24.75 21.1 49.5 31.7 74.3c7.5-10.5 14.9-21 22.4-31.5c16 27.2 32 54.3 48 81.5l-16.2 9.5l-33.3-56.7l-42.5 59.4l-15.2-10.9l24-33.5l-21.9-51.5l-24.6 40.1l12 22.6l-16.5 8.8l-18.3-34.5l-24.8 58.2l-17.2-7.4l32.5-76.2l7.7-18c4.8 9.2 9.6 18.3 14.5 27.4c12.5-20.6 25.1-41.11 37.7-61.6M91.2 128c6.72 1.6 13.4 3.4 19.2 5.3c-2.1 5.9-4.1 11.8-6.2 17.6c-5.79-1.6-11.72-3.4-16.9-4.7c1.39-6 2.62-12.1 3.9-18.2m37.9 13.4c6.3 3.8 12 7.2 17 12.8L132.6 167c-4-3.7-8.6-7-12.8-9.4zm28.7 32.3c2.1 7.4 2.1 15.7 1.6 22.5l-18.5-2.4c.1-5.1.3-10-1-14.5zm-21.2 35.7l17.2 7.1c-3.3 6.6-5.1 12.7-8.6 17.8l-16.3-9c2.6-5.4 5.6-10.8 7.7-15.9m-16.5 34.1l17.7 6.1c-1.5 5.4-3 11.2-3.6 16.2l-18.6-2c1.3-7.5 2.1-14 4.5-20.3m207.8 17.4c8.5 1 14.6 3 21.7 7.1l-9.8 16c-4.1-2.8-9.4-3.8-13.5-4.5zm-21.2 1.5c1.1 6.1 2.5 12.2 3.9 18.3c-5.9 1.3-11.7 3.3-16.5 5.1l-6.8-17.4c6.7-2.4 13.5-4.7 19.4-6m-37.9 15.9l11 15.1c-5.6 4-11.8 7.8-16.8 10.6l-8.9-16.4c5.1-2.9 10.6-6.3 14.7-9.3M135.3 281c1.5 4.7 4.2 9.2 6.9 12.1l-13.8 12.6c-5.5-5.7-9.5-13.5-11.2-20.1zm230.3 3.3c3.5 6.4 6.8 12.7 8.7 19.1l-17.8 5.6c-2-5.4-4.3-10.8-6.8-14.8zm-127.4 10.9l6.9 17.3c-6.4 2.7-12.9 4.8-18.6 6.5l-5-18c5.9-1.6 11.3-3.8 16.7-5.8m-83.8 6.2c5.3 1.7 10.8 3.4 15.7 4.2c-1.2 6.1-2 12.3-2.8 18.5c-7-1-14.5-3.3-20.5-5.7zm50 3.5l2.8 18.5c-7.2 1.3-13.4 1.6-19.8 1.9l-.4-18.7c5.9-.2 11.6-.8 17.4-1.7m174.5 18c1 6.4 1.6 12.9 2.2 19.3l-18.7 1.5c-.4-6-.9-11.9-2-17.8zm-67.6 30.8c18.9 3.5 44.9 16.2 68.9 33.9c7.4-9.9 14.4-20.4 21.3-31.1l30.1 12.9c-4.7 12.3-15 25.6-28.6 37.2c17 16.2 30.9 34.5 37 53c-13.8-18.1-31.1-31.8-50.3-42.8c-23.4 15.8-52.7 25.9-79.6 20.4c22.9-4.4 40.6-16.6 55.8-32.6c-16.5-7.5-33.8-13.9-51.3-20.1z\"/>"};
+const $=id=>document.getElementById(id);
+const ico=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 512 512">${ICONS[n]||''}</svg>`;
+const SUF=['','K','M','B','T','aa','ab','ac','ad','ae','af','ag','ah','ai','aj'];
+function fmt(n){if(!isFinite(n))return'∞';n=Math.max(0,n);if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n)+'';const i=Math.floor(Math.log10(n)/3);if(i>=SUF.length)return n.toExponential(2);const v=n/Math.pow(1000,i);return(v<10?v.toFixed(2):v<100?v.toFixed(1):Math.floor(v))+SUF[i];}
+const rand=Math.random,rr=(a,b)=>a+rand()*(b-a),pick=a=>a[Math.floor(rand()*a.length)];
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+/* ================= DONNÉES ================= */
+const ZONES=[
+ {n:'Forêt maudite',fog:0x1a2a24,sky:0x3a5a4c,hs:0x5a7a68,hg:0x100c08,moon:0xd8f0dc,ground:0x22261b,leaf:0x2c3d22,mist:0x9ac0aa},
+ {n:"Ruines d'Ostrelune",fog:0x221c33,sky:0x4a3e70,hs:0x6e5e98,hg:0x0e0a12,moon:0xdcd2ff,ground:0x27232e,leaf:0x322840,mist:0xa898cc},
+ {n:'Brasier cendré',fog:0x2c120b,sky:0x6a2a14,hs:0x9a5030,hg:0x140504,moon:0xffb08a,ground:0x261813,leaf:0x3a1c10,mist:0xd08068},
+ {n:'Abysse de givre',fog:0x0e2130,sky:0x2e5a78,hs:0x6a9ec0,hg:0x060c12,moon:0xd8f4ff,ground:0x1e2c36,leaf:0x3a5868,mist:0xa8d0e8},
+ {n:'Citadelle du Néant',fog:0x190a24,sky:0x4a1a66,hs:0x8040a8,hg:0x08030c,moon:0xf2a8ff,ground:0x1b1122,leaf:0x2c1838,mist:0xb878d8}];
+const RIFTZ={n:'Faille temporelle',fog:0x2a0720,sky:0x8a1a5a,hs:0xc04080,hg:0x0c0208,moon:0xff6ab8,ground:0x1e0b18,leaf:0x3a0e2a,mist:0xff80c0};
+const ARCH=[
+ {n:['Goule des ronces','Rôdeur moussu','Écorcheur sylvestre'],b:"Mère-Ronce l'Écorce hurlante",skin:0x5d6e40,dark:0x2a3020,eye:0xc4ff3a,horn:'antler',extra:'branches',bulk:1},
+ {n:['Golem fêlé','Sentinelle de pierre','Colosse runique'],b:'Le Gardien sans visage',skin:0x7a756e,dark:0x3e3a36,eye:0x6fd6ff,horn:'none',extra:'plates',bulk:1.18},
+ {n:['Diablotin de braise','Bourreau cendré','Démon du brasier'],b:'Vorhaal, Roi des Cendres',skin:0x7a2a1a,dark:0x2c0e0a,eye:0xffb02e,horn:'curl',extra:'flames',bulk:1.05},
+ {n:['Spectre de givre','Hurleur glacial','Wendigo des neiges'],b:"Ysgrim l'Hiver éternel",skin:0x8fb0c4,dark:0x3c5566,eye:0x9ff6ff,horn:'spikes',extra:'crystals',bulk:.95},
+ {n:['Rejeton du Néant','Horreur sans nom','Dévoreur stellaire'],b:"L'Œil qui rampe",skin:0x46305e,dark:0x170d22,eye:0xff3df2,horn:'curl',extra:'tentacles',bulk:1.1}];
+const HEROES=[
+ {n:"Sylve l'Archère",ic:'bow-arrow',base:4,cost:20,u:2,rate:1.2,col:0x9be36b,css:'#9be36b',k:'arrow',pos:[-3.5,0,1.6]},
+ {n:'Ignara la Pyromancienne',ic:'fire-ray',base:22,cost:220,u:4,rate:.9,col:0xff7a2a,css:'#ff8a3a',k:'fire',pos:[-4.3,0,-.2]},
+ {n:'Vesper Lame-d\'ombre',ic:'hooded-assassin',base:130,cost:2400,u:7,rate:1.7,col:0xb06aff,css:'#b882ff',k:'dagger',pos:[-1.3,0,2.1]},
+ {n:"Orage le Prophète",ic:'lightning-arc',base:800,cost:26000,u:13,rate:.75,col:0x6fd8ff,css:'#7fdcff',k:'bolt',pos:[-4.6,0,1.1]},
+ {n:'Gardien des Cendres',ic:'black-knight-helm',base:5200,cost:290000,u:18,rate:.5,col:0xf4c35a,css:'#f4c35a',k:'wave',pos:[-3.2,0,-1.1]}];
+const SLOTS=[['weapon','Arme','broadsword'],['helm','Heaume','black-knight-helm'],['chest','Plastron','chest-armor'],['hands','Gantelets','gauntlet'],['feet','Bottes','metal-boot'],['ring','Anneau','ring'],['neck','Amulette','gem-pendant']];
+const SLOTN=Object.fromEntries(SLOTS.map(s=>[s[0],s]));
+const RAR=[{n:'Commun',c:'#bdb7ac',h:0xbdb7ac,aff:1,m:1},{n:'Magique',c:'#6d8dff',h:0x6d8dff,aff:2,m:1.6},{n:'Rare',c:'#f5d547',h:0xf5d547,aff:3,m:2.4},{n:'Légendaire',c:'#ff8b1f',h:0xff8b1f,aff:3,m:3.4},{n:'Set',c:'#39e27c',h:0x39e27c,aff:2,m:3.2}];
+const AFF={tap:['Dégâts de frappe','%'],merc:['Dégâts des alliés','%'],gold:['Or trouvé','%'],crit:['Chance de critique','%'],cdmg:['Dégâts critiques','%']};
+const LEG={
+ shadow:{slot:'chest',n:'Linceul du Double',ic:'shadow-follower',d:"Un clone d'ombre combat à tes côtés : 2 frappes/s à 250 % de tes dégâts."},
+ meteor:{slot:'helm',n:"Couronne de l'Astre chu",ic:'meteor-impact',d:'Toutes les 12 frappes, 5 météores frappent TOUS les ennemis (400 % chacun).'},
+ chain:{slot:'hands',n:"Poignes de l'Orage",ic:'chain-lightning',d:"30 % par frappe : une chaîne d'éclairs rebondit entre tous les ennemis (300 %)."},
+ blade:{slot:'weapon',n:'Lame du Crépuscule',ic:'crossed-swords',d:'Chaque 5e frappe libère une onde tranchante qui traverse tout (600 %).'},
+ frenzy:{slot:'feet',n:'Bottes du Fléau',ic:'sands-of-time',d:'Toutes les 15 s : Frénésie, 5 frappes automatiques/s pendant 4 s.'},
+ greed:{slot:'ring',n:"Anneau de l'Avare",ic:'two-coins',d:"Chaque coup critique fait jaillir de l'or (40 % de l'or d'un monstre)."}};
+const SETP={weapon:'Fauchelame du Veilleur',neck:'Médaillon du Veilleur',ring:'Sceau du Veilleur'};
+const SETD='Set du Veilleur — 2 pièces : alliés +200 %. 3 pièces : alliés 50 % plus rapides et embrasent leurs cibles (×2).';
+const BASEN={weapon:['Épée','Hache','Lame','Fauchon'],helm:['Heaume','Casque','Capuche'],chest:['Cuirasse','Brigandine','Haubert'],hands:['Gantelets','Poignes','Mitaines'],feet:['Bottes','Grèves','Solerets'],ring:['Anneau','Chevalière','Bague'],neck:['Amulette','Talisman','Collier']};
+const ADJ=[['rouillé','usé','terne'],['du fossoyeur','des cendres','spectral'],['runique','du crépuscule','du sang-noir']];
+const BPOOL=[{k:'kill',t:'Abattre {n} monstres',n:20},{k:'boss',t:'Vaincre {n} boss',n:1},{k:'crit',t:'Porter {n} coups critiques',n:25},{k:'tap',t:'Frapper {n} fois',n:120},{k:'minion',t:'Anéantir {n} larves',n:8},{k:'hire',t:'Améliorer des héros {n} fois',n:15}];
+const BLEG=['blade','frenzy','greed'];
+const KPS=6;
+const hp=s=>10*Math.pow(1.5,s-1);
+const goldFor=s=>hp(s)*.12;
+const xpFor=s=>8*Math.pow(s,1.6);
+const need=l=>Math.floor(10*Math.pow(l,1.6));
+const paraNeed=p=>Math.floor(need(70)*(.6+p*.05));
+const tapBase=l=>(1+(l-1)*1.2)*Math.pow(1.6,Math.floor((l-1)/10));
+const tapCost=l=>5*Math.pow(1.09,l);
+const heroDps=(i,l)=>l?HEROES[i].base*l*Math.pow(1.6,Math.floor(l/10)):0;
+const heroCost=(i,l)=>HEROES[i].cost*Math.pow(1.1,l);
+
+/* ================= ÉTAT ================= */
+const KEY='cendrelame_save_v1';
+function fresh(){return{stage:1,kills:0,maxStage:1,runMax:1,gold:0,tapLvl:1,heroes:[0,0,0,0,0],lvl:1,xp:0,para:0,pp:0,pa:[0,0,0,0],gear:{},inv:[],souls:0,rebirths:0,rift:1,riftBest:0,bnt:[],bDone:0,un:{},got:{},bossFailed:false,mult:1,uid:1,taps:0};}
+let S=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw){S=Object.assign(fresh(),JSON.parse(raw));}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const C={tap:1,mercM:1,gold:1,crit:.05,cdmg:3,legs:{},setN:0,dps:0,spd:1};
+function calc(){
+ const g={tap:0,merc:0,gold:0,crit:0,cdmg:0},legs={};let setN=0;
+ for(const s of SLOTS){const it=S.gear[s[0]];if(!it)continue;for(const k in it.st)g[k]+=it.st[k];if(it.leg)legs[it.leg]=1;if(it.set)setN++;}
+ const P=S.pa,lvlM=1+.08*(S.lvl-1)+.02*S.para,soulM=1+.15*S.souls;
+ C.legs=legs;C.setN=setN;C.spd=setN>=3?1.5:1;
+ C.tap=tapBase(S.tapLvl)*lvlM*soulM*(1+g.tap/100)*(1+.05*P[0]);
+ C.mercM=lvlM*soulM*(1+g.merc/100)*(1+.05*P[1])*(setN>=2?3:1)*(setN>=3?2:1);
+ C.gold=(1+g.gold/100)*(1+.04*P[2])*(1+.05*S.souls);
+ C.crit=Math.min(.6,.05+g.crit/100+.003*P[3]);C.cdmg=3+g.cdmg/100;
+ let d=0;for(let i=0;i<5;i++)d+=heroDps(i,S.heroes[i]);C.dps=d*C.mercM*C.spd;
+}
+calc();
+
+/* ================= THREE : SCÈNE ================= */
+const sceneEl=$('scene'),cv=$('cv');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(1.5,window.devicePixelRatio||1));
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x1a2a24,.05);
+scene.background=new THREE.Color(0x1a2a24);
+const camera=new THREE.PerspectiveCamera(40,1,.1,140);
+const camBase=new THREE.Vector3(.2,2.7,11.8),camLook=new THREE.Vector3(.3,2.05,0);
+camera.position.copy(camBase);camera.lookAt(camLook);
+function resize(){const w=sceneEl.clientWidth,h=sceneEl.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+resize();if(window.ResizeObserver)new ResizeObserver(resize).observe(sceneEl);else addEventListener('resize',resize);
+
+function canvasTex(w,h,fn){const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);return new THREE.CanvasTexture(c);}
+const radial=(stops)=>canvasTex(64,64,x=>{const g=x.createRadialGradient(32,32,0,32,32,32);stops.forEach(s=>g.addColorStop(s[0],s[1]));x.fillStyle=g;x.fillRect(0,0,64,64);});
+const glowTex=radial([[0,'rgba(255,255,255,1)'],[.22,'rgba(255,255,255,.55)'],[1,'rgba(255,255,255,0)']]);
+const shadowTex=radial([[0,'rgba(0,0,0,.85)'],[.5,'rgba(0,0,0,.45)'],[1,'rgba(0,0,0,0)']]);
+const mistTex=canvasTex(256,64,(x,w,h)=>{for(let i=0;i<40;i++){const px=rand()*w,py=h*.35+rand()*h*.4,r=10+rand()*28;const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba(255,255,255,.22)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,w,h);}});
+const skyTex=canvasTex(4,128,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#000');g.addColorStop(.55,'#555');g.addColorStop(.8,'#fff');g.addColorStop(1,'#888');x.fillStyle=g;x.fillRect(0,0,w,h);});
+const ADD={transparent:true,blending:THREE.AdditiveBlending,depthWrite:false};
+function std(c,m=0,r=.85,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:m,roughness:r,flatShading:true},o||{}));}
+const basic=(c,o)=>new THREE.MeshBasicMaterial(Object.assign({color:c},o||{}));
+function mk(geo,mat,x,y,z,p){const m=new THREE.Mesh(geo,mat);m.position.set(x||0,y||0,z||0);if(p)p.add(m);return m;}
+function jit(geo,a,R){R=R||rand;const p=geo.attributes.position,map={};for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),k=Math.round(x*500)+'|'+Math.round(y*500)+'|'+Math.round(z*500);if(!map[k])map[k]=[(R()-.5)*a,(R()-.5)*a,(R()-.5)*a];const o=map[k];p.setXYZ(i,x+o[0],y+o[1],z+o[2]);}geo.computeVertexNormals();return geo;}
+function sprite(col,s,op){const m=new THREE.Sprite(new THREE.SpriteMaterial(Object.assign({map:glowTex,color:col,opacity:op||1},ADD)));m.scale.set(s,s,1);return m;}
+function blob(s){const m=new THREE.Mesh(new THREE.PlaneGeometry(s,s*.6),new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;m.position.y=.03;return m;}
+
+const hemi=new THREE.HemisphereLight(0x5a7a68,0x100c08,.95);scene.add(hemi);
+const moonL=new THREE.DirectionalLight(0xa8c0ff,.8);moonL.position.set(-6,10,-8);scene.add(moonL);
+const fillL=new THREE.DirectionalLight(0xffd0a0,.4);fillL.position.set(4,6,9);scene.add(fillL);
+const hitL=new THREE.PointLight(0xffaa66,0,8,2);hitL.position.set(1.4,2.2,1.5);scene.add(hitL);
+
+// ciel, lune
+const skyM=new THREE.MeshBasicMaterial({map:skyTex,color:0x3a5a4c,fog:false});
+mk(new THREE.PlaneGeometry(170,60),skyM,0,12,-50,scene);
+const moonM=basic(0xd8f0dc,{fog:false});mk(new THREE.IcosahedronGeometry(3,2),moonM,8,15,-45,scene);
+const moonG=sprite(0xd8f0dc,26,.35);moonG.material.fog=false;moonG.position.set(8,15,-44);scene.add(moonG);
+// sol
+const groundM=std(0x22261b,0,1);
+{const g=new THREE.PlaneGeometry(80,46,40,23);g.rotateX(-Math.PI/2);const p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);const f=Math.min(1,(Math.abs(z+1)+Math.abs(x)*.3)/6);p.setY(i,(rand()-.5)*.35*f+(z<-8?(rand())*1.2:0));}g.computeVertexNormals();mk(g,groundM,0,0,-8,scene);}
+const barkM=std(0x1c1511,0,1),leafM=std(0x2c3d22,0,1),stoneM=std(0x4a4650,0,.95),stoneD=std(0x2e2b33,0,1);
+const decor=new THREE.Group();scene.add(decor);
+function tree(x,z,s){const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(s);g.rotation.y=rand()*6;let p=g;
+ for(let i=0;i<3;i++){const seg=new THREE.Group();seg.position.y=i?1.3:0;seg.rotation.z=(rand()-.5)*.4;p.add(seg);mk(new THREE.CylinderGeometry(.2-.05*i,.3-.05*i,1.45,6),barkM,0,.7,0,seg);
+  if(i>0)for(let b=0;b<2;b++){const br=new THREE.Group();br.position.y=.5+rand()*.7;br.rotation.set(rand()*.6-.3,rand()*6,(rand()>.5?1:-1)*(.7+rand()*.5));seg.add(br);mk(new THREE.CylinderGeometry(.03,.09,1.3,5),barkM,0,.65,0,br);if(rand()<.75)mk(jit(new THREE.IcosahedronGeometry(.5+rand()*.35,0),.2),leafM,0,1.3,0,br);}
+  p=seg;}
+ if(rand()<.8)mk(jit(new THREE.IcosahedronGeometry(1+rand()*.4,0),.4),leafM,0,1.3,0,p);
+ decor.add(g);return g;}
+function pillar(x,z,h,broken,par){const g=new THREE.Group();g.position.set(x,0,z);mk(new THREE.BoxGeometry(1.1,.35,1.1),stoneD,0,.17,0,g);mk(jit(new THREE.CylinderGeometry(.38,.42,h,7,3),.1),stoneM,0,.35+h/2,0,g);
+ if(!broken)mk(new THREE.BoxGeometry(1.15,.35,1.15),stoneD,0,.5+h,0,g);else mk(jit(new THREE.DodecahedronGeometry(.4,0),.15),stoneM,.8,.3,.3,g);g.rotation.z=(rand()-.5)*.12;(par||decor).add(g);return g;}
+function rock(x,z,s,par){const m=mk(jit(new THREE.DodecahedronGeometry(s,0),s*.35),stoneD,x,s*.4,z,par||decor);m.rotation.set(rand(),rand(),rand());return m;}
+[[-11,-9,1.3],[-7,-12,1.5],[-4,-7,1],[4.5,-8,1.2],[8,-11,1.6],[12,-7,1.1],[-14,-5,1.2],[15,-12,1.5],[0,-14,1.7],[-9,-4.5,.9],[10,-4.5,.95],[6,-15,1.4],[-16,-14,1.6]].forEach(t=>tree(t[0],t[1],t[2]));
+tree(-7.4,3.2,1.25);tree(7.6,2.6,1.35);
+pillar(-6,-3,3.4,false);pillar(-3.4,-5.5,2.2,true);pillar(5.6,-3.6,3.8,false);pillar(3.2,-6.2,1.6,true);pillar(-1,-8,4,false);pillar(1.8,-8,4,false);
+mk(new THREE.BoxGeometry(3.8,.5,1.1),stoneD,.4,4.75,-8,decor);
+for(let i=0;i<9;i++)rock(rr(-8,8),rr(-5,3.5),rr(.15,.5));
+for(let i=0;i<6;i++){const gs=mk(jit(new THREE.BoxGeometry(.45,.75,.14),.05),stoneM,rr(-7,7),.3,rr(-6,-2.5),decor);gs.rotation.set(rr(-.2,.2),rr(-.5,.5),rr(-.2,.2));}
+// props par zone
+const zoneProps=[0,1,2,3,4].map(()=>{const g=new THREE.Group();g.visible=false;scene.add(g);return g;});
+const animProps=[];
+for(let i=0;i<7;i++){const x=rr(-7,7),z=rr(-4,2.5);if(Math.abs(x+.5)<3&&z>-1)continue;const st=mk(new THREE.CylinderGeometry(.04,.06,.3,5),std(0xcfc8b0),x,.15,z,zoneProps[0]);mk(new THREE.ConeGeometry(.2,.16,7),basic(0x4affd0),0,.18,0,st);const s=sprite(0x4affd0,.8,.5);s.position.y=.25;st.add(s);}
+for(let i=0;i<4;i++){const p=pillar(rr(-9,9),rr(-7,-3),rr(1,2.5),true,zoneProps[1]);const r=mk(new THREE.BoxGeometry(.5,.08,.02),basic(0xb08aff),0,1,.44,p);}
+for(let i=0;i<3;i++){const rs=mk(jit(new THREE.BoxGeometry(.6,1.3,.3),.1),stoneD,rr(-8,8),.65,rr(-3,1),zoneProps[1]);mk(new THREE.BoxGeometry(.3,.6,.02),basic(0xb08aff),0,0,.16,rs);}
+const lavaM=basic(0xff5a14);
+for(let i=0;i<9;i++){const c=mk(new THREE.BoxGeometry(rr(1,3),.03,rr(.06,.14)),lavaM,rr(-9,9),.04,rr(-6,3),zoneProps[2]);c.rotation.y=rr(0,3);}
+for(let i=0;i<5;i++){const sp=mk(jit(new THREE.ConeGeometry(.35,rr(1.5,3),5),.15),std(0x1a0e0a),rr(-10,10),.9,rr(-8,-3),zoneProps[2]);sp.rotation.z=rr(-.2,.2);}
+const iceM=std(0x9fdcff,.1,.2,{emissive:0x1a4a6a,transparent:true,opacity:.9});
+for(let i=0;i<10;i++){const g=new THREE.Group();g.position.set(rr(-10,10),0,rr(-8,2));if(Math.abs(g.position.x)<3.5&&g.position.z>-2)g.position.z-=4;for(let k=0;k<3;k++){const c=mk(new THREE.OctahedronGeometry(rr(.25,.6),0),iceM,rr(-.3,.3),.4,rr(-.3,.3),g);c.scale.y=rr(2,3.5);c.rotation.z=rr(-.4,.4);}zoneProps[3].add(g);}
+const voidM=std(0x0a0410,.6,.3,{emissive:0x3a0a5a});
+for(let i=0;i<6;i++){const o=mk(new THREE.OctahedronGeometry(rr(.4,.8),0),voidM,rr(-9,9),rr(2,5),rr(-9,-3),zoneProps[4]);o.scale.y=2.4;const s=sprite(0xd04aff,2.5,.4);o.add(s);animProps.push({o,y:o.position.y,sp:rr(.5,1.2),ph:rand()*6});}
+// torches
+const torches=[];
+function torch(x,z){const g=new THREE.Group();g.position.set(x,0,z);mk(new THREE.CylinderGeometry(.06,.09,2,6),barkM,0,1,0,g);mk(new THREE.CylinderGeometry(.22,.12,.25,7),stoneD,0,2.05,0,g);
+ const f1=mk(new THREE.ConeGeometry(.17,.6,6),basic(0xff6a1a,ADD),0,2.45,0,g),f2=mk(new THREE.ConeGeometry(.09,.4,6),basic(0xffe08a,ADD),0,2.38,0,g);const s=sprite(0xff8a3a,2.4,.6);s.position.y=2.4;g.add(s);
+ const L=new THREE.PointLight(0xff7a2a,1.7,11,2);L.position.y=2.5;g.add(L);decor.add(g);torches.push({f1,f2,s,L,ph:rand()*9});}
+torch(-1.1,-1.6);torch(4.6,-1.2);
+// brume
+const mists=[];
+for(let i=0;i<5;i++){const m=mk(new THREE.PlaneGeometry(34,5),new THREE.MeshBasicMaterial({map:mistTex,color:0x9ac0aa,transparent:true,opacity:.5,depthWrite:false}),rr(-6,6),.9+i*.25,-1.5-i*2.2,scene);m.renderOrder=2;mists.push({m,sp:rr(.15,.4)*(i%2?1:-1)});}
+// braises
+const EMB=90,embGeo=new THREE.BufferGeometry(),embPos=new Float32Array(EMB*3),embV=[];
+for(let i=0;i<EMB;i++){embPos[i*3]=rr(-9,9);embPos[i*3+1]=rr(0,8);embPos[i*3+2]=rr(-6,4);embV.push(rr(.4,1.1),rand()*6);}
+embGeo.setAttribute('position',new THREE.BufferAttribute(embPos,3));
+const embM=new THREE.PointsMaterial(Object.assign({size:.13,map:glowTex,color:0xff8a3a},ADD));
+const embers=new THREE.Points(embGeo,embM);embers.frustumCulled=false;scene.add(embers);
+// étincelles
+const SP=300,spGeo=new THREE.BufferGeometry(),spPos=new Float32Array(SP*3),spCol=new Float32Array(SP*3),spV=new Float32Array(SP*3),spL=new Float32Array(SP),spB=new Float32Array(SP*3);let spI=0;
+for(let i=0;i<SP;i++)spPos[i*3+1]=-99;
+spGeo.setAttribute('position',new THREE.BufferAttribute(spPos,3));spGeo.setAttribute('color',new THREE.BufferAttribute(spCol,3));
+const sparks=new THREE.Points(spGeo,new THREE.PointsMaterial(Object.assign({size:.24,map:glowTex,vertexColors:true},ADD)));sparks.frustumCulled=false;scene.add(sparks);
+const tmpC=new THREE.Color();
+function burst(p,n,col,spd,up){tmpC.setHex(col);spd=spd||4;up=up==null?2:up;for(let k=0;k<n;k++){const i=spI++%SP,a=rand()*6.283,b=rr(-1,1),s=spd*rr(.3,1);spPos[i*3]=p.x;spPos[i*3+1]=p.y;spPos[i*3+2]=p.z;spV[i*3]=Math.cos(a)*s*Math.sqrt(1-b*b);spV[i*3+1]=b*s+up;spV[i*3+2]=Math.sin(a)*s*.6;spL[i]=rr(.35,.8);spB[i*3]=tmpC.r;spB[i*3+1]=tmpC.g;spB[i*3+2]=tmpC.b;}}
+
+/* ---------- Héros (chevalier) ---------- */
+function buildKnight(ov){
+ const g=new THREE.Group(),steel=ov||std(0x8d939e,.65,.38),dk=ov||std(0x2b2a33,.5,.6),cloth=ov||std(0x7a1820,0,.9),gold=ov||std(0xc9a14a,.7,.35),glow=basic(ov?0xc080ff:0xffa040);
+ for(const s of[-1,1]){mk(new THREE.CylinderGeometry(.16,.13,.9,6),dk,s*.2,.45,0,g);mk(new THREE.BoxGeometry(.26,.18,.42),steel,s*.2,.09,.07,g);}
+ mk(new THREE.CylinderGeometry(.42,.32,.95,7),steel,0,1.35,0,g);mk(new THREE.CylinderGeometry(.35,.35,.12,7),gold,0,.92,0,g);
+ const sk=mk(new THREE.CylinderGeometry(.34,.48,.45,7,1,true),cloth,0,.72,0,g);sk.material.side=THREE.DoubleSide;
+ const cape=mk(new THREE.BoxGeometry(.85,1.45,.05),cloth,0,1.15,-.38,g);cape.rotation.x=.2;
+ mk(new THREE.BoxGeometry(.3,.4,.06),gold,0,1.45,.36,g);
+ const head=new THREE.Group();head.position.y=2.08;g.add(head);
+ mk(new THREE.CylinderGeometry(.24,.27,.46,7),steel,0,0,0,head);mk(new THREE.ConeGeometry(.25,.3,7),steel,0,.38,0,head);mk(new THREE.BoxGeometry(.32,.05,.06),glow,0,.03,.25,head);
+ const pl=mk(new THREE.ConeGeometry(.07,.55,5),cloth,0,.55,-.12,head);pl.rotation.x=-.9;
+ for(const s of[-1,1]){const p=mk(new THREE.SphereGeometry(.25,7,5),steel,s*.5,1.78,0,g);p.scale.set(1,.75,1.05);}
+ const armL=new THREE.Group();armL.position.set(-.55,1.7,0);g.add(armL);mk(new THREE.CylinderGeometry(.11,.1,.75,6),dk,0,-.37,0,armL);
+ const sh=mk(new THREE.CylinderGeometry(.44,.44,.08,8),steel,0,-.6,.22,armL);sh.rotation.x=Math.PI/2;mk(new THREE.CylinderGeometry(.12,.12,.1,6),gold,0,.05,0,sh);mk(new THREE.BoxGeometry(.06,.06,.75),cloth,0,0,0,sh).rotation.x=Math.PI/2;
+ armL.rotation.x=-.5;
+ const armR=new THREE.Group();armR.position.set(.55,1.7,0);g.add(armR);mk(new THREE.CylinderGeometry(.11,.1,.75,6),dk,0,-.37,0,armR);
+ const sw=new THREE.Group();sw.position.set(0,-.75,0);armR.add(sw);mk(new THREE.CylinderGeometry(.04,.04,.3,5),dk,0,0,0,sw).rotation.x=Math.PI/2;
+ mk(new THREE.BoxGeometry(.4,.06,.08),gold,0,0,.15,sw);mk(new THREE.BoxGeometry(.1,.035,1.45),steel,0,0,.9,sw);
+ const rune=mk(new THREE.BoxGeometry(.03,.04,1.1),glow,0,0,.85,sw);
+ return{g,armR,armL,head,cape,rune};}
+const hero=buildKnight();hero.g.position.set(-2.4,0,.4);hero.g.rotation.y=.95;scene.add(hero.g);
+const heroBlob=blob(1.6);heroBlob.position.set(-2.4,.03,.4);scene.add(heroBlob);
+const shadowMat=std(0x07030c,.2,.6,{emissive:0x3a0f70,transparent:true,opacity:.85});
+const clone=buildKnight(shadowMat);clone.g.position.set(-3.6,0,-.7);clone.g.rotation.y=.95;clone.g.visible=false;scene.add(clone.g);
+const cloneAura=sprite(0x8a3aff,3.4,.45);cloneAura.position.set(-3.6,1.3,-.7);cloneAura.visible=false;scene.add(cloneAura);
+
+/* ---------- Héros recrutables ---------- */
+function buildMerc(H){
+ const g=new THREE.Group(),cl=std(new THREE.Color(H.col).multiplyScalar(.45).getHex(),0,.9),dk=std(0x241e2a),skin=std(0xd8b49a),glow=basic(H.col);
+ mk(new THREE.ConeGeometry(.4,1.2,7),cl,0,.6,0,g);mk(new THREE.CylinderGeometry(.2,.26,.5,7),dk,0,1.05,0,g);
+ mk(new THREE.SphereGeometry(.17,7,5),skin,0,1.42,.03,g);const hood=mk(new THREE.ConeGeometry(.24,.45,7),cl,0,1.58,-.03,g);hood.rotation.x=-.25;
+ mk(new THREE.BoxGeometry(.18,.03,.04),glow,0,1.43,.17,g);
+ const w=new THREE.Group();w.position.set(.32,1,.15);g.add(w);
+ if(H.k==='arrow'){const b=mk(new THREE.TorusGeometry(.42,.03,4,12,Math.PI),dk,0,0,0,w);b.rotation.set(0,Math.PI/2,-Math.PI/2);}
+ else if(H.k==='fire'||H.k==='bolt'){mk(new THREE.CylinderGeometry(.03,.04,1.6,5),dk,0,.2,0,w);mk(new THREE.OctahedronGeometry(.13,0),glow,0,1.05,0,w);const s=sprite(H.col,.9,.8);s.position.y=1.05;w.add(s);}
+ else if(H.k==='dagger'){mk(new THREE.BoxGeometry(.04,.5,.08),glow,0,0,0,w);mk(new THREE.BoxGeometry(.04,.5,.08),glow,-.64,0,0,w);}
+ else{mk(new THREE.CylinderGeometry(.04,.05,1.2,5),dk,0,.1,0,w);mk(new THREE.BoxGeometry(.35,.3,.5),std(0xc9a14a,.7,.35),0,.75,0,w);g.scale.setScalar(1.25);}
+ const aura=sprite(H.col,1.6,0);aura.position.y=.8;g.add(aura);
+ g.position.set(H.pos[0],0,H.pos[2]);g.rotation.y=.9;g.visible=false;scene.add(g);const b=blob(1.1);b.position.set(H.pos[0],.03,H.pos[2]);b.visible=false;scene.add(b);
+ return{g,w,b,aura,hop:0,tip:new THREE.Vector3()};}
+const mercs=HEROES.map(buildMerc);
+
+/* ---------- Monstres ---------- */
+function chain(par,n,len,rad,rz,rx,mat){let p=par;for(let i=0;i<n;i++){const g=new THREE.Group();g.position.y=i?len:0;g.rotation.z=rz;g.rotation.x=rx;p.add(g);mk(new THREE.CylinderGeometry(Math.max(rad*(1-(i+1)/n),.012),rad*(1-i/n),len,5),mat,0,len/2,0,g);p=g;}return p;}
+function buildMonster(ai,v,boss){
+ const A=ARCH[ai],R=mulberry(ai*977+v*131+(boss?7:0)+1);
+ const tint=new THREE.Color(A.skin).offsetHSL((v-1)*.03,0,(v-1)*.04+(boss?.03:0));
+ const skin=std(tint.getHex(),.05,.8,{emissive:0}),dark=std(A.dark,.1,.9,{emissive:0}),eyeM=basic(A.eye),bone=std(0xd8ccb0,0,.6);
+ const root=new THREE.Group(),body=new THREE.Group();root.add(body);const anim=[];
+ const bk=A.bulk*(1+v*.07);
+ const legs=[];for(const s of[-1,1]){const lg=new THREE.Group();lg.position.set(s*.62*bk,1.3,0);body.add(lg);mk(jit(new THREE.CylinderGeometry(.42*bk,.3,1,7),.1,R),skin,0,-.35,0,lg);mk(jit(new THREE.CylinderGeometry(.28,.36,.72,6),.08,R),dark,0,-.95,.05,lg);const ft=mk(jit(new THREE.DodecahedronGeometry(.36,0),.08,R),dark,0,-1.22,.2,lg);ft.scale.set(1.1,.5,1.5);legs.push(lg);}
+ mk(jit(new THREE.IcosahedronGeometry(.75*bk,0),.12,R),dark,0,1.45,0,body).scale.set(1.2,.7,.9);
+ const torso=mk(jit(new THREE.IcosahedronGeometry(1,1),.2,R),skin,0,2.35,-.05,body);torso.scale.set(1.22*bk,1.15,.95*bk);
+ mk(jit(new THREE.IcosahedronGeometry(.7,1),.12,R),dark,0,1.95,.38,body).scale.set(1,1,.7);
+ const core=mk(new THREE.OctahedronGeometry(.17,0),eyeM,0,2.5,.92*bk,body);const cs=sprite(A.eye,1.1,.7);core.add(cs);
+ const head=new THREE.Group();head.position.set(0,3.35,.45);body.add(head);
+ mk(jit(new THREE.DodecahedronGeometry(.56,0),.12,R),skin,0,0,0,head).scale.set(1,.85,1.1);
+ mk(jit(new THREE.BoxGeometry(.62,.36,.5),.08,R),skin,0,-.18,.42,head);
+ const jaw=new THREE.Group();jaw.position.set(0,-.36,.2);head.add(jaw);mk(jit(new THREE.BoxGeometry(.56,.16,.55),.05,R),dark,0,-.05,.22,jaw);
+ for(let i=0;i<4;i++){mk(new THREE.ConeGeometry(.045,.17,4),bone,-.2+i*.13,.08,.45,jaw);}
+ for(let i=0;i<3;i++){const t=mk(new THREE.ConeGeometry(.045,.15,4),bone,-.14+i*.14,-.33,.62,head);t.rotation.x=Math.PI;}
+ mk(new THREE.BoxGeometry(.74,.12,.22),dark,0,.17,.44,head).rotation.x=.2;
+ for(const s of[-1,1]){mk(new THREE.SphereGeometry(.075,6,4),eyeM,s*.2,.05,.58,head);const es=sprite(A.eye,.6,.8);es.position.set(s*.2,.05,.62);head.add(es);}
+ if(A.horn==='antler'){for(const s of[-1,1]){const h=new THREE.Group();h.position.set(s*.3,.35,-.05);h.rotation.z=-s*.5;head.add(h);const e=chain(h,3,.45,.09,-s*.25,-.15,bone);const b=new THREE.Group();b.rotation.z=s*.9;h.children[0].add(b);chain(b,2,.3,.05,0,0,bone);chain(e,2,.25,.04,s*.5,0,bone);}}
+ else if(A.horn==='curl'){const n=2+v;for(const s of[-1,1]){const h=new THREE.Group();h.position.set(s*.35,.3,-.05);h.rotation.set(-.3,0,-s*1.1);head.add(h);chain(h,n+2,.32,.14,s*.45,-.12,dark);}}
+ else if(A.horn==='spikes'){for(let i=0;i<5+v;i++){const a=(i/(4+v)-.5)*2.2;const sp=mk(new THREE.ConeGeometry(.08,.6,4),iceM,Math.sin(a)*.4,.35,Math.cos(a)*.1-.1,head);sp.rotation.z=-a*.8;}}
+ const arms=[];for(const s of[-1,1]){const sh=new THREE.Group();sh.position.set(s*1.25*bk,2.95,0);body.add(sh);mk(jit(new THREE.IcosahedronGeometry(.46*bk,0),.1,R),dark,0,0,0,sh);mk(jit(new THREE.CylinderGeometry(.3,.24,1.1,6),.08,R),skin,0,-.6,0,sh);
+  const el=new THREE.Group();el.position.set(0,-1.15,0);sh.add(el);mk(jit(new THREE.CylinderGeometry(.28,.42,1.05,6),.1,R),skin,0,-.5,0,el);mk(jit(new THREE.DodecahedronGeometry(.36,0),.1,R),dark,0,-1.1,.05,el);
+  for(let c=-1;c<=1;c++){const cl=mk(new THREE.ConeGeometry(.07,.45,4),bone,c*.16,-1.45,.12,el);cl.rotation.x=Math.PI*.9;}
+  sh.rotation.z=s*.2;el.rotation.x=-.55;arms.push({sh,el,s});}
+ for(let i=0;i<4;i++){const sp=mk(new THREE.ConeGeometry(.17,.75-.1*i,5),dark,0,3.05-i*.42,-.8,body);sp.rotation.x=-1-i*.12;}
+ if(A.extra==='branches'){for(let i=0;i<3;i++){const b=new THREE.Group();b.position.set((i-1)*.5,2.9,-.6);b.rotation.set(-.6,0,(i-1)*.6);body.add(b);const e=chain(b,3,.5,.08,(R()-.5)*.6,-.2,barkM);mk(jit(new THREE.IcosahedronGeometry(.32,0),.15,R),leafM,0,.5,0,e);}
+  for(let i=0;i<4;i++)mk(jit(new THREE.IcosahedronGeometry(.28,0),.12,R),leafM,(R()-.5)*1.6,2+R()*1.2,.5+R()*.3,body);}
+ if(A.extra==='plates'){const pm=std(0x55524e,.3,.6);for(const s of[-1,1]){const p=mk(jit(new THREE.BoxGeometry(.9,.35,.9),.1,R),pm,s*1.3*bk,3.3,0,body);p.rotation.z=s*.35;}mk(jit(new THREE.BoxGeometry(1.5,.8,.4),.1,R),pm,0,2.6,.75,body);for(let i=0;i<3;i++)mk(new THREE.BoxGeometry(.05,.5,.02),eyeM,(i-1)*.35,2.6,.96,body);}
+ if(A.extra==='flames'){for(const p of[[-1.25*bk,3.4,0],[1.25*bk,3.4,0],[0,3.95,.1],[0,3,-.7]]){const f=mk(new THREE.ConeGeometry(.22,.8,6),basic(0xff7a1a,ADD),p[0],p[1],p[2],body);const s=sprite(0xff6a1a,1.4,.6);f.add(s);anim.push({o:f,t:'flame',ph:R()*6});}}
+ if(A.extra==='crystals'){for(let i=0;i<6;i++){const c=mk(new THREE.OctahedronGeometry(.22+R()*.2,0),iceM,(R()-.5)*1.8,2.4+R()*1.2,-.6-R()*.3,body);c.scale.y=2.4;c.rotation.set(-.6+R()*.4,0,(R()-.5)*1.2);}}
+ if(A.extra==='tentacles'){for(let i=0;i<4;i++){const b=new THREE.Group();b.position.set((i-1.5)*.55,2.2+(i%2)*.6,-.7);b.rotation.set(-1.1,0,(i-1.5)*.5);body.add(b);let p=b;const segs=[];for(let k=0;k<5;k++){const g=new THREE.Group();g.position.y=k?.32:0;p.add(g);mk(new THREE.SphereGeometry(.17-.025*k,6,4),k%2?dark:skin,0,.16,0,g);segs.push(g);p=g;}anim.push({o:segs,t:'tent',ph:i*1.3});}}
+ if(boss){for(let i=0;i<7;i++){const a=i/7*6.283;const c=mk(new THREE.ConeGeometry(.06,.4,4),eyeM,Math.cos(a)*.42,.62,Math.sin(a)*.42,head);}const au=mk(new THREE.RingGeometry(1.6,2.3,32),basic(A.eye,Object.assign({opacity:.35,side:THREE.DoubleSide},ADD)),0,.05,0,root);au.rotation.x=-Math.PI/2;anim.push({o:au,t:'spin'});root.userData.sc=1.14;}
+ else root.userData.sc=.92+v*.04;
+ root.add(blob(3.4));
+ return{root,body,head,jaw,arms,legs,core,mats:[skin,dark],anim,eye:A.eye,skin:tint.getHex()};}
+const mCache={};
+function getMonster(ai,v,boss){const k=ai*10+v+(boss?100:0);return mCache[k]||(mCache[k]=buildMonster(ai,v,boss));}
+function buildMinion(ai,idx){const A=ARCH[ai],R=mulberry(ai*31+idx*7+3),skin=std(A.skin,0,.8,{emissive:0}),dark=std(A.dark,0,.9,{emissive:0}),eyeM=basic(A.eye);
+ const root=new THREE.Group(),body=new THREE.Group();root.add(body);mk(jit(new THREE.IcosahedronGeometry(.34,0),.1,R),skin,0,0,0,body);mk(jit(new THREE.BoxGeometry(.3,.12,.24),.04,R),dark,0,-.22,.12,body);
+ for(const s of[-1,1]){mk(new THREE.SphereGeometry(.055,5,4),eyeM,s*.12,.04,.3,body);const h=mk(new THREE.ConeGeometry(.06,.3,4),dark,s*.18,.32,0,body);h.rotation.z=-s*.5;}
+ const wings=[];for(const s of[-1,1]){const w=new THREE.Group();w.position.set(s*.25,.08,-.08);body.add(w);const m=mk(new THREE.ConeGeometry(.32,.7,3),dark,s*.3,0,0,w);m.rotation.z=s*Math.PI/2;m.scale.z=.12;wings.push({w,s});}
+ const t=mk(new THREE.ConeGeometry(.08,.45,4),dark,0,-.42,-.1,body);t.rotation.x=Math.PI+.4;const au=sprite(A.eye,1.2,.35);body.add(au);
+ return{root,body,wings,mats:[skin,dark]};}
+const minCache={};
+function getMinion(ai,i){const k=ai*10+i;return minCache[k]||(minCache[k]=buildMinion(ai,i));}
+
+/* ---------- FX pools ---------- */
+const unitBox=new THREE.BoxGeometry(1,1,1);
+const segs=[],bolts=[];
+function bolt(a,b,col,w,life){w=w||.07;life=life||.2;const pts=[a.clone()],n=7;for(let i=1;i<n;i++){const p=a.clone().lerp(b,i/n);p.x+=rr(-.35,.35);p.y+=rr(-.35,.35);p.z+=rr(-.2,.2);pts.push(p);}pts.push(b.clone());const list=[];
+ for(let i=0;i<pts.length-1;i++){let s=segs.find(s=>!s.visible);if(!s){s=new THREE.Mesh(unitBox,basic(0xffffff,Object.assign({},ADD)));scene.add(s);segs.push(s);}s.visible=true;s.material.color.setHex(col);s.material.opacity=1;s.position.copy(pts[i]).lerp(pts[i+1],.5);s.scale.set(w,w,pts[i].distanceTo(pts[i+1])+.05);s.lookAt(pts[i+1]);list.push(s);}
+ bolts.push({list,t:life,life});}
+const pools={};
+function fromPool(kind,make){const p=pools[kind]||(pools[kind]=[]);let o=p.find(o=>!o.visible);if(!o){o=make();scene.add(o);p.push(o);}o.visible=true;return o;}
+const fxs=[];
+function ring(p,col,s1,life){const m=fromPool('ring',()=>{const m=new THREE.Mesh(new THREE.RingGeometry(.75,1,40),basic(0xffffff,Object.assign({side:THREE.DoubleSide},ADD)));m.rotation.x=-Math.PI/2;return m;});m.material.color.setHex(col);m.position.set(p.x,.08,p.z);fxs.push({o:m,t:0,life:life||.5,k:'ring',s1:s1||3});}
+function slash(p,col,big){const m=fromPool('slash',()=>new THREE.Mesh(new THREE.TorusGeometry(1,.06,3,24,Math.PI*.85),basic(0xffffff,Object.assign({},ADD))));m.material.color.setHex(col);m.position.copy(p);m.rotation.set(rr(-.3,.3),rr(-.3,.3),rr(0,6.28));fxs.push({o:m,t:0,life:.2,k:'slash',s1:big?1.8:1.1});}
+function beam(x,col){const m=fromPool('beam',()=>{const g=new THREE.Group();mk(new THREE.CylinderGeometry(.3,.45,12,12,1,true),basic(0xffffff,Object.assign({side:THREE.DoubleSide,opacity:.5},ADD)),0,6,0,g);mk(new THREE.CylinderGeometry(.08,.12,12,8,1,true),basic(0xffffff,Object.assign({},ADD)),0,6,0,g);return g;});m.children.forEach(c=>c.material.color.setHex(col));m.position.set(x,0,.6);fxs.push({o:m,t:0,life:2.6,k:'beam'});}
+const frags=[];for(let i=0;i<22;i++){const f=new THREE.Mesh(new THREE.TetrahedronGeometry(.22,0),std(0xffffff,0,.8));f.visible=false;scene.add(f);frags.push({m:f,v:new THREE.Vector3(),r:new THREE.Vector3(),t:0});}
+function shatter(p,col,s){for(const f of frags){f.m.visible=true;f.m.material.color.setHex(col);f.m.position.set(p.x+rr(-.8,.8)*s,p.y+rr(0,3)*s,p.z+rr(-.4,.4));f.v.set(rr(-3,5),rr(2,7),rr(-2,3));f.r.set(rr(-9,9),rr(-9,9),rr(-9,9));f.t=rr(.7,1.1);f.m.scale.setScalar(rr(.6,1.6)*s);}}
+const projs=[];
+function makeProj(k,col){const g=new THREE.Group();
+ if(k==='arrow'){mk(new THREE.BoxGeometry(.04,.04,.75),std(0x6a4a2a),0,0,0,g);mk(new THREE.ConeGeometry(.06,.16,4),basic(col),0,0,.42,g).rotation.x=Math.PI/2;const s=sprite(col,.5,.7);s.position.z=.4;g.add(s);}
+ else if(k==='fire'){mk(new THREE.IcosahedronGeometry(.16,0),basic(0xffe08a),0,0,0,g);g.add(sprite(col,1.3,.95));}
+ else if(k==='dagger'){mk(new THREE.BoxGeometry(.06,.05,.5),basic(col),0,0,0,g);g.add(sprite(col,.8,.7));}
+ else if(k==='meteor'){mk(jit(new THREE.IcosahedronGeometry(.34,0),.12),std(0x3a1a0a,0,.8,{emissive:0xff4a0a}),0,0,0,g);g.add(sprite(0xff6a1a,2.2,1));const t=sprite(0xff9a3a,1.4,.6);t.position.set(0,.5,0);g.add(t);}
+ else if(k==='wave'){const m=mk(new THREE.TorusGeometry(1.1,.09,3,20,Math.PI),basic(col,Object.assign({},ADD)),0,0,0,g);m.rotation.z=-Math.PI/2;g.add(sprite(col,1.4,.6));}
+ return g;}
+function shoot(k,col,from,to,dur,arc,cb){const m=fromPool('p_'+k+col,()=>makeProj(k,col));m.position.copy(from);projs.push({m,k,a:from.clone(),b:to.clone(),t:0,dur,arc,cb});}
+
+/* ---------- Combat ---------- */
+let M=null,mins=[],nextSpawn=.2,T=0,shake=0,swing=1,cloneSwing=1,cloneT=.5,frT=15,frOn=0,frTap=0,metC=0,bladeC=0;
+const mT=[0,0,0,0,0];
+let R={on:false};
+const MPOS=new THREE.Vector3(1.95,0,-.2),MINP=[[3.7,1.5,-1.4],[2.6,3.4,-2.2],[4.5,2.8,-.3]];
+function zoneIdx(){return Math.floor((S.stage-1)/10)%5;}
+function spawnMain(){
+ let ai,v,boss=false,hpv,name,guard=false;
+ if(R.on){ai=Math.floor(rand()*5);v=Math.floor(rand()*3);guard=R.guardNext;if(guard){R.guardNext=false;R.guard=true;boss=true;}hpv=hp(6+R.tier*3)*(guard?10:.5);name=guard?'Gardien de faille — '+ARCH[ai].b:ARCH[ai].n[v];}
+ else{ai=zoneIdx();v=Math.min(2,Math.floor(((S.stage-1)%10)/3.4));boss=S.stage%5===0&&S.kills>=KPS&&!S.bossFailed;hpv=hp(S.stage)*(boss?7:1);name=boss?ARCH[ai].b:ARCH[ai].n[v];if(boss){S.bossT=30;}}
+ const o=getMonster(ai,v,boss);o.root.position.set(MPOS.x,-4,MPOS.z);o.root.rotation.y=-.75;o.root.scale.setScalar(o.root.userData.sc);o.body.scale.set(1,1,1);o.body.position.set(0,0,0);o.body.rotation.set(0,0,0);o.mats.forEach(m=>m.emissive.setHex(0));scene.add(o.root);
+ M={o,hp:hpv,max:hpv,boss,guard,state:'rise',t:0,kx:0,flash:0,name,ai,isMin:false};
+ burst(new THREE.Vector3(MPOS.x,.2,.5),26,0x8a7a6a,3,1.5);ring(MPOS,ARCH[ai].eye,boss?5:3.5,.6);
+ if(boss){shake=.5;hitL.color.setHex(ARCH[ai].eye);hitL.intensity=4;}
+ mins.forEach(m=>scene.remove(m.o.root));mins=[];
+ const nm=R.on?3:(S.stage>=3?2:0);
+ for(let i=0;i<nm;i++){const o=getMinion(ai,i);const p=MINP[i];o.root.position.set(p[0],p[1],p[2]);o.root.scale.setScalar(.01);o.mats.forEach(m=>m.emissive.setHex(0));scene.add(o.root);mins.push({o,hp:hpv*.22,max:hpv*.22,state:'rise',t:0,flash:0,isMin:true,p,ph:rand()*6});}
+ renderMHud(true);}
+function targets(){const l=[];if(M&&M.state!=='dying')l.push(M);mins.forEach(m=>{if(m.state!=='dying')l.push(m);});return l;}
+const _v=new THREE.Vector3();
+function hitPos(tg,out){out=out||new THREE.Vector3();if(tg.isMin)return out.copy(tg.o.root.position);const sc=tg.o.root.userData.sc;return out.set(MPOS.x-.5*sc+tg.kx,2.3*sc+rr(-.5,.5),.6);}
+function dmg(tg,d,cls,knock){if(!tg||tg.state==='dying')return;tg.hp-=d;tg.flash=1;if(knock&&!tg.isMin)tg.kx=Math.min(tg.kx+knock,.55);
+ popNum(hitPos(tg,_v),fmt(d),cls);if(tg.hp<=0){tg.hp=0;tg.isMin?killMin(tg):killMain();}}
+function rollTap(mult){const c=rand()<C.crit;return{d:C.tap*(mult||1)*(c?C.cdmg:1),c};}
+function doTap(auto){
+ S.taps++;bump('tap');swing=0;const tg=M&&M.state!=='dying'?M:null;
+ if(!tg)return;
+ const r=rollTap();const p=hitPos(tg);slash(p,r.c?0xffc04a:0xfff0d0,r.c);burst(p,r.c?22:10,r.c?0xffb030:0xffe0a0,r.c?6:4);
+ hitL.color.setHex(0xffaa66);hitL.intensity=r.c?5:2.5;if(r.c){shake=Math.max(shake,.18);bump('crit');if(C.legs.greed){const g=goldFor(S.stage)*C.gold*.4;addGold(g);popNum(p,'+'+fmt(g),'gold');burst(p,8,0xffd040,3,3);}}
+ dmg(tg,r.d,r.c?'crit':'',r.c?.35:.18);
+ if(C.legs.meteor&&++metC>=12){metC=0;meteors();}
+ if(C.legs.chain&&rand()<.3)chainL();
+ if(C.legs.blade&&++bladeC>=5){bladeC=0;bladeWave();}
+ if(!auto)$('tapHint').style.display='none';}
+function meteors(){for(let i=0;i<5;i++)setTimeout(()=>{const tl=targets();if(!tl.length)return;const tg=pick(tl),to=hitPos(tg);shoot('meteor',0,new THREE.Vector3(to.x-3+rr(-1,1),10,to.z-1),to,.45,0,()=>{shake=Math.max(shake,.35);ring(to,0xff6a1a,4,.5);burst(to,30,0xff7a2a,7,3);hitL.color.setHex(0xff5a1a);hitL.intensity=6;targets().forEach(t=>dmg(t,rollTap(4).d,'big',.3));});},i*130);}
+function swordTip(){return hero.rune.getWorldPosition(new THREE.Vector3());}
+function chainL(){const tl=targets();if(!tl.length)return;let a=swordTip();const seq=tl.length>1?tl:[tl[0],tl[0]];seq.forEach((t,i)=>setTimeout(()=>{if(t.state==='dying')return;const b=hitPos(t);bolt(i&&seq[i-1]===t?new THREE.Vector3(b.x+rr(-1,1),8,b.z):a,b,0x8ae8ff,.09,.25);burst(b,12,0x8ae8ff,5);a=b;dmg(t,rollTap(3).d,'elec');},i*90));}
+function bladeWave(){const from=new THREE.Vector3(-1.6,1.6,.6),to=new THREE.Vector3(7,1.6,.6);const hitSet=new Set();shoot('wave',0xffd08a,from,to,.45,0,null);const pr=projs[projs.length-1];pr.onMove=(x)=>{targets().forEach(t=>{if(hitSet.has(t))return;const p=hitPos(t);if(x>=p.x-.3){hitSet.add(t);burst(p,14,0xffd08a,5);dmg(t,rollTap(6).d,'big',.3);}});};}
+function mercAttack(i){
+ const tg=M&&M.state!=='dying'?M:null;if(!tg)return;const H=HEROES[i],mc=mercs[i];mc.hop=1;
+ const d=heroDps(i,S.heroes[i])*C.mercM/H.rate,set3=C.setN>=3;const col=set3?0x5ef59a:H.col;
+ const from=mc.w.getWorldPosition(new THREE.Vector3());from.y+=.4;const to=hitPos(tg);
+ const onHit=()=>{if(tg.state==='dying')return;burst(to,6,col,3);dmg(tg,d,'merc',.06);if(set3)burst(to,6,0x5ef59a,2,2);};
+ if(H.k==='arrow')shoot('arrow',col,from,to,.32,.6,onHit);
+ else if(H.k==='fire')shoot('fire',col,from,to,.45,1.2,onHit);
+ else if(H.k==='dagger')shoot('dagger',col,from,to,.25,.3,onHit);
+ else if(H.k==='bolt'){from.y+=.7;bolt(from,to,col,.06,.18);onHit();}
+ else{ring(mc.g.position,col,6,.6);setTimeout(()=>{targets().forEach(t=>{const p=hitPos(t);burst(p,8,col,3);dmg(t,d,'merc',.1);});},150);}}
+function cloneAttack(){const tg=M&&M.state!=='dying'?M:null;if(!tg)return;cloneSwing=0;const r=rollTap(2.5),p=hitPos(tg);slash(p,0xa060ff,r.c);burst(p,10,0x9a4aff,4);dmg(tg,r.d,'shadow',.12);}
+function killMain(){const m=M;m.state='dying';m.t=0;const p=hitPos(m);shatter(new THREE.Vector3(MPOS.x,0,.3),m.o.skin,m.o.root.userData.sc);burst(p,40,m.o.eye,7,2);hitL.color.setHex(m.o.eye);hitL.intensity=6;shake=Math.max(shake,m.boss?.6:.25);ring(MPOS,m.o.eye,m.boss?7:4,.7);
+ const st=R.on?6+R.tier*3:S.stage;const g=goldFor(st)*C.gold*(m.boss?6:1)*(R.on?1.5:1);addGold(g);popNum(new THREE.Vector3(MPOS.x,1.2,.6),'+'+fmt(g)+' or','gold');
+ addXP(xpFor(st)*(m.boss?5:1));bump('kill');
+ if(m.boss||rand()<.14)dropItem(m.boss);
+ if(R.on){if(m.guard){riftEnd(true);return;}R.prog+=10;if(R.prog>=100){R.prog=100;R.guardNext=true;}nextSpawn=.35;return;}
+ if(m.boss){bump('boss');S.stage++;S.kills=0;S.bossFailed=false;}
+ else if(!S.bossFailed){S.kills++;if(S.kills>=KPS&&S.stage%5!==0){S.stage++;S.kills=0;}}
+ if(S.stage>S.maxStage)S.maxStage=S.stage;if(S.stage>S.runMax)S.runMax=S.stage;
+ nextSpawn=.35;checkUnlocks();applyZone();}
+function killMin(m){m.state='dying';m.t=0;const p=m.o.root.position;burst(p,22,ARCH[M?M.ai:0].eye,5,1);const st=R.on?6+R.tier*3:S.stage;const g=goldFor(st)*C.gold*.3;addGold(g);popNum(p,'+'+fmt(g),'gold');bump('minion');if(R.on)R.prog=Math.min(100,R.prog+4);if(R.on&&R.prog>=100&&!R.guard)R.guardNext=true;}
+function bossFail(){if(!M)return;S.bossFailed=true;S.kills=0;M.state='dying';M.t=0;banner('crowned-skull','ÉCHEC','Le boss s\'est enfui','Monte en puissance puis défie-le à nouveau.','#ff5a4a');nextSpawn=.4;}
+$('bossBtn').addEventListener('click',e=>{e.stopPropagation();S.bossFailed=false;S.kills=KPS;if(M){M.state='dying';M.t=0;}mins.forEach(m=>m.state='dying');nextSpawn=.2;});
+
+/* ---------- Butin ---------- */
+function rollAff(k,il,m){const r=rr(.75,1.25);if(k==='crit')return+Math.min(10,(1+il*.05)*m*r).toFixed(1);if(k==='cdmg')return Math.round((10+il*3)*m*r);return Math.round((6+il*3)*m*r);}
+function makeItem(rar,il,o){o=o||{};const slot=o.slot||(o.leg?LEG[o.leg].slot:pick(SLOTS)[0]);const Rr=RAR[rar];let keys=['tap','merc','gold','crit','cdmg'].sort(()=>rand()-.5).slice(0,Rr.aff);if(rar>=3&&!keys.includes('tap')&&!keys.includes('merc'))keys[0]=rand()<.5?'tap':'merc';
+ const st={};keys.forEach(k=>st[k]=rollAff(k,il,Rr.m));const nm=o.leg?LEG[o.leg].n:o.set?SETP[slot]:pick(BASEN[slot])+' '+pick(ADJ[Math.min(2,rar)]);
+ return{id:S.uid++,slot,rar,il,st,name:nm,leg:o.leg||null,set:o.set?1:0};}
+function score(it){if(!it)return 0;const s=it.st;return(s.tap||0)+(s.merc||0)*.9+(s.gold||0)*.4+(s.crit||0)*10+(s.cdmg||0)*.4+(it.leg?2000:0)+(it.set?1500:0);}
+function sellVal(it){return goldFor(S.stage)*(2+it.rar*it.rar*3);}
+function iconOf(it){return it.leg?LEG[it.leg].ic:SLOTN[it.slot][2];}
+function dropItem(boss){
+ const st=R.on?6+R.tier*3:S.stage;let it=null;
+ if(!R.on&&boss){const g={5:'shadow',10:'meteor',15:'chain'}[S.stage];if(g&&!S.got[g])it=makeItem(3,st,{leg:g});}
+ if(!it){const r=rand();let rar=boss?(r<.06?3:r<.4?2:1):(r<.012?3:r<.11?2:r<.42?1:0);it=rar===3?makeItem(3,st,{leg:pick(Object.keys(LEG))}):makeItem(rar,st);}
+ gainItem(it,boss);}
+function gainItem(it,force){
+ if(it.leg)S.got[it.leg]=1;
+ const eq=S.gear[it.slot];let auto=!eq||((it.leg||it.set)&&!eq.leg&&!eq.set&&!(it.set&&C.setN>=2))||(it.leg&&force&&!eq.leg);
+ if(auto){if(eq)S.inv.push(eq);S.gear[it.slot]=it;}else S.inv.push(it);
+ if(S.inv.length>24){S.inv.sort((a,b)=>score(a)-score(b));const x=S.inv.findIndex(i=>i.rar<3);if(x>=0){addGold(sellVal(S.inv[x]));S.inv.splice(x,1);}}
+ const Rr=RAR[it.rar];beam(MPOS.x+.3,Rr.h);if(it.rar>=2)burst(new THREE.Vector3(MPOS.x,1,.6),30,Rr.h,4,4);
+ popNum(new THREE.Vector3(MPOS.x+.3,.6,.6),it.name,'loot',Rr.c);
+ if(it.leg)banner(LEG[it.leg].ic,'LÉGENDAIRE !',it.name,LEG[it.leg].d+(auto?' (équipé)':''),Rr.c);
+ else if(it.set)banner('star-medal','PIÈCE DE SET !',it.name,SETD+(auto?' (équipé)':''),Rr.c);
+ if(!auto&&score(it)>score(eq))S.newLoot=true;
+ if(!S.un.gear){S.un.gear=1;banner('open-treasure-chest','NOUVEAU','Onglet Butin débloqué','Les objets tombent des monstres. Les légendaires changent ton style de jeu.');renderTabs();}
+ calc();dirty=true;}
+
+/* ---------- Progression ---------- */
+function addGold(g){S.gold+=g;}
+function addXP(x){
+ if(S.lvl<70){S.xp+=x;let up=false;while(S.lvl<70&&S.xp>=need(S.lvl)){S.xp-=need(S.lvl);S.lvl++;up=true;}
+  if(up){lvlFx('NIVEAU '+S.lvl);calc();if(S.lvl>=70&&!S.un.para){S.un.para=1;S.xp=0;banner('star-medal','NIVEAU MAXIMUM','Parangon débloqué','Chaque niveau de Parangon donne un point à répartir. Sans limite.','#9fe4ff');renderTabs();}}}
+ else{S.xp+=x;let up=false;while(S.xp>=paraNeed(S.para)){S.xp-=paraNeed(S.para);S.para++;S.pp++;up=true;}if(up){lvlFx('PARANGON '+S.para);calc();dirty=true;}}}
+function lvlFx(t){const p=hero.g.position;ring(p,0x9a7aff,3.5,.8);burst(new THREE.Vector3(p.x,1,p.z),24,0xb09aff,3,4);popNum(new THREE.Vector3(p.x,2.8,p.z),t,'lvl');}
+function bump(k,n){if(!S.un.bounty)return;S.bnt.forEach(b=>{if(b.k===k&&b.p<b.n)b.p=Math.min(b.n,b.p+(n||1));});}
+function newBounty(){const used=S.bnt.map(b=>b.k);const pool=BPOOL.filter(b=>!used.includes(b.k));const b=pick(pool);return{k:b.k,t:b.t,n:Math.round(b.n*(1+S.bDone*.15)),p:0};}
+function claimBounty(i){const b=S.bnt[i];if(!b||b.p<b.n)return;S.bDone++;const g=goldFor(S.stage)*C.gold*40;addGold(g);
+ const lg=BLEG.find(l=>!S.got[l]);if(S.bDone%2===1&&lg)gainItem(makeItem(3,S.stage,{leg:lg}),true);else gainItem(makeItem(rand()<.25?3:2,S.stage+2,rand()<.25?{leg:pick(Object.keys(LEG))}:{}),false);
+ popNum(new THREE.Vector3(-2.4,2.6,.4),'Prime +'+fmt(g),'gold');S.bnt[i]=newBounty();dirty=true;save();}
+function riftStart(){if(R.on)return;R={on:true,t:45,prog:0,tier:S.rift,guard:false,guardNext:false};if(M){scene.remove(M.o.root);M=null;}mins.forEach(m=>scene.remove(m.o.root));mins=[];nextSpawn=.6;applyZone();
+ banner('magic-portal','FAILLE — PALIER '+R.tier,'45 secondes','Remplis la jauge puis abats le Gardien avant la fin du chrono.','#ff6ab8');shake=.4;$('flash').style.transition='none';$('flash').style.opacity=.5;setTimeout(()=>{$('flash').style.transition='opacity .9s';$('flash').style.opacity=0;},30);dirty=true;}
+function riftEnd(win){const tier=R.tier,left=R.t;R={on:false};if(M){M.state='dying';M.t=0;}mins.forEach(m=>m.state='dying');nextSpawn=1;
+ if(win){const up=left>15?2:1;S.rift=tier+up;S.riftBest=Math.max(S.riftBest,tier);const g=goldFor(6+tier*3)*C.gold*60;addGold(g);bump('rift');
+  const miss=['weapon','neck','ring'].find(s=>!S.got['set_'+s]);let it;if(miss){S.got['set_'+miss]=1;it=makeItem(4,6+tier*3,{set:1,slot:miss});}else it=rand()<.45?makeItem(3,6+tier*3,{leg:pick(Object.keys(LEG))}):makeItem(2,8+tier*3);
+  banner('magic-portal','FAILLE VAINCUE','Palier '+tier+' → '+S.rift,'+'+fmt(g)+' or'+(up>1?' · Bonus vitesse : +2 paliers':''),'#ff6ab8');setTimeout(()=>gainItem(it,true),1400);}
+ else banner('hourglass','TEMPS ÉCOULÉ','Faille échouée','Renforce-toi et retente le palier '+tier+'.','#ff5a4a');
+ applyZone();dirty=true;save();}
+function soulsGain(){return S.runMax<20?0:Math.floor(1+Math.pow(S.runMax-15,1.3)/3);}
+function rebirth(){const g=soulsGain();if(!g||R.on)return;S.souls+=g;S.rebirths++;S.stage=1;S.kills=0;S.gold=0;S.tapLvl=1;S.heroes=[0,0,0,0,0];S.bossFailed=false;S.runMax=1;
+ if(M){scene.remove(M.o.root);M=null;}mins.forEach(m=>scene.remove(m.o.root));mins=[];nextSpawn=1.2;
+ $('flash').style.transition='none';$('flash').style.opacity=1;setTimeout(()=>{$('flash').style.transition='opacity 1.4s';$('flash').style.opacity=0;},40);
+ burst(new THREE.Vector3(-2.4,1,.4),80,0x9fe4ff,8,4);ring(hero.g.position,0x9fe4ff,9,1.2);
+ banner('soul','RENAISSANCE','+'+g+' Âmes de cendre','Tous tes dégâts et ton or sont augmentés pour toujours.','#9fe4ff');calc();applyZone();renderTabs();dirty=true;save();}
+function checkUnlocks(){
+ HEROES.forEach((H,i)=>{if(S.maxStage>=H.u&&!S.un['h'+i]){S.un['h'+i]=1;banner(H.ic,'NOUVEAU HÉROS',H.n,'Recrute-le dans l\'onglet Héros : il attaque seul.',H.css);dirty=true;}});
+ if(S.maxStage>=8&&!S.un.bounty){S.un.bounty=1;S.bnt=[newBounty(),newBounty(),newBounty()];S.bnt.forEach((b,i)=>{b.k=BPOOL[[0,2,3][i]].k;b.t=BPOOL[[0,2,3][i]].t;b.n=BPOOL[[0,2,3][i]].n;});banner('wanted-reward','NOUVEAU MODE','Primes débloquées','De petites quêtes qui rapportent or et légendaires. Onglet Aventure.');renderTabs();}
+ if(S.maxStage>=12&&!S.un.rift){S.un.rift=1;banner('magic-portal','NOUVEAU MODE','Failles chronométrées','45 s pour vaincre le Gardien. Chaque victoire fait monter le palier.','#ff6ab8');renderTabs();}
+ if(S.maxStage>=20&&!S.un.rebirth){S.un.rebirth=1;banner('soul','PRESTIGE','Renaissance débloquée','Recommence plus fort avec des Âmes de cendre permanentes.','#9fe4ff');renderTabs();}
+ const z=zoneIdx();if(S.stage%10===1&&S.stage>1&&S.un['z'+S.stage]==null){S.un['z'+S.stage]=1;banner('treasure-map','NOUVELLE ZONE',ZONES[z].n,'De nouveaux monstres rôdent ici.','#cfe0ff');}}
+
+/* ---------- Zones / couleurs ---------- */
+const zc={fog:new THREE.Color(),sky:new THREE.Color(),hs:new THREE.Color(),hg:new THREE.Color(),moon:new THREE.Color(),ground:new THREE.Color(),leaf:new THREE.Color(),mist:new THREE.Color()};
+let zt=ZONES[0];
+function applyZone(){const zi=zoneIdx();zt=R.on?RIFTZ:ZONES[zi];zoneProps.forEach((g,i)=>g.visible=!R.on&&i===zi);}
+applyZone();for(const k in zc)zc[k].setHex(zt[k]);
+function lerpZone(dt){const a=Math.min(1,dt*2);for(const k in zc)zc[k].lerp(tmpC.setHex(zt[k]),a);
+ scene.fog.color.copy(zc.fog);scene.background.copy(zc.fog);skyM.color.copy(zc.sky);hemi.color.copy(zc.hs);hemi.groundColor.copy(zc.hg);moonM.color.copy(zc.moon);moonG.material.color.copy(zc.moon);groundM.color.copy(zc.ground);leafM.color.copy(zc.leaf);mists.forEach(m=>m.m.material.color.copy(zc.mist));
+ embM.color.setHex(R.on?0xff60c0:zoneIdx()===3?0xbfefff:zoneIdx()===4?0xd070ff:0xff8a3a);}
+
+/* ---------- HUD / DOM ---------- */
+const fx=$('fx');
+function popNum(p,txt,cls,col){if(fx.childElementCount>30)fx.firstChild.remove();const v=p.clone().project(camera);const w=sceneEl.clientWidth,h=sceneEl.clientHeight;const el=document.createElement('div');el.className='num '+(cls||'');el.textContent=txt;if(col)el.style.color=col;el.style.left=((v.x*.5+.5)*w+rr(-18,18))+'px';el.style.top=((-v.y*.5+.5)*h)+'px';el.style.setProperty('--dx',rr(-30,30)+'px');el.addEventListener('animationend',()=>el.remove());fx.appendChild(el);}
+const bq=[];let bOn=false;
+function banner(ic,sm,b,p,col){bq.push({ic,sm,b,p,col});if(!bOn)nextBanner();}
+function nextBanner(){const x=bq.shift();const el=$('banner');if(!x){bOn=false;el.classList.remove('show');return;}bOn=true;el.style.setProperty('--bc',x.col||'#f4c35a');el.style.setProperty('--bg2',(x.col||'#f4c35a')+'55');el.innerHTML=ico(x.ic)+`<small>${x.sm}</small><b>${x.b}</b>${x.p?`<p>${x.p}</p>`:''}`;el.classList.add('show');setTimeout(()=>{el.classList.remove('show');setTimeout(nextBanner,320);},bq.length>2?1700:2600);}
+let lastHp=-1,lastName='';
+function renderMHud(force){
+ const m=M;const name=m?m.name:'';if(name!==lastName||force){lastName=name;$('mName').textContent=name||' ';$('mName').className='mname'+(m&&m.boss?' boss':'');}
+ const f=m?Math.max(0,m.hp/m.max):0;if(f!==lastHp||force){lastHp=f;$('hpFill').style.width=(f*100)+'%';$('hpChip').style.width=(f*100)+'%';$('hpTxt').textContent=m?fmt(m.hp):'';}
+ let pr='';if(R.on){pr='';$('rTxt').textContent='FAILLE P'+R.tier+' · '+Math.ceil(R.t)+' s · '+(R.guard||R.guardNext?'GARDIEN !':Math.floor(R.prog)+' %');}
+ else{$('rTxt').textContent='';if(m&&m.boss)pr='';else{for(let i=0;i<KPS;i++)pr+=`<i class="${i<S.kills?'on':''}"></i>`;if(S.stage%5===0)pr+=ico('crowned-skull');}}
+ const pe=$('prog');if(pe._h!==pr){pe._h=pr;pe.innerHTML=pr;}
+ const bt=$('bTimer');const showT=(m&&m.boss&&!R.on)||R.on;bt.classList.toggle('on',showT);if(showT)$('bTimerI').style.width=(R.on?R.t/45:Math.max(0,S.bossT)/30)*100+'%';
+ $('bossBtn').hidden=!(S.bossFailed&&!R.on);}
+function refreshTop(){
+ $('goldBox').innerHTML=ico('two-coins')+' '+fmt(S.gold);
+ const sb=$('soulsBox');sb.hidden=!S.souls;if(S.souls)sb.innerHTML=ico('soul')+' '+S.souls;
+ const ln=$('lvlNum');if(S.lvl>=70){ln.textContent='P'+S.para;ln.className='para';}else{ln.textContent=S.lvl;ln.className='';}
+ const f=S.lvl>=70?S.xp/paraNeed(S.para):S.xp/need(S.lvl);$('xpRing').style.strokeDashoffset=132*(1-Math.min(1,f));$('xpRing').style.stroke=S.lvl>=70?'#5fd0ff':'var(--xp)';
+ $('zoneName').textContent=R.on?RIFTZ.n:ZONES[zoneIdx()].n;$('stageName').textContent=R.on?'Palier '+R.tier:'Étape '+S.stage;
+ $('tapTxt').textContent=fmt(C.tap);$('critTxt').textContent=Math.round(C.crit*100)+'%';$('dpsTxt').textContent=fmt(C.dps);
+ let lb='';for(const k in C.legs){let sm='';if(k==='meteor')sm=metC+'/12';if(k==='blade')sm=bladeC+'/5';if(k==='frenzy')sm=frOn>0?'!':Math.ceil(frT)+'s';lb+=`<div class="leg ${k==='frenzy'&&frOn>0?'hot':''}">${ico(LEG[k].ic)}${sm?`<small>${sm}</small>`:''}</div>`;}
+ if(C.setN>=2)lb+=`<div class="leg set">${ico('star-medal')}<small>${C.setN}/3</small></div>`;
+ const le=$('legBar');if(le._h!==lb){le._h=lb;le.innerHTML=lb;}}
+
+/* ---------- Onglets / panneaux ---------- */
+const TABS=[{id:'hero',n:'Héros',ic:'crossed-swords'},{id:'loot',n:'Butin',ic:'open-treasure-chest',u:'gear',h:'Premier objet'},{id:'adv',n:'Aventure',ic:'magic-portal',u:'bounty',h:'Étape 8'},{id:'para',n:'Parangon',ic:'star-medal',u:'para',h:'Niveau 70'},{id:'reb',n:'Renaissance',ic:'soul',u:'rebirth',h:'Étape 20'}];
+let tab='hero',dirty=true;const panel=$('panel');
+function renderTabs(){$('tabs').innerHTML=TABS.map(t=>{const lk=t.u&&!S.un[t.u];return`<button class="tab ${tab===t.id?'on':''} ${lk?'lock':''}" data-tab="${t.id}">${ico(lk?'padlock':t.ic)}${lk?t.h:t.n}${t.id==='loot'&&S.newLoot?'<i class="dot"></i>':''}</button>`;}).join('');dirty=true;}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;const t=TABS.find(t=>t.id===b.dataset.tab);if(t.u&&!S.un[t.u])return;tab=t.id;if(tab==='loot')S.newLoot=false;renderTabs();panel.scrollTop=0;});
+function buyInfo(cost0,r,lvl){const g=S.gold;let n;if(S.mult===0){n=Math.max(1,Math.floor(Math.log(g*(r-1)/cost0+1)/Math.log(r)));}else n=S.mult;const c=cost0*(Math.pow(r,n)-1)/(r-1);return{n,c,ok:g>=c};}
+function renderPanel(){
+ let h='';
+ if(tab==='hero'){
+  h=`<div class="phead"><span>Compagnie</span><div class="mult">${[1,10,0].map(m=>`<button data-mult="${m}" class="${S.mult===m?'on':''}">${m?'x'+m:'MAX'}</button>`).join('')}</div></div>`;
+  h+=row('t','broadsword','Kaelen, le Veilleur','#ffb35a');
+  let shownLocked=false;HEROES.forEach((H,i)=>{if(S.maxStage>=H.u)h+=row('h'+i,H.ic,H.n,H.css);else if(!shownLocked){shownLocked=true;h+=`<div class="row locked"><div class="fr">${ico('padlock')}</div><div class="info"><b>${H.n}</b><small>Débloqué à l'étape ${H.u}</small></div></div>`;}});}
+ else if(tab==='loot'){
+  h=`<div class="phead"><span>Équipement</span><button class="btn ghost" data-sellall>Vendre communs &amp; magiques</button></div><div class="slots">`;
+  SLOTS.forEach(s=>{const it=S.gear[s[0]];h+=`<div class="slot">${it?`<div class="fr r${it.rar}">${ico(iconOf(it))}<i class="il">${it.il}</i></div>`:`<div class="fr empty">${ico(s[2])}</div>`}</div>`;});h+='</div>';
+  const act=Object.keys(C.legs).map(k=>`<p class="eff">${ico(LEG[k].ic)} ${LEG[k].d}</p>`).join('')+(C.setN?`<p class="eff set">${SETD} <b>(${C.setN}/3)</b></p>`:'');
+  if(act)h+=`<div class="box"><h3>Effets actifs</h3>${act}</div>`;
+  h+=`<div class="phead"><span>Sac (${S.inv.length})</span></div>`;
+  const inv=S.inv.slice().sort((a,b)=>b.rar-a.rar||score(b)-score(a));
+  if(!inv.length)h+='<p class="lockmsg" style="padding:16px">Ton sac est vide. Abats des monstres !</p>';
+  inv.forEach(it=>h+=itemCard(it));
+  h+=`<div class="phead"><span>Équipé</span></div>`;SLOTS.forEach(s=>{const it=S.gear[s[0]];if(it)h+=itemCard(it,true);});}
+ else if(tab==='adv'){
+  h+=`<div class="box"><h3>${ico('magic-portal')} Failles chronométrées</h3>`;
+  if(!S.un.rift)h+=`<p>Débloquées à l'étape 12.</p>`;
+  else h+=`<p>45 s pour remplir la jauge et abattre le Gardien. Victoire rapide (+15 s restantes) = +2 paliers. Récompenses : pièces du <b style="color:var(--c4)">Set du Veilleur</b>, légendaires, or.</p><p>Palier actuel : <b style="color:#ff9ad2">${S.rift}</b> · Record : ${S.riftBest||'—'}</p><button class="btn big blue" data-rift ${R.on?'disabled':''}>${R.on?'Faille en cours…':'Ouvrir la faille (palier '+S.rift+')'}</button>`;
+  h+=`</div><div class="phead"><span>${ico('wanted-reward')} Primes</span></div>`;
+  S.bnt.forEach((b,i)=>{h+=`<div class="row"><div class="fr" style="--c:#f4c35a">${ico('wanted-reward')}</div><div class="info"><b>${b.t.replace('{n}',b.n)}</b><small data-bp="${i}">${b.p} / ${b.n}</small><div class="bar"><i data-bb="${i}" style="width:${b.p/b.n*100}%"></i></div></div><button class="btn" data-claim="${i}" ${b.p<b.n?'disabled':''}>Réclamer</button></div>`;});
+  h+=`<p class="lockmsg" style="padding:6px;font-size:13px">Récompense : or + objet. Une prime sur deux offre un légendaire inédit.</p>`;}
+ else if(tab==='para'){
+  const P=[['Force','biceps','+5 % dégâts de frappe'],['Commandement','crossed-swords','+5 % dégâts des alliés'],['Fortune','two-coins','+4 % or trouvé'],['Précision','on-target','+0,3 % chance de critique']];
+  h=`<div class="box"><h3>${ico('star-medal')} Parangon ${S.para}</h3><p>Au-delà du niveau 70, chaque niveau de Parangon donne 1 point et +2 % de dégâts. Points disponibles : <b style="color:#9fe4ff;font-size:17px">${S.pp}</b></p><div class="bar"><i style="width:${Math.min(100,S.xp/paraNeed(S.para)*100)}%;background:linear-gradient(90deg,#3a8aff,#9fe4ff)"></i></div></div>`;
+  P.forEach((p,i)=>h+=`<div class="row"><div class="fr" style="--c:#9fe4ff">${ico(p[1]==='biceps'?'mailed-fist':p[1])}</div><div class="info"><b>${p[0]} · ${S.pa[i]}</b><small>${p[2]} par point</small></div><button class="btn blue" data-pa="${i}" ${S.pp<1?'disabled':''}>+1</button></div>`);
+  h+=`<button class="btn big blue" data-paall ${S.pp<1?'disabled':''}>Répartir automatiquement</button>`;}
+ else if(tab==='reb'){
+  const g=soulsGain();
+  h=`<div class="box"><h3>${ico('soul')} Renaissance</h3><p>Renais de tes cendres : retour à l'étape 1, or et niveaux de héros remis à zéro. Tu gardes niveau, Parangon, équipement et paliers de faille.</p><p>Âmes de cendre : <b style="color:#9fe4ff">${S.souls}</b> (+${S.souls*15} % dégâts, +${S.souls*5} % or)</p><p>Gain si tu renais maintenant : <b style="color:#9fe4ff;font-size:18px">+${g}</b> <small>(étape max. de la vie : ${S.runMax})</small></p><button class="btn big blue" data-reb ${g&&!R.on?'':'disabled'}>${g?'Renaître (+'+g+' âmes)':'Atteins l\'étape 20'}</button></div>
+  <div class="box"><h3>${ico('recycle')} Nouvelle partie</h3><p>Efface toute la progression.</p><button class="btn ghost" data-reset>${resetArm?'Toucher encore pour confirmer':'Tout effacer'}</button></div>`;}
+ panel.innerHTML=h;dirty=false;refreshPanel();}
+function row(k,ic,n,col){return`<div class="row"><div class="fr" style="--c:${col}">${ico(ic)}</div><div class="info"><b>${n}</b><small data-lv="${k}"></small><small data-ln="${k}"></small></div><button class="buy" data-buy="${k}"><small data-bn="${k}"></small><span data-bc="${k}"></span></button></div>`;}
+function itemCard(it,isEq){const Rr=RAR[it.rar],eq=S.gear[it.slot];const d=isEq?0:score(it)-score(eq);
+ const st=Object.keys(it.st).map(k=>`<div class="st">+${it.st[k]}${AFF[k][1]} ${AFF[k][0]}</div>`).join('');
+ return`<div class="item r${it.rar}"><div class="fr">${ico(iconOf(it))}<i class="il">${it.il}</i></div><div class="info"><b>${it.name}</b><small>${Rr.n} · ${SLOTN[it.slot][1]} · niv. ${it.il}</small>${st}${it.leg?`<p class="eff">${LEG[it.leg].d}</p>`:''}${it.set?`<p class="eff set">${SETD}</p>`:''}</div>${isEq?'':`<div class="acts"><span class="${d>=0?'up':'dn'}">${d>=0?'▲ Mieux':'▼ Moins'}</span><button class="btn" data-eq="${it.id}">Équiper</button><button class="btn ghost" data-sell="${it.id}">${ico('two-coins')} ${fmt(sellVal(it))}</button></div>`}</div>`;}
+function q(sel){return panel.querySelector(sel);}
+function refreshPanel(){
+ if(tab==='hero'){
+  const t=buyInfo(tapCost(S.tapLvl),1.09);setRow('t','Niv. '+S.tapLvl,'Frappe : <em>'+fmt(C.tap)+'</em>',t);
+  HEROES.forEach((H,i)=>{if(!q(`[data-buy="h${i}"]`))return;const b=buyInfo(heroCost(i,S.heroes[i]),1.1);const l=S.heroes[i];setRow('h'+i,l?'Niv. '+l:'À recruter','DPS : <em>'+fmt(heroDps(i,l)*C.mercM*C.spd)+'</em>'+(l%10>=7?' · ×1,6 au niv. '+(Math.floor(l/10)+1)*10:''),b,!l);});}
+ else if(tab==='adv'){S.bnt.forEach((b,i)=>{const s=q(`[data-bp="${i}"]`);if(!s)return;s.textContent=b.p+' / '+b.n;q(`[data-bb="${i}"]`).style.width=b.p/b.n*100+'%';q(`[data-claim="${i}"]`).disabled=b.p<b.n;});}}
+function setRow(k,lv,ln,b,recruit){const lvE=q(`[data-lv="${k}"]`);if(!lvE)return;lvE.textContent=lv;q(`[data-ln="${k}"]`).innerHTML=ln;q(`[data-bn="${k}"]`).textContent=recruit?'Recruter':'+'+b.n;q(`[data-bc="${k}"]`).innerHTML=ico('two-coins','co')+' '+fmt(b.c);q(`[data-buy="${k}"]`).disabled=!b.ok;}
+let resetArm=false;
+panel.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+ if(d.mult!=null){S.mult=+d.mult;dirty=true;}
+ else if(d.buy){const k=d.buy;if(k==='t'){const b=buyInfo(tapCost(S.tapLvl),1.09);if(!b.ok)return;S.gold-=b.c;S.tapLvl+=b.n;burst(new THREE.Vector3(-2.4,1.5,.4),12,0xffb35a,2,3);}
+  else{const i=+k.slice(1),b=buyInfo(heroCost(i,S.heroes[i]),1.1);if(!b.ok)return;const first=!S.heroes[i];S.gold-=b.c;S.heroes[i]+=b.n;bump('hire',b.n);const mc=mercs[i];if(first){mc.g.visible=true;mc.b.visible=true;ring(mc.g.position,HEROES[i].col,3,.7);burst(new THREE.Vector3(mc.g.position.x,1,mc.g.position.z),30,HEROES[i].col,4,3);mT[i]=.3;}else burst(new THREE.Vector3(mc.g.position.x,1,mc.g.position.z),8,HEROES[i].col,2,2);}
+  calc();refreshPanel();}
+ else if(d.eq){const it=S.inv.find(x=>x.id==d.eq);if(!it)return;const cur=S.gear[it.slot];S.inv=S.inv.filter(x=>x!==it);if(cur)S.inv.push(cur);S.gear[it.slot]=it;calc();dirty=true;}
+ else if(d.sell){const i=S.inv.findIndex(x=>x.id==d.sell);if(i<0)return;addGold(sellVal(S.inv[i]));S.inv.splice(i,1);dirty=true;}
+ else if(d.sellall!=null){S.inv=S.inv.filter(x=>{if(x.rar<=1){addGold(sellVal(x));return false;}return true;});dirty=true;}
+ else if(d.rift!=null)riftStart();
+ else if(d.claim!=null)claimBounty(+d.claim);
+ else if(d.pa!=null){if(S.pp<1)return;S.pp--;S.pa[+d.pa]++;calc();dirty=true;}
+ else if(d.paall!=null){while(S.pp>0){S.pa[[0,1,0,3,1,2][S.pp%6]]++;S.pp--;}calc();dirty=true;}
+ else if(d.reb!=null)rebirth();
+ else if(d.reset!=null){if(!resetArm){resetArm=true;dirty=true;setTimeout(()=>{resetArm=false;dirty=true;},3000);}else{try{localStorage.removeItem(KEY);}catch(e){}S=fresh();resetArm=false;calc();mercs.forEach(m=>{m.g.visible=false;m.b.visible=false;});if(M){scene.remove(M.o.root);M=null;}nextSpawn=.5;applyZone();renderTabs();}}
+ save();});
+
+/* ---------- Entrée ---------- */
+sceneEl.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();doTap(false);});
+
+/* ---------- Boucle ---------- */
+function update(dt){
+ T+=dt;
+ for(let i=0;i<5;i++)if(S.heroes[i]>0){mT[i]-=dt*C.spd;if(mT[i]<=0){mT[i]+=1/HEROES[i].rate;mercAttack(i);}}
+ if(C.legs.shadow){cloneT-=dt;if(cloneT<=0){cloneT=.5;cloneAttack();}}
+ if(C.legs.frenzy){if(frOn>0){frOn-=dt;frTap-=dt;if(frTap<=0){frTap=.2;doTap(true);}}else{frT-=dt;if(frT<=0){frOn=4;frT=15;}}}
+ if(M&&M.boss&&!R.on&&M.state!=='dying'){S.bossT-=dt;if(S.bossT<=0)bossFail();}
+ if(R.on){R.t-=dt;if(R.t<=0)riftEnd(false);}
+ if(!M){nextSpawn-=dt;if(nextSpawn<=0)spawnMain();}
+ animate(dt);}
+function animate(dt){
+ // héros
+ swing=Math.min(1,swing+dt/.22);const sa=swing<.3?-.5+(-2.1)*(swing/.3):swing<.6?-2.6+2.5*((swing-.3)/.3):-.1-.4*((swing-.6)/.4);hero.armR.rotation.x=sa;hero.g.position.x=-2.4+(swing<.6?Math.sin(swing/.6*Math.PI)*.35:0);
+ hero.cape.rotation.x=.2+Math.sin(T*2.2)*.06;hero.g.position.y=Math.sin(T*2)*.02;hero.rune.material.color.setHSL(.08,1,.5+Math.sin(T*4)*.15);
+ const cv2=!!C.legs.shadow;clone.g.visible=cv2;cloneAura.visible=cv2;
+ if(cv2){cloneSwing=Math.min(1,cloneSwing+dt/.22);const c=cloneSwing;clone.armR.rotation.x=c<.3?-.5-2.1*(c/.3):c<.6?-2.6+2.5*((c-.3)/.3):-.1-.4*((c-.6)/.4);clone.g.position.y=.15+Math.sin(T*2.5)*.08;cloneAura.material.opacity=.35+Math.sin(T*5)*.12;}
+ mercs.forEach((m,i)=>{if(!m.g.visible&&S.heroes[i]>0){m.g.visible=true;m.b.visible=true;}if(m.g.visible&&!S.heroes[i]){m.g.visible=false;m.b.visible=false;}m.hop=Math.max(0,m.hop-dt*4);m.g.position.y=Math.sin(m.hop*Math.PI)*.25+Math.sin(T*2+i)*.03;m.aura.material.opacity=C.setN>=3?.45:0;if(C.setN>=3)m.aura.material.color.setHex(0x5ef59a);});
+ // monstre
+ if(M){const o=M.o,sc=o.root.userData.sc;M.t+=dt;
+  if(M.state==='rise'){const k=Math.min(1,M.t/.45);o.root.position.y=-4*(1-k)*(1-k);if(k>=1){M.state='alive';}}
+  if(M.state==='dying'){const k=M.t/.38;o.body.scale.set(1+k*.3,Math.max(.01,1-k),1+k*.3);o.body.position.y=-k*.5;o.mats.forEach(m=>m.emissive.setRGB(k,k*.8,k*.6));if(k>=1){scene.remove(o.root);M=null;}}
+  else{M.kx+=(0-M.kx)*Math.min(1,dt*9);o.root.position.x=MPOS.x+M.kx;o.body.rotation.z=-M.kx*.35;o.body.scale.y=1+Math.sin(T*2.2)*.025;
+   o.arms.forEach(a=>{a.sh.rotation.x=Math.sin(T*1.6+a.s)*.15-M.kx*.8;a.el.rotation.x=-.55+Math.sin(T*1.6+a.s+1)*.12;});o.head.rotation.x=Math.sin(T*1.3)*.08+M.kx*.6;o.jaw.rotation.x=.15+Math.sin(T*3)*.1+M.flash*.4;
+   M.flash=Math.max(0,M.flash-dt*7);const f=M.flash;o.mats.forEach(m=>m.emissive.setRGB(f,f*.85,f*.75));}
+  o.core.scale.setScalar(1+Math.sin(T*4)*.2);
+  o.anim.forEach(a=>{if(a.t==='flame'){a.o.scale.set(1,1+Math.sin(T*12+a.ph)*.25,1);}else if(a.t==='tent'){a.o.forEach((g,k)=>g.rotation.z=Math.sin(T*2.5+a.ph+k*.7)*.35);}else if(a.t==='spin'){a.o.rotation.z+=dt*.6;}});}
+ for(let i=mins.length-1;i>=0;i--){const m=mins[i],o=m.o;m.t+=dt;if(m.state==='rise'){const k=Math.min(1,m.t/.5);o.root.scale.setScalar(k);if(k>=1)m.state='alive';}
+  if(m.state==='dying'){const k=Math.max(0,1-m.t/.25);o.root.scale.setScalar(k+.001);if(m.t>.25){scene.remove(o.root);mins.splice(i,1);continue;}}
+  o.root.position.y=m.p[1]+Math.sin(T*2.4+m.ph)*.25;o.wings.forEach(w=>w.w.rotation.y=w.s*Math.sin(T*16+m.ph)*.6);o.root.rotation.y=-.6;m.flash=Math.max(0,m.flash-dt*7);o.mats.forEach(mt=>mt.emissive.setRGB(m.flash,m.flash,m.flash));}
+ // projectiles
+ for(let i=projs.length-1;i>=0;i--){const p=projs[i];p.t+=dt/p.dur;const k=Math.min(1,p.t);const prev=p.m.position.clone();p.m.position.lerpVectors(p.a,p.b,k);p.m.position.y+=Math.sin(k*Math.PI)*p.arc;
+  if(p.k==='dagger')p.m.rotation.y+=dt*30;else if(p.k!=='wave'&&p.k!=='fire')p.m.lookAt(p.m.position.clone().add(p.m.position.clone().sub(prev)));
+  if(p.k==='fire'||p.k==='meteor')burst(p.m.position,1,p.k==='meteor'?0xff7a2a:HEROES[1].col,.6,.5);
+  if(p.onMove)p.onMove(p.m.position.x);
+  if(k>=1){p.m.visible=false;projs.splice(i,1);if(p.cb)p.cb();}}
+ for(let i=bolts.length-1;i>=0;i--){const b=bolts[i];b.t-=dt;const a=Math.max(0,b.t/b.life);b.list.forEach(s=>s.material.opacity=a);if(b.t<=0){b.list.forEach(s=>s.visible=false);bolts.splice(i,1);}}
+ for(let i=fxs.length-1;i>=0;i--){const f=fxs[i];f.t+=dt;const k=f.t/f.life;const mt=f.o.material||f.o.children[0].material;
+  if(f.k==='ring'){f.o.scale.setScalar(.3+k*f.s1);f.o.material.opacity=1-k;}
+  else if(f.k==='slash'){f.o.scale.setScalar(f.s1*(.7+k*.6));f.o.material.opacity=1-k;f.o.rotation.z+=dt*8;}
+  else if(f.k==='beam'){const a=k<.15?k/.15:1-(k-.15)/.85;f.o.children[0].material.opacity=a*.5;f.o.children[1].material.opacity=a;f.o.scale.set(1+Math.sin(T*10)*.1,1,1);if(rand()<.5)burst(new THREE.Vector3(f.o.position.x+rr(-.3,.3),rr(0,2),.6),1,f.o.children[1].material.color.getHex(),.5,2.5);}
+  if(k>=1){f.o.visible=false;fxs.splice(i,1);}}
+ frags.forEach(f=>{if(!f.m.visible)return;f.t-=dt;f.v.y-=14*dt;f.m.position.addScaledVector(f.v,dt);if(f.m.position.y<.1){f.m.position.y=.1;f.v.y*=-.3;f.v.x*=.6;}f.m.rotation.x+=f.r.x*dt;f.m.rotation.y+=f.r.y*dt;if(f.t<.3)f.m.scale.multiplyScalar(.9);if(f.t<=0)f.m.visible=false;});
+ // particules
+ for(let i=0;i<SP;i++){if(spL[i]<=0)continue;spL[i]-=dt;const j=i*3;spV[j+1]-=7*dt;spPos[j]+=spV[j]*dt;spPos[j+1]+=spV[j+1]*dt;spPos[j+2]+=spV[j+2]*dt;const a=Math.max(0,spL[i]/.6);spCol[j]=spB[j]*a;spCol[j+1]=spB[j+1]*a;spCol[j+2]=spB[j+2]*a;if(spL[i]<=0){spPos[j+1]=-99;}}
+ spGeo.attributes.position.needsUpdate=true;spGeo.attributes.color.needsUpdate=true;
+ for(let i=0;i<EMB;i++){const j=i*3;embPos[j+1]+=embV[i*2]*dt;embPos[j]+=Math.sin(T+embV[i*2+1])*dt*.4;if(embPos[j+1]>8){embPos[j+1]=0;embPos[j]=rr(-9,9);}}
+ embGeo.attributes.position.needsUpdate=true;
+ torches.forEach(t=>{const f=.85+Math.sin(T*13+t.ph)*.1+Math.sin(T*23+t.ph)*.06;t.L.intensity=1.7*f;t.f1.scale.set(1,f*1.1,1);t.f2.scale.set(1,f,1);t.s.material.opacity=.5*f;});
+ mists.forEach(m=>{m.m.position.x+=m.sp*dt;if(m.m.position.x>8)m.m.position.x=-8;if(m.m.position.x<-8)m.m.position.x=8;});
+ animProps.forEach(a=>{a.o.position.y=a.y+Math.sin(T*a.sp+a.ph)*.3;a.o.rotation.y+=dt*.5;});
+ hitL.intensity=Math.max(0,hitL.intensity-dt*18);
+ lerpZone(dt);
+ shake=Math.max(0,shake-dt*1.8);camera.position.set(camBase.x+rr(-1,1)*shake*.25,camBase.y+rr(-1,1)*shake*.25,camBase.z);camera.lookAt(camLook);}
+let last=performance.now(),uiT=0,saveT=0;
+function loop(now){requestAnimationFrame(loop);if(document.hidden){last=now;return;}const el=now-last;if(el<32)return;last=now;const dt=Math.min(el/1000,.1);
+ update(dt);renderer.render(scene,camera);renderMHud(false);
+ uiT+=dt;if(uiT>.25){uiT=0;refreshTop();if(dirty)renderPanel();else refreshPanel();}
+ saveT+=dt;if(saveT>8){saveT=0;save();}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});
+// démarrage
+S.heroes.forEach((l,i)=>{if(l){mercs[i].g.visible=true;mercs[i].b.visible=true;}});
+if(S.taps>20)$('tapHint').style.display='none';
+calc();renderTabs();refreshTop();renderPanel();
+requestAnimationFrame(loop);
+</script>
+
+</body></html>

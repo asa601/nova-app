@@ -1,0 +1,329 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Faille Néon</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: pitch court en haut, puis un écran de téléphone jouable centré, puis la feuille de route. Univers sombre assumé (une seule ambiance). */
+:root{
+  --night:#0c0a16; --panel:#15122a; --line:#2c2650; --text:#e9e6ff; --muted:#9a93c8;
+  --cyan:#3ef0ff; --pink:#ff3d8b; --amber:#ffb02e; --rare:#5b8cff; --set:#4fe39a; --common:#a9a6bf;
+  --display:"Chakra Petch",ui-sans-serif,system-ui,sans-serif;
+  --body:"Barlow",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--night);color:var(--text)}
+body{font-family:var(--body);font-size:15px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-family:var(--display);font-weight:700;font-size:44px;line-height:1;margin:0;letter-spacing:.02em;text-wrap:balance}
+h1 span{color:var(--pink)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin:0 0 8px}
+.lede{color:var(--muted);margin:10px 0 0}
+.pillars{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0;padding:0;list-style:none}
+.pillars li{border-top:1px solid var(--line);padding-top:8px;font-size:13.5px;color:var(--muted)}
+.pillars b{display:block;color:var(--text);font-family:var(--display);font-size:15px;letter-spacing:.03em}
+/* Écran de jeu */
+.phone{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#07060f;box-shadow:0 0 0 6px #100d20,0 20px 60px -20px rgba(255,61,139,.35)}
+.hud{display:flex;flex-direction:column;gap:6px;padding:10px 12px 8px;background:linear-gradient(#07060f,#0d0b1c)}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--mono);font-size:12px}
+.lvl{font-family:var(--display);font-size:15px;font-weight:700}
+.lvl em{font-style:normal;color:var(--amber)}
+.bar{height:5px;background:#1d1838;border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--cyan);width:0;transition:width .2s}
+.cred{color:var(--amber)}
+.eco{color:var(--set);font-size:10px;letter-spacing:.1em}
+.stage{position:relative}
+canvas{display:block;width:100%;aspect-ratio:4/5;max-width:100%;touch-action:manipulation;cursor:crosshair}
+.enemy{position:absolute;left:12px;right:12px;top:10px;pointer-events:none;font-family:var(--mono);font-size:11.5px}
+.enemy .bar{height:7px;margin-top:4px}
+.enemy .bar i{background:var(--pink)}
+.ename{display:flex;justify-content:space-between}
+.ename b{font-family:var(--display);font-size:14px;letter-spacing:.03em}
+.toast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(12,10,22,.88);border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:13px;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis;pointer-events:none;opacity:0;transition:opacity .25s}
+.toast.on{opacity:1}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+.tabs button{background:none;border:0;color:var(--muted);font-family:var(--display);font-size:14px;padding:10px 0;letter-spacing:.05em;cursor:pointer;border-bottom:2px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--pink)}
+.panel{padding:10px 12px 14px;min-height:210px;background:#0d0b1c}
+.up{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:8px 0;border-bottom:1px solid #1d1838}
+.up:last-child{border:0}
+.up b{font-family:var(--display);font-size:14.5px}
+.up small{color:var(--muted);font-size:12.5px;grid-column:1}
+.up button,.rift-btn{grid-row:1/3;grid-column:2;font-family:var(--mono);font-size:12px;background:#221c44;color:var(--amber);border:1px solid #3a3170;border-radius:8px;padding:8px 10px;cursor:pointer;min-width:84px}
+.up button:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.slot{border:1px solid #241e48;border-radius:8px;padding:6px;font-size:11.5px;min-height:46px;min-width:0}
+.slot span{display:block;color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.slot b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drops{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
+.drops li{display:flex;justify-content:space-between;gap:8px}
+.drops li span{color:var(--muted);font-family:var(--mono);font-size:11px;white-space:nowrap}
+.r-commun{color:var(--common)} .r-rare{color:var(--rare)} .r-legendaire{color:var(--amber)} .r-set{color:var(--set)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:10px}
+.stats b{display:block;color:var(--text);font-size:14px;font-variant-numeric:tabular-nums}
+.rift p{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+.rift-btn{width:100%;padding:12px;font-size:13px;color:var(--night);background:var(--pink);border:0;font-weight:700}
+.rift-btn:disabled{opacity:.5}
+.road h2{font-family:var(--display);font-size:20px;margin:0 0 8px}
+.road ol{margin:0;padding-left:20px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.road ol b{color:var(--text)}
+.note{font-size:12.5px;color:var(--muted);text-align:center;margin:-10px 0 0}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Concept · Action-RPG idle mobile</p>
+    <h1>Faille <span>Néon</span></h1>
+    <p class="lede">Mercenaire augmenté dans une mégapole qui ne dort jamais. Tu tapes, tes drones frappent seuls, tu ramasses du butin, et la progression ne s'arrête jamais.</p>
+  </header>
+  <ul class="pillars">
+    <li><b>Tap + idle</b>Chaque tap frappe, les drones tirent même quand tu ne joues pas.</li>
+    <li><b>Loot à la Diablo</b>Commun, rare, légendaire, set. Chaque pièce change ton build.</li>
+    <li><b>1 → 70 → ∞</b>Niveaux classiques, puis parangon sans plafond.</li>
+    <li><b>Failles</b>Runs chronométrées, paliers infinis, gardien au bout.</li>
+  </ul>
+
+  <section class="phone" aria-label="Prototype jouable">
+    <div class="hud">
+      <div class="hrow"><span class="lvl" id="lvl">Niv. 1</span><span class="cred" id="cred">0 ¢</span><span class="eco">● ÉCO 30 i/s</span></div>
+      <div class="bar"><i id="xpb"></i></div>
+    </div>
+    <div class="stage">
+      <canvas id="cv" aria-label="Tape sur l'ennemi pour attaquer"></canvas>
+      <div class="enemy"><div class="ename"><b id="ename">—</b><span id="ewave">Secteur 1</span></div><div class="bar"><i id="ehp"></i></div></div>
+      <div class="toast" id="toast"></div>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-t="imp" id="tab-imp">Implants</button>
+      <button role="tab" aria-selected="false" data-t="loot" id="tab-loot">Butin</button>
+      <button role="tab" aria-selected="false" data-t="rift" id="tab-rift">Faille</button>
+    </div>
+    <div class="panel" id="panel"></div>
+  </section>
+  <p class="note">Tape sur l'ennemi. La partie est gardée sur cet appareil.</p>
+
+  <section class="road">
+    <h2>Ce que la vraie version ajoute</h2>
+    <ol>
+      <li><b>Vraie 3D légère</b> en low-poly néon, caméra derrière l'épaule, bloquée à 30 i/s pour que le téléphone reste froid.</li>
+      <li><b>Classes</b> : Solo, Netrunner, Techie, chacune avec ses arbres d'implants.</li>
+      <li><b>Histoire en quartiers</b> à libérer, avec boss et personnages.</li>
+      <li><b>Saisons</b> : un nouveau perso, un nouveau classement, de nouveaux sets.</li>
+    </ol>
+  </section>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const cv=$('cv'),cx=cv.getContext('2d');
+const SLOTS=['Arme','Optique','Bras','Torse','Jambes','Neuro-puce'];
+const ENEMIES=['Drone de sécurité','Gangster augmenté','Netrunner rebelle','Exécuteur corpo','Chien-robot','Sniper à optique'];
+const BOSSES=['Titan de chrome','Reine des câbles','Le Démolisseur'];
+const RAR={commun:{n:'Commun',a:[2,5]},rare:{n:'Rare',a:[6,12]},legendaire:{n:'Légendaire',a:[15,30]},set:{n:'Set Spectre',a:[20,35]}};
+const AFF={tap:'% dégâts de tap',drone:'% dégâts drones',crit:'% critique'};
+const NAMES={Arme:['Canon','Lame thermique','Fusil à rail'],Optique:['Kiroshi','Visée tactique','Œil-scanner'],Bras:['Bras-gorille','Lames mantis','Poing cinétique'],Torse:['Blindage sous-cutané','Plaque titane','Gilet réactif'],Jambes:['Jambes renforcées','Ressorts balistiques','Pieds silencieux'],'Neuro-puce':['Sandevistan','Puce de combat','Booster réflexe']};
+
+let S={lvl:1,xp:0,par:0,cred:0,stage:1,kills:0,tapLv:1,droneLv:0,critLv:0,equip:{},drops:[],riftTier:1,best:0};
+try{const d=JSON.parse(localStorage.getItem('faille-neon')||'null');if(d)S=Object.assign(S,d)}catch(e){}
+function save(){try{localStorage.setItem('faille-neon',JSON.stringify(S))}catch(e){}}
+
+const fmt=n=>n<1000?Math.floor(n).toString():n<1e6?(n/1e3).toFixed(1)+'k':n<1e9?(n/1e6).toFixed(2)+'M':(n/1e9).toFixed(2)+'G';
+const bonus=k=>Object.values(S.equip).reduce((s,it)=>s+(it.aff===k?it.val:0),0);
+const parM=()=>1+S.par*0.02;
+const tapDmg=()=>(5+S.tapLv*4*Math.pow(1.08,S.tapLv))*(1+bonus('tap')/100)*parM();
+const droneDps=()=>S.droneLv?S.droneLv*6*Math.pow(1.1,S.droneLv)*(1+bonus('drone')/100)*parM():0;
+const critCh=()=>Math.min(60,5+S.critLv*2+bonus('crit'));
+const xpNeed=()=>S.lvl<70?Math.floor(20*Math.pow(S.lvl,1.35)):600+S.par*40;
+const cost={tap:()=>10*Math.pow(1.15,S.tapLv),drone:()=>25*Math.pow(1.17,S.droneLv),crit:()=>80*Math.pow(1.6,S.critLv)};
+
+let rift=null, enemy=null;
+function spawn(){
+  const st=rift?rift.tier*5+3:S.stage;
+  let boss=false,name;
+  if(rift){boss=rift.kills>=12;name=boss?'Gardien de la faille':ENEMIES[Math.random()*ENEMIES.length|0]}
+  else{boss=S.stage%5===0&&S.kills===7;name=boss?BOSSES[(S.stage/5|0)%3]:ENEMIES[Math.random()*ENEMIES.length|0]}
+  const hp=30*Math.pow(1.17,st-1)*(boss?(rift?10:8):1);
+  enemy={name,boss,hp,max:hp,hit:0,die:0,hue:boss?340:[190,280,30,310,160,50][Math.random()*6|0],st};
+  $('ename').textContent=name;$('ename').style.color=boss?'var(--pink)':'';
+}
+function dmg(v,crit,src){
+  if(!enemy||enemy.die)return;
+  enemy.hp-=v;enemy.hit=1;
+  if(src==='tap')nums.push({x:W*(.42+Math.random()*.16),y:H*.42,v,crit,t:0});
+  if(enemy.hp<=0)kill();
+}
+function kill(){
+  const e=enemy;e.die=1;e.hp=0;
+  const st=e.st,mult=e.boss?6:1;
+  S.cred+=3*Math.pow(1.12,st)*mult;
+  gainXp(8*Math.pow(st,.7)*mult*(rift?2:1));
+  let chance=e.boss?1:.22;
+  if(Math.random()<chance)drop(st,e.boss&&rift);
+  if(rift){rift.kills++;if(e.boss){endRift(true);}}
+  else{S.kills++;if(S.kills>=8){S.kills=0;S.stage++;if(S.stage>S.best)S.best=S.stage}}
+  setTimeout(()=>{spawn();},380);
+  save();
+}
+function gainXp(x){
+  S.xp+=x;
+  while(S.xp>=xpNeed()){S.xp-=xpNeed();if(S.lvl<70){S.lvl++;toast(S.lvl===70?'Niveau 70 ! Le parangon commence':'Niveau '+S.lvl)}else{S.par++;toast('Parangon '+S.par+' · +2% dégâts')}}
+}
+function drop(st,forceLeg){
+  const r=Math.random();
+  const rar=forceLeg?(r<.3?'set':'legendaire'):r<.012?'set':r<.04?'legendaire':r<.3?'rare':'commun';
+  const slot=SLOTS[Math.random()*6|0];
+  const affs=Object.keys(AFF);const aff=affs[Math.random()*3|0];
+  const [a,b]=RAR[rar].a;let val=Math.round((a+Math.random()*(b-a))*(1+st*0.04));
+  if(aff==='crit')val=Math.max(1,Math.round(val/3));
+  const base=NAMES[slot][Math.random()*3|0];
+  const it={slot,rar,aff,val,name:rar==='set'?base+' Spectre':base};
+  const cur=S.equip[slot];
+  it.eq=!cur||score(it)>score(cur);
+  if(it.eq)S.equip[slot]=it;
+  S.drops.unshift(it);S.drops=S.drops.slice(0,7);
+  beams.push({x:W*.5,c:rarCol(rar),t:0});
+  if(rar!=='commun')toast(RAR[rar].n+' : '+it.name+(it.eq?' (équipé)':''));
+  if(tab==='loot')render();
+}
+const score=it=>it.aff==='crit'?it.val*3:it.val;
+const rarCol=r=>({commun:'#a9a6bf',rare:'#5b8cff',legendaire:'#ffb02e',set:'#4fe39a'})[r];
+
+function startRift(){if(rift)return;rift={tier:S.riftTier,time:45,kills:0};enemy=null;spawn();toast('Faille palier '+S.riftTier+' : 12 ennemis + gardien en 45 s');render();}
+function endRift(ok){
+  if(!rift)return;
+  if(ok){S.riftTier++;S.cred+=50*Math.pow(1.3,rift.tier);toast('Faille réussie ! Palier '+S.riftTier+' débloqué')}
+  else toast('Temps écoulé. Renforce-toi et retente.');
+  rift=null;setTimeout(spawn,400);render();save();
+}
+
+let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
+
+// ---------- Panneau ----------
+let tab='imp';
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));render()});
+function render(){
+  const p=$('panel');
+  if(tab==='imp'){
+    const row=(k,t,d,lv)=>`<div class="up"><b>${t} <small style="font-family:var(--mono)">niv ${lv}</small></b><small>${d}</small><button id="b-${k}" data-k="${k}" ${S.cred<cost[k]()||(k==='crit'&&S.critLv>=20)?'disabled':''}>${k==='crit'&&S.critLv>=20?'MAX':fmt(cost[k]())+' ¢'}</button></div>`;
+    p.innerHTML=`<div class="stats"><div>Tap<b>${fmt(tapDmg())}</b></div><div>Drones/s<b>${fmt(droneDps())}</b></div><div>Critique<b>${critCh().toFixed(0)}%</b></div></div>`+
+      row('tap','Bras cinétique','Augmente les dégâts de chaque tap',S.tapLv)+
+      row('drone','Essaim de drones','Dégâts automatiques, même hors ligne',S.droneLv)+
+      row('crit','Logiciel de visée','+2% de chance de coup critique (x3)',S.critLv);
+    p.querySelectorAll('button[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k,c=cost[k]();if(S.cred>=c){S.cred-=c;S[k+'Lv']++;save();render()}});
+  }else if(tab==='loot'){
+    p.innerHTML=`<div class="slots">${SLOTS.map(s=>{const it=S.equip[s];return `<div class="slot"><span>${s}</span>${it?`<b class="r-${it.rar}">${it.name}</b>+${it.val}${AFF[it.aff]}`:'<b style="color:var(--muted)">vide</b>'}</div>`}).join('')}</div>
+    <ul class="drops">${S.drops.length?S.drops.map(it=>`<li><b class="r-${it.rar}">${it.name}</b><span>+${it.val}${AFF[it.aff].split(' ')[0]} ${it.eq?'· équipé':''}</span></li>`).join(''):'<li style="color:var(--muted)">Élimine des ennemis : les objets tombent avec un rayon de leur couleur.</li>'}</ul>`;
+  }else{
+    p.innerHTML=`<div class="rift"><p>Une faille t'envoie dans le réseau de la ville : 12 ennemis puis un gardien, en 45 secondes. Réussis pour monter de palier. Butin légendaire garanti sur le gardien.</p>
+    <div class="stats"><div>Palier<b>${S.riftTier}</b></div><div>Secteur max<b>${S.best||S.stage}</b></div><div>Parangon<b>${S.par}</b></div></div>
+    <button class="rift-btn" id="riftgo" ${rift?'disabled':''}>${rift?'Faille en cours…':'Ouvrir la faille · palier '+S.riftTier}</button></div>`;
+    $('riftgo').onclick=startRift;
+  }
+}
+
+// ---------- Scène ----------
+let W,H,DPR,sky=[];
+function resize(){
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  W=cv.clientWidth;H=W*1.25;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);
+  sky=[];for(let L=0;L<2;L++){let x=-10;while(x<W+10){const w=18+Math.random()*40,h=H*(L?.18:.28)*(0.4+Math.random());const win=[];for(let i=0;i<w*h/90;i++)win.push([Math.random()*w,Math.random()*h,Math.random()<.5]);sky.push({L,x,w,h,win});x+=w+(L?2:6)}}
+}
+const nums=[],beams=[],sparks=[];
+let t0=0,last=0,shot=0,tm=0,flash=0;
+cv.addEventListener('pointerdown',e=>{
+  if(!enemy||enemy.die)return;
+  const crit=Math.random()*100<critCh();
+  dmg(tapDmg()*(crit?3:1),crit,'tap');flash=1;
+  const r=cv.getBoundingClientRect();
+  for(let i=0;i<6;i++)sparks.push({x:e.clientX-r.left,y:e.clientY-r.top,vx:(Math.random()-.5)*6,vy:(Math.random()-.8)*6,t:0});
+});
+
+function draw(dt){
+  tm+=dt;
+  const hz=H*.47;
+  // ciel
+  let g=cx.createLinearGradient(0,0,0,hz);g.addColorStop(0,'#090716');g.addColorStop(1,'#3a1145');cx.fillStyle=g;cx.fillRect(0,0,W,hz);
+  // immeubles
+  for(const b of sky){const by=hz-b.h;cx.fillStyle=b.L?'#1a1030':'#0e0a1d';cx.fillRect(b.x,by,b.w,b.h);
+    for(const w of b.win){if(w[2]){cx.fillStyle=b.L?'rgba(255,61,139,.35)':'rgba(62,240,255,.45)';cx.fillRect(b.x+w[0],by+w[1],2,2)}}}
+  // sol en perspective
+  g=cx.createLinearGradient(0,hz,0,H);g.addColorStop(0,'#2a0f3a');g.addColorStop(1,'#07060f');cx.fillStyle=g;cx.fillRect(0,hz,W,H-hz);
+  cx.strokeStyle='rgba(255,61,139,.35)';cx.lineWidth=1;
+  for(let i=-8;i<=8;i++){cx.beginPath();cx.moveTo(W/2,hz);cx.lineTo(W/2+i*W*.22,H);cx.stroke()}
+  const off=(tm*.25)%1;
+  for(let i=0;i<9;i++){const p=Math.pow((i+off)/9,2.2);const y=hz+p*(H-hz);cx.globalAlpha=p;cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke()}
+  cx.globalAlpha=1;
+  // pluie
+  cx.strokeStyle='rgba(160,200,255,.18)';cx.beginPath();
+  for(let i=0;i<40;i++){const x=(i*73+tm*40)%W,y=(i*131+tm*520)%H;cx.moveTo(x,y);cx.lineTo(x-2,y+10)}cx.stroke();
+  // rayons de butin
+  for(const b of beams){b.t+=dt;const a=Math.max(0,1-b.t/1.6);g=cx.createLinearGradient(0,0,0,H*.75);g.addColorStop(0,'transparent');g.addColorStop(1,b.c);cx.globalAlpha=a*.7;cx.fillStyle=g;cx.fillRect(b.x-5,0,10,H*.75);cx.globalAlpha=1}
+  // ennemi
+  if(enemy){
+    const e=enemy,s=(e.boss?1.35:1)*W/400,ex=W/2+(e.hit?(Math.random()-.5)*8:0),ey=H*.66+Math.sin(tm*2)*3;
+    if(e.die){e.die+=dt*3;cx.globalAlpha=Math.max(0,1-e.die+1)}
+    cx.save();cx.translate(ex,ey);cx.scale(s,s);
+    const c='hsl('+e.hue+',90%,60%)',dk='hsl('+e.hue+',40%,14%)';
+    cx.fillStyle='rgba(0,0,0,.5)';cx.beginPath();cx.ellipse(0,92,70,12,0,0,7);cx.fill();
+    cx.fillStyle=e.hit?'#fff':dk;cx.strokeStyle=c;cx.lineWidth=2;
+    const poly=pts=>{cx.beginPath();cx.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)cx.lineTo(pts[i],pts[i+1]);cx.closePath();cx.fill();cx.stroke()};
+    poly([-28,40,-14,40,-18,90,-36,90]);poly([14,40,28,40,36,90,18,90]); // jambes
+    poly([-44,-40,44,-40,30,44,-30,44]); // torse
+    poly([-62,-36,-46,-40,-40,20,-58,24]);poly([46,-40,62,-36,58,24,40,20]); // bras
+    poly([-22,-86,22,-86,26,-46,-26,-46]); // tête
+    cx.fillStyle=c;cx.shadowColor=c;cx.shadowBlur=14;cx.fillRect(-18,-72,36,7);cx.fillRect(-6,-10,12,12);cx.shadowBlur=0;
+    if(e.boss){cx.strokeStyle=c;cx.beginPath();cx.moveTo(-22,-86);cx.lineTo(-34,-110);cx.moveTo(22,-86);cx.lineTo(34,-110);cx.stroke()}
+    cx.restore();cx.globalAlpha=1;
+    e.hit=Math.max(0,e.hit-dt*10);
+    $('ehp').style.width=(100*Math.max(0,e.hp)/e.max)+'%';
+  }
+  // drones
+  const dps=droneDps();
+  if(S.droneLv){
+    const n=Math.min(4,1+(S.droneLv/10|0));
+    for(let i=0;i<n;i++){const a=tm*1.4+i*Math.PI*2/n,x=W/2+Math.cos(a)*W*.36,y=H*.36+Math.sin(a)*H*.06;
+      cx.fillStyle='#3ef0ff';cx.beginPath();cx.moveTo(x,y-6);cx.lineTo(x+8,y+5);cx.lineTo(x-8,y+5);cx.closePath();cx.fill();
+      if(shot>0.35&&enemy&&!enemy.die){cx.strokeStyle='rgba(62,240,255,.8)';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(x,y);cx.lineTo(W/2,H*.6);cx.stroke()}}
+    shot+=dt;if(shot>0.5){dmg(dps*0.5,false,'drone');shot=0}
+  }
+  // joueur (épaule + canon, vue de dos)
+  cx.fillStyle='#05040b';cx.beginPath();cx.moveTo(-10,H);cx.quadraticCurveTo(W*.05,H*.8,W*.22,H*.78);cx.lineTo(W*.3,H*.86);cx.lineTo(W*.42,H*.8);cx.lineTo(W*.46,H*.84);cx.lineTo(W*.34,H*.94);cx.lineTo(W*.3,H);cx.closePath();cx.fill();
+  cx.strokeStyle='rgba(255,61,139,.7)';cx.lineWidth=1.5;cx.beginPath();cx.moveTo(W*.22,H*.78);cx.lineTo(W*.3,H*.86);cx.lineTo(W*.42,H*.8);cx.stroke();
+  if(flash>0){cx.fillStyle='rgba(255,176,46,'+flash+')';cx.beginPath();cx.arc(W*.45,H*.81,10+flash*10,0,7);cx.fill();flash=Math.max(0,flash-dt*8)}
+  // étincelles
+  for(let i=sparks.length-1;i>=0;i--){const p=sparks[i];p.t+=dt;p.x+=p.vx;p.y+=p.vy;p.vy+=.4;cx.fillStyle='rgba(255,176,46,'+(1-p.t*3)+')';cx.fillRect(p.x,p.y,3,3);if(p.t>.33)sparks.splice(i,1)}
+  // chiffres de dégâts
+  cx.textAlign='center';
+  for(let i=nums.length-1;i>=0;i--){const n=nums[i];n.t+=dt;cx.globalAlpha=Math.max(0,1-n.t*1.2);cx.font=(n.crit?'700 26px ':'700 18px ')+'"JetBrains Mono",monospace';cx.fillStyle=n.crit?'#ffb02e':'#ffffff';cx.fillText(fmt(n.v)+(n.crit?'!':''),n.x,n.y-n.t*60);if(n.t>.9)nums.splice(i,1)}
+  cx.globalAlpha=1;
+  for(let i=beams.length-1;i>=0;i--)if(beams[i].t>1.6)beams.splice(i,1);
+  // chrono de faille
+  if(rift){rift.time-=dt;cx.font='700 15px "JetBrains Mono",monospace';cx.fillStyle=rift.time<10?'#ff3d8b':'#3ef0ff';cx.textAlign='right';cx.fillText('FAILLE '+Math.max(0,rift.time).toFixed(1)+'s · '+Math.min(12,rift.kills)+'/12',W-12,H-14);if(rift.time<=0)endRift(false)}
+}
+function hud(){
+  $('lvl').innerHTML=S.lvl<70?'Niv. '+S.lvl:'Niv. 70 · <em>Parangon '+S.par+'</em>';
+  $('cred').textContent=fmt(S.cred)+' ¢';
+  $('xpb').style.width=(100*S.xp/xpNeed())+'%';
+  $('ewave').textContent=rift?'Faille palier '+rift.tier:'Secteur '+S.stage+' · '+(S.kills+1)+'/8';
+}
+// boucle limitée à 30 i/s, en pause quand l'onglet est caché
+let hudT=0;
+function loop(now){
+  requestAnimationFrame(loop);
+  if(document.hidden)return;
+  if(now-last<33)return;
+  const dt=Math.min(.1,(now-last)/1000);last=now;
+  draw(dt);hudT+=dt;if(hudT>.2){hud();hudT=0;if(tab==='imp')refreshBtns()}
+}
+function refreshBtns(){for(const k of ['tap','drone','crit']){const b=$('b-'+k);if(b&&!(k==='crit'&&S.critLv>=20))b.disabled=S.cred<cost[k]()}}
+window.addEventListener('resize',resize);
+resize();spawn();render();hud();
+if(S.droneLv&&S.lvl>1)toast('Tes drones ont travaillé pendant ton absence');
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>

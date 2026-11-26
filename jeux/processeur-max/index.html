@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Processeur Max</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;height:100%;background:#07090c;color:#e6edf3;font-family:'JetBrains Mono',monospace;overflow:hidden}
+#app{max-width:520px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:2px;font-size:15px}
+.chip{width:22px;height:22px;border-radius:6px;background:radial-gradient(circle,#ff4d2e 0 25%,#3a1410 30%);border:2px solid #ff7a3d}
+.reset{background:#1b222b;border:1px solid #2b3540;color:#9aa7b4;border-radius:8px;padding:6px 10px;font:inherit;font-size:11px}
+.top{display:grid;grid-template-columns:1fr 1.2fr;gap:8px;padding:0 12px}
+.box{background:#0e1318;border:1px solid #1f2a33;border-radius:10px;padding:8px 10px}
+#money{font-size:24px;font-weight:800;color:#3ddc84}
+.lbl{font-size:10px;letter-spacing:1px;color:#9aa7b4;display:flex;justify-content:space-between}
+.bar{height:6px;background:#1a2129;border-radius:4px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:#9b7bff;width:0}
+#board{flex:1;min-height:0;position:relative}
+canvas{width:100%;height:100%;display:block}
+.temp{display:flex;align-items:center;gap:10px;padding:6px 12px;font-size:11px;color:#9aa7b4}
+.tbar{flex:1;height:8px;background:#1a2129;border-radius:4px;position:relative;overflow:hidden}
+.tbar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#38bdf8,#3ddc84,#facc15,#ef4444);width:0}
+.tbar b{position:absolute;top:0;bottom:0;left:90%;right:0;background:repeating-linear-gradient(45deg,#ef444455 0 3px,transparent 3px 6px);border-left:2px solid #ef4444}
+#tval{width:92px;text-align:right;font-weight:700}
+.ups{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:6px 12px 14px}
+.up{background:#0e1318;border:1px solid #1f2a33;border-radius:10px;padding:8px 6px;text-align:center}
+.up h4{margin:0;font-size:12px;letter-spacing:1px}
+.up .d{font-size:10px;color:#9aa7b4;margin:4px 0 2px;min-height:13px}
+.up .e{font-size:10px;min-height:13px}
+.up button{width:100%;margin-top:6px;border:0;border-radius:7px;padding:9px 0;font:inherit;font-weight:800;font-size:14px;background:#3ddc84;color:#04210f}
+.up button:disabled{background:#1f2730;color:#6b7785}
+.up button.max{background:#1f2730;color:#9b7bff}
+#over{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:5}
+.card{background:#11161c;border:1px solid #2b3540;border-radius:16px;padding:22px;text-align:center;width:min(86vw,340px)}
+.card h2{margin:10px 0 2px;letter-spacing:3px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0}
+.stats div{background:#0b0f13;border:1px solid #232d37;border-radius:8px;padding:8px 0;font-weight:800}
+.stats small{display:block;font-size:9px;color:#9aa7b4;font-weight:500}
+.big{width:100%;border:0;border-radius:10px;padding:14px;font:inherit;font-weight:800;letter-spacing:2px;background:#3ddc84;color:#04210f;font-size:15px}
+.help{font-size:11px;color:#9aa7b4;text-align:left;line-height:1.5}
+</style></head><body>
+<div id="app">
+<header><div class="logo"><div class="chip"></div>PROCESSEUR MAX</div><button class="reset" id="helpBtn">? AIDE</button></header>
+<div class="top">
+ <div class="box"><div class="lbl"><span>ARGENT</span><span id="gen">PUCE 1</span></div><div id="money">$0</div></div>
+ <div class="box"><div class="lbl"><span>ENTRAÎNEMENT IA</span><span id="mp">0%</span></div><div class="bar"><i id="mbar"></i></div>
+ <div class="lbl" style="margin-top:6px"><span>UTILISATION</span><span id="usep">0%</span></div><div class="bar"><i id="ubar" style="background:#38bdf8"></i></div></div>
+</div>
+<div id="board"><canvas id="c"></canvas></div>
+<div class="temp">TEMP. CPU<div class="tbar"><i id="tb"></i><b></b></div><span id="tval">40°C</span></div>
+<div class="ups">
+ <div class="up"><h4 style="color:#3ddc84">▣ CŒURS</h4><div class="d" id="d0"></div><div class="e" id="e0"></div><button id="b0"></button></div>
+ <div class="up"><h4 style="color:#facc15">∿ FRÉQUENCE</h4><div class="d" id="d1"></div><div class="e" id="e1"></div><button id="b1"></button></div>
+ <div class="up"><h4 style="color:#38bdf8">✣ VENTILOS</h4><div class="d" id="d2"></div><div class="e" id="e2"></div><button id="b2"></button></div>
+</div>
+</div>
+<div id="over"><div class="card" id="card"></div></div>
+<script>
+const MAXC=8,MAXF=12,MAXCLK=4.0;
+let S;
+function fresh(gen){return{money:20,cores:2,clock:1.0,fans:1,model:0,users:8,temp:40,gen:gen||1,t:0,done:false}}
+try{S=JSON.parse(localStorage.getItem('cpuMax'))}catch(e){}
+if(!S||typeof S.money!=='number')S=fresh(1);
+const save=()=>{try{localStorage.setItem('cpuMax',JSON.stringify(S))}catch(e){}};
+
+// --- modèle ---
+const mult=()=>1+ (S.gen-1)*0.5;
+function heatOf(c,clk){return c*clk*9}
+function coolOf(f){return f*17}
+function targetTemp(c=S.cores,clk=S.clock,f=S.fans){return 32+heatOf(c,clk)-coolOf(f)}
+function throttled(){return S.temp>=95}
+function effClock(){return throttled()?Math.max(0.5,S.clock*0.35):S.clock}
+function capacity(){return S.cores*effClock()*6}           // req/s traitables
+function served(){return Math.min(S.users,capacity())}
+function billing(){return served()*0.45*mult()}             // $/s
+function spare(){return Math.max(0,capacity()-S.users)}
+function modelRate(){return (0.008+spare()*0.01+served()*0.0012)/(1+(S.gen-1)*0.6)} // %/s
+function cost(k){
+ if(k==0)return Math.round(10*Math.pow(1.75,S.cores-2)*mult());
+ if(k==1)return Math.round(8*Math.pow(1.6,(S.clock-1)/0.25)*mult());
+ return Math.round(9*Math.pow(1.7,S.fans-1)*mult());
+}
+function maxed(k){return k==0?S.cores>=MAXC:k==1?S.clock>=MAXCLK-1e-6:S.fans>=MAXF}
+function preview(k){
+ let c=S.cores,clk=S.clock,f=S.fans;
+ if(k==0)c++;else if(k==1)clk+=0.25;else f++;
+ const dT=Math.round(targetTemp(c,clk,f)-targetTemp());
+ const capN=c*clk*6,capO=S.cores*S.clock*6;
+ const dB=Math.round((Math.min(S.users,capN)-Math.min(S.users,capO))*0.45*mult()*10)/10;
+ return{dT,dB};
+}
+function buy(k){
+ if(maxed(k)||S.money<cost(k))return;
+ S.money-=cost(k);
+ if(k==0)S.cores++;else if(k==1)S.clock=Math.round((S.clock+0.25)*100)/100;else S.fans++;
+ flash.push({k,t:1.2});save();ui();
+}
+document.querySelectorAll('.up button').forEach((b,i)=>b.onclick=()=>buy(i));
+
+// --- UI ---
+const $=id=>document.getElementById(id);
+const fmt=n=>n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e4?(n/1e3).toFixed(1)+'k':Math.floor(n).toString();
+function ui(){
+ $('money').textContent='$'+fmt(S.money);
+ $('gen').textContent='PUCE '+S.gen;
+ $('mp').textContent=Math.floor(S.model)+'%';$('mbar').style.width=S.model+'%';
+ const u=Math.min(100,Math.round(S.users/Math.max(0.01,capacity())*100));
+ $('usep').textContent=u+'%';$('ubar').style.width=u+'%';
+ const tp=Math.max(0,Math.min(100,(S.temp-20)/90*100));$('tb').style.width=tp+'%';
+ const tv=$('tval');
+ if(throttled()){tv.textContent='SURCHAUFFE';tv.style.color='#ef4444'}
+ else{tv.textContent=Math.round(S.temp)+'°C';tv.style.color=S.temp>80?'#fb923c':'#e6edf3'}
+ const desc=[`${S.cores} → ${S.cores+1}`,`${S.clock.toFixed(2)} → ${(S.clock+0.25).toFixed(2)}`,`${S.fans} → ${S.fans+1}`];
+ for(let k=0;k<3;k++){
+  const b=$('b'+k);
+  if(maxed(k)){b.textContent='MAX';b.className='max';b.disabled=true;$('d'+k).textContent='';$('e'+k).textContent='';continue}
+  const p=preview(k),c=cost(k);
+  $('d'+k).textContent=desc[k]+(k==1?' GHz':'');
+  $('e'+k).innerHTML=(k==2?'':`<span style="color:#3ddc84">+$${p.dB}/s</span> `)+`<span style="color:${p.dT>0?'#fb923c':'#38bdf8'}">${p.dT>0?'+':''}${p.dT}°</span>`;
+  b.className='';b.textContent='$'+fmt(c);b.disabled=S.money<c;
+ }
+}
+
+// --- canvas ---
+const cv=$('c'),ctx=cv.getContext('2d');let W,H,DPR;
+function rs(){DPR=devicePixelRatio||1;const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',rs);
+let flash=[],pulses=[],fanA=0,popups=[];
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function pill(x,y,w,h,col,a,b){rr(x,y,w,h,h/2);ctx.fillStyle='#0b1015';ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();
+ ctx.font='700 10px JetBrains Mono';ctx.fillStyle='#cfd8e1';ctx.textAlign='left';ctx.fillText(a,x+10,y+h/2+4);
+ ctx.font='800 12px JetBrains Mono';ctx.fillStyle=col;ctx.textAlign='right';ctx.fillText(b,x+w-10,y+h/2+4)}
+function path(pts,col,dots,speed){
+ ctx.strokeStyle=col+'55';ctx.lineWidth=2;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
+ let L=0,segs=[];for(let i=1;i<pts.length;i++){const l=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);segs.push(l);L+=l}
+ const n=Math.max(1,Math.round(dots));
+ for(let j=0;j<n;j++){let d=((S.t*speed*40+j*L/n)%L),i=0;while(d>segs[i]){d-=segs[i];i++}
+  const a=pts[i],b=pts[i+1],f=d/segs[i];ctx.fillStyle=col;ctx.beginPath();ctx.arc(a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,2.6,0,7);ctx.fill()}
+}
+function fan(x,y,r,on){ctx.save();ctx.translate(x,y);
+ ctx.strokeStyle=on?'#38bdf8':'#26313c';ctx.lineWidth=1.5;ctx.setLineDash(on?[]:[3,3]);ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.stroke();ctx.setLineDash([]);
+ if(on){ctx.rotate(fanA);ctx.fillStyle='#38bdf8';for(let i=0;i<4;i++){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.ellipse(r*0.42,0,r*0.42,r*0.2,0.5,0,7);ctx.fill()}}
+ else{ctx.fillStyle='#3a4652';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText('+',0,4)}
+ ctx.restore()}
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ const hot=throttled();
+ if(S.temp>82){ctx.fillStyle=`rgba(239,68,68,${Math.min(.22,(S.temp-82)/60)*(hot?1+0.5*Math.sin(S.t*8):1)})`;ctx.fillRect(0,0,W,H)}
+ // grille
+ ctx.strokeStyle='#ffffff08';ctx.lineWidth=1;for(let x=0;x<W;x+=22){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=22){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ const cx=W/2, top=10, pw=Math.min(150,W*0.38);
+ // processeur
+ const bw=Math.min(W*0.56,250),bh=Math.min(H*0.36,170),bx=cx-bw/2,by=H*0.30;
+ // pills
+ const bill=billing(),mr=modelRate();
+ pill(10,top,pw,28,'#3ddc84','FACTURE','+$'+bill.toFixed(1)+'/s');
+ pill(W-10-pw,top,pw,28,'#9b7bff','MODÈLE','+'+mr.toFixed(2)+'%/s');
+ pill(cx-pw/2,H-40,pw,28,'#3b82f6','CLIENTS',Math.round(S.users)+' REQ/s');
+ // fils
+ const sp=hot?0.6:effClock();
+ path([[10+pw*0.5,top+28],[10+pw*0.5,top+52],[cx-6,top+52],[cx-6,by]],'#3ddc84',3+served()/6,sp);
+ path([[W-10-pw*0.5,top+28],[W-10-pw*0.5,top+52],[cx+6,top+52],[cx+6,by]],'#9b7bff',2+spare()/4,sp);
+ path([[cx-20,H-40],[cx-20,by+bh+40],[cx-20,by+bh]],'#3b82f6',2+S.users/8,sp*0.8);
+ path([[cx+20,by+bh],[cx+20,by+bh+40],[cx+20,H-40]],'#3b82f6',2+served()/8,sp*0.8);
+ // file d'attente
+ const q=Math.max(0,S.users-capacity()),qw=Math.min(bw,180),qx=cx-qw/2,qy=by+bh+18;
+ for(let i=0;i<12;i++){ctx.fillStyle=i<Math.min(12,Math.ceil(q/2))?'#ef4444':i==0?'#3b82f6':'#18202a';rr(qx+i*qw/12,qy,qw/12-2,10,2);ctx.fill()}
+ // boîte CPU
+ rr(bx,by,bw,bh,10);ctx.fillStyle='#0b0f14';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=hot?'#ef4444':'#f59e0b';ctx.shadowColor=hot?'#ef4444':'#f59e0b';ctx.shadowBlur=hot?18:8;ctx.stroke();ctx.shadowBlur=0;
+ ctx.font='800 11px JetBrains Mono';ctx.fillStyle='#f59e0b';ctx.textAlign='left';ctx.fillText(S.cores+' CŒURS',bx,by-6);
+ const cols=4,rows=2,gap=6,cw=(bw-20-gap*(cols-1))/cols,ch=(bh-20-gap)/rows;
+ const load=Math.min(1,S.users/Math.max(.01,capacity()));
+ for(let i=0;i<MAXC;i++){const r=1-Math.floor(i/cols),c=i%cols,x=bx+10+c*(cw+gap),y=by+10+r*(ch+gap);
+  rr(x,y,cw,ch,6);
+  if(i<S.cores){ctx.fillStyle='#0f2a1b';ctx.fill();ctx.strokeStyle='#3ddc84';ctx.lineWidth=1.5;ctx.stroke();
+   for(let a=0;a<2;a++)for(let b=0;b<2;b++){ctx.fillStyle='#3ddc84';ctx.fillRect(x+cw*0.18+a*cw*0.34,y+ch*0.18+b*ch*0.26,cw*0.28,ch*0.18)}
+   const lv=Math.max(0.1,load*(0.7+0.3*Math.sin(S.t*effClock()*4+i)));ctx.fillStyle='#14532d';ctx.fillRect(x+cw*0.15,y+ch*0.78,cw*0.7,4);ctx.fillStyle=hot?'#ef4444':'#86efac';ctx.fillRect(x+cw*0.15,y+ch*0.78,cw*0.7*lv,4)}
+  else{ctx.setLineDash([3,4]);ctx.strokeStyle='#26313c';ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);if(i==S.cores){ctx.fillStyle='#3a4652';ctx.font='16px sans-serif';ctx.textAlign='center';ctx.fillText('+',x+cw/2,y+ch/2+5)}}
+ }
+ if(hot){ctx.font='800 13px JetBrains Mono';ctx.textAlign='center';const tw=ctx.measureText('TROP CHAUD · RALENTI').width+20;rr(cx-tw/2,by+bh/2-14,tw,26,6);ctx.fillStyle='#2a0b0bdd';ctx.fill();ctx.strokeStyle='#ef4444';ctx.stroke();ctx.fillStyle='#ef4444';ctx.fillText('TROP CHAUD · RALENTI',cx,by+bh/2+4)}
+ // horloge
+ const kw=Math.min(62,bx-14),kx=bx-kw-8,ky=by+bh/2-42;
+ rr(kx,ky,kw,84,8);ctx.fillStyle='#0b0f14';ctx.fill();ctx.strokeStyle=hot?'#ef4444':'#a16207';ctx.lineWidth=1.5;ctx.stroke();
+ ctx.font='700 9px JetBrains Mono';ctx.fillStyle='#9aa7b4';ctx.textAlign='center';ctx.fillText('HORLOGE',kx+kw/2,ky+14);
+ ctx.strokeStyle=hot?'#ef4444':'#facc15';ctx.lineWidth=2;ctx.beginPath();const ec=effClock();for(let i=0;i<=40;i++){const xx=kx+8+i*(kw-16)/40,yy=ky+36+Math.sin(i/40*Math.PI*2*(1+ec)+S.t*ec*3)*9;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke();
+ ctx.font='800 14px JetBrains Mono';ctx.fillStyle=hot?'#ef4444':'#facc15';ctx.fillText(ec.toFixed(2),kx+kw/2,ky+66);ctx.font='700 8px JetBrains Mono';ctx.fillStyle='#9aa7b4';ctx.fillText(hot?'LENT':'GHz',kx+kw/2,ky+78);
+ // ventilos
+ const fx=bx+bw+8,fw=W-fx-4,fr=Math.max(7,Math.min(13,(fw-8)/6.4));
+ ctx.font='700 9px JetBrains Mono';ctx.fillStyle='#38bdf8';ctx.textAlign='left';ctx.fillText('VENTILOS',fx,by-6);
+ for(let i=0;i<MAXF;i++){const c=i%3,r=Math.floor(i/3);fan(fx+fr+1+c*(fr*2+4),by+fr+4+r*(fr*2+6),fr,i<S.fans)}
+ // chaleur
+ if(S.temp>60){const n=Math.floor((S.temp-60)/4);for(let i=0;i<n;i++){const ph=(S.t*1.5+i*0.37)%1;ctx.fillStyle=`rgba(251,146,60,${1-ph})`;ctx.beginPath();ctx.arc(bx+bw+2+ph*8,by+10+((i*37)%(bh-20)),2.2,0,7);ctx.fill()}}
+ // flash
+ flash=flash.filter(f=>(f.t-=1/60)>0);
+ flash.forEach(f=>{ctx.globalAlpha=Math.min(1,f.t);ctx.font='800 13px JetBrains Mono';ctx.textAlign='center';ctx.fillStyle=['#3ddc84','#facc15','#38bdf8'][f.k];
+  const txt=['+1 CŒUR','+0.25 GHz','+1 VENTILO'][f.k];const yy=by+bh/2-(1.2-f.t)*30;ctx.fillText(txt,f.k==1?kx+kw/2+30:f.k==2?fx+fw/2:cx,f.k==0?yy:by-20-(1.2-f.t)*20);ctx.globalAlpha=1});
+}
+// --- boucle ---
+let last=performance.now(),acc=0;
+function step(dt){
+ if(S.done)return;
+ S.t+=dt;
+ const tg=targetTemp();
+ S.temp+=(Math.max(25,tg)-S.temp)*Math.min(1,dt*0.6);
+ S.money+=billing()*dt;
+ // clients : croissance attirée par la capacité et le modèle
+ const want=6+S.model*0.5+capacity()*0.8;
+ S.users+=(want-S.users)*dt*0.05;
+ S.model=Math.min(100,S.model+modelRate()*dt);
+ fanA+=dt*(4+S.fans);
+ if(S.model>=100){S.done=true;save();win()}
+}
+function loop(now){let dt=Math.min(0.1,(now-last)/1000);last=now;step(dt);draw();acc+=dt;if(acc>0.15){acc=0;ui()}if(S.t%5<dt)save();requestAnimationFrame(loop)}
+function win(){
+ $('card').innerHTML=`<div class="chip" style="width:64px;height:64px;margin:0 auto;border-radius:14px"></div><h2>PUCE ${S.gen}</h2><div style="color:#3ddc84;font-size:12px;letter-spacing:2px">MODÈLE IA ENTRAÎNÉ</div>
+ <div class="stats"><div>${S.cores}<small>CŒURS</small></div><div>${S.clock.toFixed(2)}<small>GHz</small></div><div>${S.fans}<small>VENTILOS</small></div></div>
+ <button class="big" id="nx">PUCE SUIVANTE ▶</button><div style="font-size:10px;color:#9aa7b4;margin-top:10px">Revenus ×${(1+S.gen*0.5).toFixed(1)} · entraînement plus long</div>`;
+ $('over').style.display='flex';
+ $('nx').onclick=()=>{S=fresh(S.gen+1);save();$('over').style.display='none';ui()}
+}
+$('helpBtn').onclick=()=>{
+ $('card').innerHTML=`<h2 style="font-size:16px">COMMENT JOUER</h2><div class="help"><p>🎯 But : entraîner le modèle IA à 100 %.</p>
+ <p>🟩 <b>Cœurs</b> et 🟨 <b>Fréquence</b> augmentent la capacité de calcul… mais chauffent.</p>
+ <p>🟦 <b>Ventilos</b> refroidissent. Au-delà de 95 °C : <b style="color:#ef4444">surchauffe</b>, le CPU ralentit fortement.</p>
+ <p>💰 La capacité utilisée par les clients rapporte de l'argent. La capacité <b>non utilisée</b> part dans l'entraînement IA.</p>
+ <p>⚖️ L'astuce : exploiter 100 % de la puce sans jamais surchauffer.</p></div>
+ <button class="big" id="ok">COMPRIS</button><button class="reset" id="rz" style="margin-top:10px;width:100%">Recommencer à zéro</button>`;
+ $('over').style.display='flex';$('ok').onclick=()=>$('over').style.display='none';
+ $('rz').onclick=()=>{S=fresh(1);save();$('over').style.display='none';ui()}
+};
+rs();ui();if(S.done)win();requestAnimationFrame(loop);
+</script></body></html>

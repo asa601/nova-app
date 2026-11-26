@@ -1,0 +1,726 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fiefs de Braise</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Rubik:wght@400;500;700;800&display=swap">
+<style>
+:root{color-scheme:dark;--bg:#0c0a0f;--bg2:#15111b;--panel:#1c1624;--panel2:#261d31;--line:#3d2f4a;--txt:#efe6dc;--mute:#a8998f;--gold:#f6c45a;--food:#9ede5c;--pb:#86b9ff;--ember:#ff6a2b;--red:#ff4d4d;--ok:#5fe08a;--r0:#9aa3ad;--r1:#4aa3ff;--r2:#b56cff;--r3:#ffb13b;--ff:'Rubik',system-ui,-apple-system,'Segoe UI',sans-serif;--fh:'Cinzel',Georgia,'Times New Roman',serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:radial-gradient(120% 60% at 50% 0%,#24152a 0%,var(--bg) 60%) fixed,var(--bg);color:var(--txt);margin:0;font-family:var(--ff)}
+body{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 22px;overflow-x:hidden}
+.wrap{max-width:460px;margin:0 auto}
+header h1{font-family:var(--fh);font-weight:900;font-size:26px;margin:0;letter-spacing:.5px;background:linear-gradient(180deg,#ffe2a0,#ff8a3a);-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{margin:3px 0 0;font-size:12.5px;color:var(--mute);line-height:1.35}
+header b{color:var(--txt)}
+#game{position:relative;margin-top:10px;border-radius:18px;overflow:hidden;background:var(--bg2);border:1px solid var(--line);box-shadow:0 10px 40px #000a,inset 0 1px 0 #ffffff10}
+#hud{display:flex;gap:5px;padding:8px;background:linear-gradient(180deg,#2a1f35,#1a1422);border-bottom:1px solid var(--line)}
+.chip{flex:1;display:flex;align-items:center;gap:4px;background:#0008;border:1px solid #ffffff14;border-radius:999px;padding:3px 7px 3px 3px;font-weight:700;font-size:13px;min-width:0;white-space:nowrap}
+.chip .ico{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none}
+.chip .ico svg{width:15px;height:15px}
+.chip span{overflow:hidden;text-overflow:ellipsis}
+.c-gold .ico{background:radial-gradient(#ffe08a,#c58a1c);color:#5a3500}.c-food .ico{background:radial-gradient(#c9f58c,#4f9a24);color:#1d3a05}
+.c-army .ico{background:radial-gradient(#ffb27d,#b5481f);color:#3a1004}.c-pb .ico{background:radial-gradient(#b8d6ff,#3f6fc8);color:#0b1f45}
+.bump{animation:bump .35s}@keyframes bump{50%{transform:scale(1.15)}}
+#layers{display:flex;gap:4px;padding:6px 8px;background:#0e0b13;border-bottom:1px solid var(--line);overflow:hidden}
+.lay{flex:1;min-width:0;border-radius:8px;padding:3px 4px;background:linear-gradient(180deg,#2b2236,#1d1626);border:1px solid #ffffff12;text-align:center;font-size:9.5px;line-height:1.2;color:var(--mute)}
+.lay b{display:block;font-size:11px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lay.off{opacity:.38;filter:grayscale(1)}.lay.off b::before{content:'🔒 '}
+.lay.flash{animation:lflash 1.4s 2}@keyframes lflash{50%{box-shadow:0 0 14px var(--gold);border-color:var(--gold)}}
+#stage{position:relative;height:430px;touch-action:none;cursor:grab;background:#3b2a3c}
+#cv{display:block;width:100%;height:100%}
+#ov{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.bubble{position:absolute;width:40px;height:40px;margin:-48px 0 0 -20px;border-radius:50%;display:grid;place-items:center;pointer-events:auto;cursor:pointer;border:2px solid #fff;box-shadow:0 4px 10px #0008,inset 0 -4px 8px #0004;animation:bob 1.2s ease-in-out infinite}
+.bubble svg{width:24px;height:24px}
+.bubble.food{background:radial-gradient(circle at 35% 30%,#e5ffb8,#5aa82a);color:#1b3a06}.bubble.gold{background:radial-gradient(circle at 35% 30%,#fff1b8,#d39a22);color:#4a2c00}
+.bubble.hide{display:none}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.clabel{position:absolute;transform:translate(-50%,-100%);font-size:10px;font-weight:700;padding:2px 6px 2px 3px;border-radius:999px;background:#120d18d8;border:1px solid #ffffff22;white-space:nowrap;display:flex;gap:4px;align-items:center}
+.clabel .lv{background:var(--ember);color:#fff;border-radius:999px;padding:0 5px;font-size:9.5px}
+.clabel.weak{border-color:#5fe08a88}.clabel.strong{border-color:#ff4d4d99}.clabel.dead{opacity:.6}
+.hpbar{position:absolute;width:70px;height:8px;margin-left:-35px;border-radius:4px;background:#000a;border:1px solid #fff5;overflow:hidden}
+.hpbar i{display:block;height:100%;background:linear-gradient(90deg,#ff3b3b,#ff9b3b);transition:width .12s}
+.dmg{position:absolute;font:900 17px var(--ff);color:#fff;text-shadow:0 2px 0 #7a1a00,0 0 8px #ff5a00;pointer-events:none;animation:dmg .9s ease-out forwards}
+.dmg.crit{font-size:23px;color:#ffd84a}.dmg.heal{color:var(--food);text-shadow:0 2px 0 #1a4a00}
+@keyframes dmg{0%{transform:translate(-50%,0) scale(.6);opacity:0}15%{transform:translate(-50%,-10px) scale(1.25);opacity:1}100%{transform:translate(-50%,-48px) scale(1);opacity:0}}
+.fly{position:fixed;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;z-index:50;pointer-events:none;border:2px solid #fff}
+.fly svg{width:16px;height:16px}
+#banner{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:88%;pointer-events:none;z-index:5}
+.bn{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:linear-gradient(135deg,#3a2414f2,#1b1022f2);border:2px solid var(--gold);box-shadow:0 0 30px #ff8a2a88,0 10px 30px #000c;animation:bn 3.6s forwards}
+.bn .bi{width:46px;height:46px;flex:none;border-radius:12px;display:grid;place-items:center;background:radial-gradient(#ffcf6a,#b4520f);color:#2a1000}
+.bn .bi svg{width:32px;height:32px}
+.bn small{display:block;font:800 10px var(--ff);letter-spacing:2px;color:var(--gold)}
+.bn b{display:block;font:900 16px var(--fh)}.bn span{font-size:11.5px;color:#e8d8c8}
+@keyframes bn{0%{opacity:0;transform:scale(.6)}8%{opacity:1;transform:scale(1.06)}12%{transform:scale(1)}85%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
+#toast{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#000c;border:1px solid #ffffff30;padding:6px 12px;border-radius:999px;font-size:12px;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1}
+#quest{display:flex;align-items:center;gap:8px;padding:7px 10px;background:linear-gradient(90deg,#3a2614,#22162a);border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px}
+#quest .qi{width:26px;height:26px;flex:none;border-radius:8px;background:var(--gold);color:#3a2200;display:grid;place-items:center}
+#quest .qi svg{width:18px;height:18px}
+#quest .qt{flex:1;line-height:1.25}#quest .qt em{display:block;font-style:normal;font-size:10.5px;color:var(--gold)}
+#quest .qp{font-weight:800;color:var(--gold)}
+#tabs{display:flex;background:#100c15}
+#tabs button{flex:1;background:none;border:0;color:var(--mute);font:700 10.5px var(--ff);padding:7px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;cursor:pointer}
+#tabs button svg{width:22px;height:22px}
+#tabs button.on{color:var(--gold);background:linear-gradient(180deg,#2a1f35,#100c15)}
+#tabs button.on::after{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;border-radius:0 0 3px 3px;background:var(--gold)}
+#tabs button .dot{position:absolute;top:4px;right:22%;width:9px;height:9px;border-radius:50%;background:var(--ember);box-shadow:0 0 6px var(--ember);display:none}
+#tabs button.new .dot{display:block}
+#panel{height:290px;overflow-y:auto;padding:10px;background:var(--panel)}
+#panel h3{font:900 15px var(--fh);margin:0 0 6px;display:flex;align-items:center;gap:6px}
+#panel h3 svg{width:20px;height:20px;color:var(--gold)}
+.sub{font-size:11.5px;color:var(--mute);margin:0 0 8px;line-height:1.35}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.card{background:linear-gradient(180deg,var(--panel2),#1a1421);border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;gap:8px;align-items:center;position:relative}
+.card .ci{width:40px;height:40px;flex:none;border-radius:10px;display:grid;place-items:center;background:radial-gradient(#4a3a58,#241a2e);border:1px solid #ffffff1a;color:#ffd99a}
+.card .ci svg{width:28px;height:28px}
+.card .cb{flex:1;min-width:0;font-size:11px;line-height:1.3}
+.card .cb b{font-size:12.5px;display:block}
+.card.lock{opacity:.5}.card.lock .ci{color:#777}
+.tag{display:inline-block;font:800 9px var(--ff);padding:1px 6px;border-radius:999px;letter-spacing:.4px;text-transform:uppercase;margin-right:3px}
+.t-tank{background:#3b5a8a}.t-dist{background:#3e7a3a}.t-choc{background:#9a3420}.t-siege{background:#6c3a9a}.t-pil{background:#444}.t-beast{background:#8a5a12}
+.btn{border:0;border-radius:10px;font:800 12px var(--ff);padding:7px 10px;cursor:pointer;color:#2a1600;background:linear-gradient(180deg,#ffd77a,#e09a2a);box-shadow:0 3px 0 #8a520f,inset 0 1px 0 #fff8;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.btn svg{width:14px;height:14px}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #8a520f}
+.btn.red{background:linear-gradient(180deg,#ff8a5a,#d0401a);color:#fff;box-shadow:0 3px 0 #7a1e05}
+.btn.blue{background:linear-gradient(180deg,#9ac8ff,#3a78d8);color:#04163a;box-shadow:0 3px 0 #1a3a7a}
+.btn.no{filter:grayscale(.9) brightness(.7)}
+.btn.wide{width:100%;justify-content:center;padding:10px;font-size:14px}
+.row{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.cost{font-weight:800;font-size:11px;display:inline-flex;align-items:center;gap:2px}
+.cost svg{width:12px;height:12px}.cost.g{color:var(--gold)}.cost.f{color:var(--food)}
+.bar{height:8px;border-radius:5px;background:#0009;overflow:hidden;border:1px solid #ffffff18;margin:5px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff8a2a,#ffd24a)}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
+.slot{aspect-ratio:1;border-radius:10px;border:2px dashed #ffffff22;display:grid;place-items:center;color:#ffffff30;position:relative;background:#0005}
+.slot svg{width:60%;height:60%}
+.slot.r0{border:2px solid var(--r0);color:var(--r0)}.slot.r1{border:2px solid var(--r1);color:var(--r1);box-shadow:0 0 8px #4aa3ff55}.slot.r2{border:2px solid var(--r2);color:var(--r2);box-shadow:0 0 10px #b56cff66}.slot.r3{border:2px solid var(--r3);color:var(--r3);box-shadow:0 0 14px #ffb13b88}
+.slot small{position:absolute;bottom:2px;font-size:8px;color:var(--mute)}
+.item{cursor:pointer}.item.r0{border-color:var(--r0)}.item.r1{border-color:var(--r1)}.item.r2{border-color:var(--r2);box-shadow:0 0 10px #b56cff33}.item.r3{border-color:var(--r3);box-shadow:0 0 12px #ffb13b44}
+.item.r1 .ci{color:var(--r1)}.item.r2 .ci{color:var(--r2)}.item.r3 .ci{color:var(--r3)}
+.rb{font:800 8.5px var(--ff);padding:1px 5px;border-radius:4px;color:#111}.rb.r0{background:var(--r0)}.rb.r1{background:var(--r1)}.rb.r2{background:var(--r2)}.rb.r3{background:var(--r3)}
+.spec{color:#ffcf6a;font-weight:700}
+.lb{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:9px;font-size:12px;background:#ffffff08;margin-bottom:4px}
+.lb .rk{width:22px;text-align:center;font-weight:900;color:var(--mute)}
+.lb.me{background:linear-gradient(90deg,#5a3a14,#2a1f35);border:1px solid var(--gold)}
+.lb .pts{margin-left:auto;font-weight:800;color:var(--pb)}
+.badge{display:inline-flex;align-items:center;gap:4px;font:900 12px var(--fh);padding:3px 9px;border-radius:999px;background:linear-gradient(180deg,#c57a3a,#7a3e12);border:1px solid #ffd59a66}
+.verdict{font-size:11px;font-weight:800}.v-ok{color:var(--ok)}.v-mid{color:#ffcf4a}.v-ko{color:var(--red)}
+.full{margin-top:12px;font-size:12px;color:var(--mute);line-height:1.45}
+.full b{color:var(--txt)}
+footer{margin-top:10px;font-size:10.5px;color:#6f6470;display:flex;justify-content:space-between;gap:8px}
+footer button{background:none;border:1px solid #ffffff20;color:#8a7d88;border-radius:6px;font-size:10px;padding:2px 6px;cursor:pointer}
+</style>
+
+<div class="wrap">
+<header>
+<h1>Fiefs de Braise</h1>
+<p>Inspiré de : <b>King of Avalon + Clash of Clans + FarmVille 2 + War of Mercenaries</b>.</p>
+<p>Ton royaume nourrit une compagnie de mercenaires et un dragon qui grandit à chaque pillage — et ses reliques changent les règles (clone d'ombre, chasse automatique…).</p>
+</header>
+
+<div id="game">
+ <div id="hud">
+  <div class="chip c-gold" id="hGold"><div class="ico" data-i="two-coins"></div><span>0</span></div>
+  <div class="chip c-food" id="hFood"><div class="ico" data-i="wheat"></div><span>0</span></div>
+  <div class="chip c-army" id="hArmy"><div class="ico" data-i="crossed-swords"></div><span>0</span></div>
+  <div class="chip c-pb" id="hPb"><div class="ico" data-i="laurels"></div><span>0</span></div>
+ </div>
+ <div id="layers"></div>
+ <div id="stage"><canvas id="cv"></canvas><div id="ov"></div><div id="banner"></div><div id="toast"></div></div>
+ <div id="quest"></div>
+ <nav id="tabs">
+  <button data-tab="roy" class="on"><i class="dot"></i><svg viewBox="0 0 512 512" data-i="castle"></svg>Royaume</button>
+  <button data-tab="tav"><i class="dot"></i><svg viewBox="0 0 512 512" data-i="beer-stein"></svg>Taverne</button>
+  <button data-tab="dra"><i class="dot"></i><svg viewBox="0 0 512 512" data-i="dragon-head"></svg>Bêtes</button>
+  <button data-tab="att"><i class="dot"></i><svg viewBox="0 0 512 512" data-i="crossed-swords"></svg>Attaque</button>
+  <button data-tab="lig"><i class="dot"></i><svg viewBox="0 0 512 512" data-i="laurels"></svg>Ligue</button>
+ </nav>
+ <div id="panel"></div>
+</div>
+
+<div class="full"><b>Dans la version complète :</b> plus de 15 mercenaires et 3 bêtes (dragon, griffon, mammouth de guerre) avec leurs propres arbres d'évolution ; une carte du monde où piller les fiefs d'autres joueurs, des alliances et des saisons de ligue jusqu'au rang Légende ★∞ ; un dragon sans plafond (niveaux de parangon) et des centaines de reliques qui transforment ta stratégie.</div>
+<footer><span>Icônes : game-icons.net (CC BY 3.0)</span><button id="reset">Recommencer</button></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>const ICONS={"archer":"<path fill=\"currentColor\" d=\"M341 25.97c-25.5 42.42-21.2 82.13-10.9 117.13c10.3 35.1 25.6 66.5 25.6 95.5h.1c6.3-1.4 12.1-1.9 17.9-.9c-.3-34.7-16.8-67-26.4-99.6c-9.7-33-13.4-65.29 9.1-102.87zm-33.3 36.27L154.2 227.7c7.6 0 15.6.9 23.2 2.9c7.2-2.9 13.8-8 19.3-15.1c4.1-5.3 7.5-11.6 10-18.7L304 91.96c.1-9.68 1.2-19.6 3.7-29.72M164.2 107.1c-12.3 0-23.7 6.3-32.5 17.6s-14.5 27.4-14.5 45.4s5.7 34.1 14.5 45.4c1.4 1.8 2.9 3.5 4.4 5l70.9-76.3c-2.5-7.4-6.1-14-10.3-19.5c-8.8-11.3-20.2-17.6-32.5-17.6m264.5 119.5v19h-34c5.9 4.9 9 11.3 10.2 18h23.8v19l64-28zm-225.2 19c1.4 2 2.5 4.3 3.3 6.8c.8 2.4.5 5.1-.2 6.7c-.7 1.9-1.8 3.1-3.2 4.5h131.5c.1-.2.1-.4.1-.6c1.9-8.2 2.5-12.6 8-17.4zm-58.3.5c-8.5 1.3-14.4 4.5-21 6.7l-74.48-1c-23.01-.1-31.67 34.4-7.93 35.4c16.14.3 27.69-2 39.55-4s24.16-3.8 39.56-1.3c9.3 2.2 18.1 7.4 25.3 12c8.7 2.2 17.5 2 23.8.2c5.7-1.6 8.7-4.1 9.9-6.1c-5-7.6-12.3-14.2-9.6-22.3c3-6.4 9.5-9.1 15-12.1c.1 0 .2-.1.3-.1c-2.6-1.9-6.4-3.8-11.3-5.1c-10.2-2.3-19.5-3.2-29.1-2.3m209 13.7c.9-1-.8 1.7-1.3 5.7c-.6 4-.8 9.2-.4 14.4c1.3 6.9.7 16.2 6.2 21.4c6.5 4.1 24.2 5.1 27.2-1.2c1.3-12.3 4.1-23.5.8-35.2c-.8-3-1.9-4.3-2.2-4.5c-8.6-4.6-22.7-8.8-30.3-.6m-19.7 21.1c-51 .9-87.9.2-137.8.6c5.7 15.3-9.3 26.3-21.9 29.9c-.1 0-.2 0-.3.1l130.8 171c-1.4-9.8-1.5-19.3-.9-28.6l-84.2-110.1c.7-14.3 0-25.5-.9-39.3c40.6 2.7 82.7 1.5 119.6-1.7c-2.5-7-3.9-15-4.4-21.6zM112.9 299c-12.5 41.7-2.7 92.3-7.3 138v-.2L101 494h121.1l-16.7-63.3c3.5-12.9 6.8-26.4 8.9-37.6l-61.1-79.9c-17.7-.3-25.6-12.5-40.3-14.2m242.8 21.2c-.6 28.6-15.5 59.4-25.6 93.9c-7.2 24.5-11.5 51.4-4.6 79.9h18.4c-7.7-26.2-3.8-50.4 3.4-74.9c9.3-31.5 25-62.8 26.3-96.1c-6 .3-12.2-.5-17.9-2.8\"/>","barbarian":"<path fill=\"currentColor\" d=\"M197.584 23.28c-18.284.166-34.4 4.378-48.488 12.285C120.92 51.38 102.008 80.7 87.62 117.445c-.637 1.623-1.254 3.282-1.874 4.936a433 433 0 0 0 16.73 6.654a321 321 0 0 1 1.905-5.028c13.612-34.757 30.7-59.935 53.524-72.746c11.413-6.405 24.546-10.037 40.137-10.136c15.592-.1 33.64 3.335 54.884 11.06L256 53.3l3.076-1.116c42.486-15.45 72.195-13.735 95.02-.924c22.824 12.81 39.912 37.99 53.523 72.746c.645 1.65 1.276 3.338 1.905 5.028a433 433 0 0 0 16.73-6.653c-.62-1.653-1.238-3.312-1.874-4.936c-14.388-36.743-33.3-66.065-61.476-81.88C335.38 20.117 300.046 18.895 256 34.27c-21.502-7.506-40.977-11.15-58.416-10.99m-16.145 85.35c-4.77 5.446-9.19 11.48-13.268 18.068c-3.655 5.905-7 12.262-10.037 19.01l.16.035c.235-.005.47-.018.705-.018a32.6 32.6 0 0 1 13.77 3.05a439 439 0 0 0 49.494 6.62c-15.17-15.56-29.05-32.14-40.825-46.764zm157.474 10.652c-9.547 9.597-17.313 20.762-23.076 33.34a438 438 0 0 0 23.387-3.846a32.6 32.6 0 0 1 13.775-3.05c.236 0 .47.012.705.017l.16-.035c-3.036-6.748-6.382-13.105-10.037-19.01a148 148 0 0 0-4.914-7.416M37.727 138.725l22.34 22.34l7.445-22.34zm406.76 0l7.447 22.34l22.34-22.34zM85.526 141.61l-10.187 30.564c17.367 6.233 34.72 11.564 52.062 16.002c-.906-3-1.4-6.17-1.4-9.45c0-7.88 2.816-15.144 7.486-20.84a453 453 0 0 1-47.96-16.276zm340.95 0a453 453 0 0 1-47.967 16.267c4.673 5.7 7.492 12.966 7.492 20.848c0 3.276-.492 6.444-1.396 9.44a579 579 0 0 0 52.058-15.99zM159 163.725c-8.39 0-15 6.61-15 15s6.61 15 15 15s15-6.61 15-15s-6.61-15-15-15m194 0c-8.39 0-15 6.61-15 15s6.61 15 15 15s15-6.61 15-15s-6.61-15-15-15m-31.78 6.184a454 454 0 0 1-12.21 1.585c-2.643 9.64-4.27 19.926-4.8 30.808a510 510 0 0 0 23.265-2.752c-4.663-5.694-7.475-12.953-7.475-20.825c0-3.05.43-6.005 1.22-8.816m-130.433.014a32.6 32.6 0 0 1 1.213 8.8c0 7.875-2.813 15.136-7.48 20.83a511 511 0 0 0 34.617 3.73c.32-6.48-3.405-30.475-3.405-30.475a457 457 0 0 1-24.945-2.886zm51.604 4.64l-8.644 6.897l13.88 83.265h16.75L275.4 198.57c-11.192-6.3-22.285-14.618-33.01-24.007zM66.28 188.16c-15.22 63.397-26.077 137.993-43.05 211.542l-1.8 7.804l7.543 2.696a14846 14846 0 0 0 43.41 15.453a418 418 0 0 1 12.77-4.47c5.114-1.703 10.176-3.32 15.11-4.903c-17.488-6.054-36.565-12.83-57.777-20.403C58.5 324.755 69.37 253.65 83.47 194.134a614 614 0 0 1-17.19-5.974m379.44 0a614 614 0 0 1-17.19 5.975c14.1 59.517 24.97 130.62 40.984 201.744c-21.212 7.57-40.29 14.348-57.776 20.402c4.933 1.582 9.995 3.2 15.108 4.904a418 418 0 0 1 12.77 4.47c13.545-4.79 27.904-9.916 43.41-15.454l7.544-2.696l-1.8-7.804c-16.973-73.55-27.83-148.145-43.05-211.54zm-305.408 21.694c-2.188 15.23-3.312 31.277-3.312 47.87c0 48 .646 86.742 14.814 111.536c7.085 12.397 17.22 21.812 33.647 28.657c16.428 6.844 39.29 10.808 70.54 10.808s54.112-3.964 70.54-10.808c16.426-6.845 26.56-16.26 33.646-28.657C374.354 344.466 375 305.725 375 257.725c0-16.594-1.124-32.64-3.313-47.87c-27.274 6.046-54.568 9.943-81.87 11.71l-2.413 14.484c21.605 2.345 46.537-6.993 77.395-18.737l6.4 16.824c-7.816 2.975-15.448 5.92-22.948 8.63c4.365 3.607 7.7 8.663 7.7 14.958c0 8.2-5.652 14.307-11.88 17.834s-13.82 5.31-22.095 5.31s-15.868-1.784-22.096-5.31c-6.227-3.528-11.88-9.635-11.88-17.835c0-1.182.13-2.316.35-3.41a79 79 0 0 1-3.92-.416l-4.805 28.825h-47.25L227.57 253.9c-1.305.168-2.612.31-3.92.415c.22 1.094.35 2.228.35 3.41c0 8.2-5.653 14.307-11.88 17.834c-6.23 3.526-13.822 5.31-22.097 5.31c-8.274 0-15.867-1.784-22.095-5.31c-6.228-3.528-11.88-9.635-11.88-17.835c0-6.295 3.335-11.35 7.7-14.96c-7.5-2.707-15.132-5.653-22.95-8.628l6.403-16.824c30.86 11.744 55.79 21.082 77.396 18.736l-2.414-14.485c-27.3-1.767-54.595-5.664-81.87-11.71zm-36.177 6.512c-.22.01-.53.215-.754.254c-9.218 30.762-5.474 47.118.24 66.853l15.38 7.69v-62.618c-4.425-6.463-8.398-9.97-11.084-11.224c-1.486-.692-2.616-1.015-3.78-.954zm303.73 0c-1.165-.06-2.295.262-3.78.955c-2.687 1.254-6.66 4.762-11.085 11.225v62.618l15.38-7.69c5.715-19.735 9.458-36.09.24-66.853c-.226-.04-.535-.243-.755-.254zM190.023 252.58c-5.52 0-10.413 1.38-13.224 2.973c-2.023 1.145-2.54 1.945-2.68 2.172c.14.227.657 1.027 2.68 2.172c2.81 1.592 7.704 2.973 13.223 2.973s10.415-1.38 13.227-2.973c2.022-1.145 2.538-1.945 2.68-2.172c-.142-.227-.658-1.027-2.68-2.172c-2.812-1.592-7.707-2.972-13.227-2.972zm15.907 5.145c.055.09.07.11.07 0s-.015-.09-.07 0m-31.81 0c-.056-.09-.07-.11-.07 0s.014.09.07 0m147.857-5.144c-5.52 0-10.415 1.38-13.227 2.973c-2.022 1.145-2.538 1.945-2.68 2.172c.142.227.658 1.027 2.68 2.172c2.812 1.592 7.707 2.973 13.227 2.973s10.413-1.38 13.224-2.973c2.023-1.145 2.54-1.945 2.68-2.172c-.14-.227-.657-1.027-2.68-2.172c-2.81-1.592-7.704-2.972-13.223-2.972zm15.904 5.145c.056.09.07.11.07 0s-.014-.09-.07 0m-31.81 0c-.055-.09-.07-.11-.07 0s.015.09.07 0m-91.07 32h18s.124 6.12 3.05 11.975c2.927 5.853 6.95 11.025 19.95 11.025s17.023-5.172 19.95-11.025s3.05-11.975 3.05-11.975h18s.124 9.88-4.95 20.026c-5.073 10.147-17.05 20.975-36.05 20.975s-30.977-10.828-36.05-20.974c-5.074-10.146-4.95-20.025-4.95-20.025zm41 53.178c21.138 0 42.276 4.093 66.846 12.283l-5.692 17.078c-46.86-15.62-75.447-15.62-122.308 0l-5.692-17.078c24.57-8.19 45.708-12.283 66.846-12.283m-94.244 62.674a30 30 0 0 1-1.297 1.53c-5.123 5.61-11.71 9.69-19.056 13.228c-14.692 7.073-32.843 12.024-50.558 17.93c-17.716 5.904-34.85 12.754-46.82 22.064c-9.73 7.565-16.135 16.173-18.22 28.395H173.81c12.59-6.51 23.538-11.936 30.553-17.66c7.39-6.03 10.754-11.19 10.635-21.232l18-.215c.18 15.237-7.198 27.185-17.256 35.392a82 82 0 0 1-4.953 3.715h90.42a82 82 0 0 1-4.954-3.715c-10.058-8.207-17.436-20.155-17.256-35.392l18 .215c-.12 10.042 3.246 15.203 10.635 21.232c7.015 5.724 17.962 11.15 30.553 17.66h148.007c-2.086-12.222-8.492-20.83-18.22-28.396c-11.97-9.31-29.105-16.16-46.82-22.066c-17.716-5.905-35.867-10.856-50.56-17.93c-7.345-3.536-13.932-7.618-19.054-13.228a30 30 0 0 1-1.296-1.53c-5.047 3.394-10.633 6.395-16.783 8.958c-19.572 8.155-44.71 12.19-77.46 12.19s-57.888-4.035-77.46-12.19c-6.15-2.563-11.737-5.564-16.784-8.957z\"/>","barracks":"<path fill=\"currentColor\" d=\"M127.596 26.436C111.219 26.126 90.368 38.184 78 32v64c16.008 8.004 48.437-15.563 64 0c16 16 40.004 7.996 48 0V32c-7.755 7.755-32 16-48 0c-3.985-3.985-8.946-5.462-14.404-5.564M39 32v254.373c5.412-12.05 11.43-23.452 18-34.172V32zm217 121C135.23 153 28.575 256.151 25.162 439H208V336c0-32 96-32 96 0v103h182.838C483.425 256.151 376.769 153 256 153m0 26.938l36.025 18.011l-8.05 16.102L256 200.063l-27.975 13.988l-8.05-16.102zm0 38l36.025 18.011l-8.05 16.102L256 238.063l-27.975 13.988l-8.05-16.102zm0 38l36.025 18.011l-8.05 16.102L256 276.063l-27.975 13.988l-8.05-16.102zM80 336h96v48H80zm256 0h96v48h-96zm-80 39v18h32v-18zM25 457v16h158v-16zm176 0v16h110v-16zm128 0v16h158v-16z\"/>","beer-stein":"<path fill=\"currentColor\" d=\"M252.094 19.438c-18.092-.063-35.548 9.82-43.125 28.437v9.688l-11.376-2.5c-14.316-3.17-25.792-1.15-33.375 3.843c-7.585 4.994-12.174 12.898-12.345 25.438c-.13 9.54 1.93 15.82 4.813 20s6.673 6.672 11.906 8.062c10.465 2.78 26.67-.357 41.094-8.75l5.968-3.47l5.063 4.658c8.405 7.744 14.51 11.07 20.56 12.25c6.052 1.18 13.046.318 23.44-2.875l9.842-3.032l2.063 10.093c2.695 13.158 14.91 23.407 29.125 23.407c13.237 0 23.67-9.028 27.313-21.468l2.218-7.532l7.783.843c8.855.99 19.41-4.045 25-10.343l6-6.75l6.968 5.782c18.61 15.487 35.46 16.96 47.283 11.468c11.82-5.494 20.18-18.602 19.25-38.782c-.88-18.827-10.97-30.448-25.5-35.812c-14.532-5.364-33.76-3.61-51.282 8.218l-7.436 5.032l-5.344-7.25c-7.038-9.585-17.09-15.485-26.72-17c-9.628-1.516-18.487.928-25.374 8.406l-7.406 8.03l-6.78-8.56c-10.443-13.165-25.214-19.482-39.626-19.532zM65.22 119.968C37.8 203.65 25.784 289.07 28.812 376.19c39.55 17.23 81.422 18.105 123.437 18a957 957 0 0 0 6.594-34.22c-32.102 1.678-64.094 2.52-94.313-9.124c-2.33-66.88 6.917-121.622 28-187.03c27.318 6.5 55.01 8.61 83.25 7.467c-.07-11.715-.387-22.556-1.03-32.31c-37.168-1.726-73.593-8.642-109.53-19zm148 2.97c-6.57 3.29-13.37 5.82-20.19 7.406c3.092 33.456 1.947 78.392-2.186 127.094c-4.777 56.28-13.866 116.5-26.438 166.718H434.25c-9.932-52.565-18.812-111.61-23.594-166.72c-3.87-44.618-5.233-86.115-2.03-119.717c-10.777-1.282-22.047-5.642-32.938-13.22c-7.498 5.988-16.954 10.145-27.25 10.75c-7.46 16.247-23.42 28.125-42.688 28.125c-19.644 0-36.84-11.86-44.344-28.938c-8.26 1.885-15.993 2.507-23.72 1c-8.57-1.67-16.468-6.014-24.467-12.5zm-78.376 319.906L116.22 491.25h358.686l-21.72-48.406h-318.34z\"/>","big-egg":"<path fill=\"currentColor\" d=\"M256 16C166 16 76 196 76 316c0 90 60 180 180 180s180-90 180-180c0-120-90-300-180-300\"/>","bowman":"<path fill=\"currentColor\" d=\"m281.28 15.28l-4.655 7.5l-56.28 90.44c-7.312-18.505-21.67-30.9-37.126-30.44c-.66.02-1.308.06-1.97.126c-21.174 2.14-35.927 27.865-32.938 57.47c1.005 9.948 3.91 19.074 8.094 26.718c-44.558 1.188-76.495 11.61-92.812 38.25c20.32 19.086 59.816 22.993 91.844 18.625l4.843 3.124l.126.094l18.906 51.375l-52.78 212.718h34.156l61.125-168.905L332 491.28h33.563L261.438 292.19l97.156 62.53c-.08.262-.17.52-.25.782c.173-.202.328-.422.5-.625l6.937 4.47l9 5.78l4.533-9.656c32.03-68.4 40.24-134.49 25.843-192.064l23.938-4.812l6.187 23.812l55.408-46.656l-73.875-24.313l7.562 29.032l-24.563 4.968C381.796 93.172 343.996 49.38 289.033 19.5l-7.75-4.22zm3.408 29.907c31.818 30.565 54.66 66.986 69.093 106.094l-136.686 21.25c5.196-8.662 8.24-19.857 8.28-32.06l59.314-95.282zm77.5 132.688c13.773 51.64 13.89 106.532 1.562 157.906l-113.625-73.124l-4.125-61.72l116.188-23.06z\"/>","castle":"<path fill=\"currentColor\" d=\"M254.25 15.344c-132.537 0-240.188 107.62-240.188 240.156c0 132.537 107.65 240.188 240.188 240.188S494.406 388.038 494.406 255.5S386.786 15.344 254.25 15.344m0 18.687c122.436 0 221.47 99.034 221.47 221.47c0 65.65-28.465 124.583-73.75 165.125V238.75l14-22.78h-7.595L364 101.5l-43.813 114.47h-8.156l14.595 22.78v33.875h-36.813v-88.188l14.625-22.78h-7.593l-44.406-114.47l-44.375 114.47h-7.594l14.03 22.78v123.22h-37.375v-18.094l14.594-22.782h-8.19l-43.78-114.467L95.344 266.78H87.75l14.03 22.783V416.25C59.25 375.9 32.75 318.83 32.75 255.5c0-122.436 99.064-221.47 221.5-221.47zm1.094 160.532h18.687v36.344h-18.686v-36.344zm110.156 87.97h18.688v36.312H365.5V282.53zm-246.656 22.03h18.687v36.344h-18.686v-36.344zm50.875 29.407h18.686v36.342H169.72V333.97zm170.81 30.5h18.69v36.342h-18.69z\"/>","checked-shield":"<path fill=\"currentColor\" d=\"M48.906 19.656v10.782c0 103.173 10.53 206.07 41.313 289.53c30.78 83.463 82.763 148.094 164.53 170.563l2.188.626l2.25-.5c89.686-19.12 142.322-84.028 171.187-168.344S465.78 133.657 465.78 30.438v-10.78l-10.655 1.53C323.26 39.954 191.452 40 59.595 21.188l-10.69-1.53zM67.75 41.03c63.242 8.536 126.495 12.792 189.75 12.782v184.532h174.78c-4.905 27.572-11.31 53.747-19.592 77.937c-27.348 79.884-73.757 137.33-155.157 155.564c-.008-.003-.02.003-.03 0v-233.5H86.53c-12.87-60.99-18.277-128.81-18.78-197.313z\"/>","claw":"<path fill=\"currentColor\" d=\"M256 16C106 76 46 226 46 226c0 45 60 90 90 90c90 0 180-195 135-285zm45 15c30 60 0 135 0 135c120 30 120 180 75 330c75-75 90-150 90-210c0-90-15-225-165-255\"/>","click":"<path fill=\"currentColor\" d=\"M459.15 269.75a133.197 133.197 0 0 1-55.862 179.975l-42.782 22.541l-10.52 5.533a71.28 71.28 0 0 1-62.966 1.685l-167.077-71.38l15.733-46.676l99.363 19.194l-51.458-97.78l-82.843-157.411l40.357-21.232l82.844 157.457l19.934-10.485l-36.521-69.445l40.335-21.22l36.52 69.445l19.935-10.485l-28.2-53.598l40.358-21.232l28.2 53.598l19.945-10.576l-19.354-36.886l40.346-21.174l19.354 36.885l54.348 103.301zM73.268 146.674a60.03 60.03 0 0 1 42.361-102.459a60.098 60.098 0 0 1 56.58 80.169l10.588 20.013A78.29 78.29 0 0 0 115.708 26a78.233 78.233 0 0 0-5.635 156.262L99.428 162.02a59.7 59.7 0 0 1-26.16-15.346\"/>","crossed-swords":"<path fill=\"currentColor\" d=\"M19.75 14.438c59.538 112.29 142.51 202.35 232.28 292.718l3.626 3.75l.063-.062c21.827 21.93 44.04 43.923 66.405 66.25c-18.856 14.813-38.974 28.2-59.938 40.312l28.532 28.53l68.717-68.717c42.337 27.636 76.286 63.646 104.094 105.81l28.064-28.06c-42.47-27.493-79.74-60.206-106.03-103.876l68.936-68.938l-28.53-28.53c-11.115 21.853-24.413 42.015-39.47 60.593c-43.852-43.8-86.462-85.842-130.125-125.47c-.224-.203-.432-.422-.656-.625C183.624 122.75 108.515 63.91 19.75 14.437zm471.875 0c-83.038 46.28-154.122 100.78-221.97 161.156l22.814 21.562l56.81-56.812l13.22 13.187l-56.438 56.44l24.594 23.186c61.802-66.92 117.6-136.92 160.97-218.72zm-329.53 125.906l200.56 200.53a403 403 0 0 1-13.405 13.032L148.875 153.53zm-76.69 113.28l-28.5 28.532l68.907 68.906c-26.29 43.673-63.53 76.414-106 103.907l28.063 28.06c27.807-42.164 61.758-78.174 104.094-105.81l68.718 68.717l28.53-28.53c-20.962-12.113-41.08-25.5-59.937-40.313c17.865-17.83 35.61-35.433 53.157-52.97l-24.843-25.655l-55.47 55.467c-4.565-4.238-9.014-8.62-13.374-13.062l55.844-55.844l-24.53-25.374c-18.28 17.856-36.602 36.06-55.158 54.594c-15.068-18.587-28.38-38.758-39.5-60.625z\"/>","crown":"<path fill=\"currentColor\" d=\"m408.256 119.46l-37.7 52.165l19.57 44.426l34.8-37.214l-16.67-59.375zm86.074 12.513L384.44 249.498L334.01 135.02l-75.162 132.947l-86.948-131.78l-33.334 114.122L17.922 132.83l39.3 127.6c1.945-.348 3.94-.54 5.98-.54c18.812 0 34.26 15.452 34.26 34.262c0 13.823-8.346 25.822-20.235 31.22l5.337 17.33c12.425 25.466 71.863 45.152 176.582 47.206c110.805 2.174 178.12-17.54 189.854-47.207h-.002l4.357-20.26c-16.836-2.114-30.02-16.612-30.02-33.986c0-18.81 15.45-34.262 34.263-34.262c3.513 0 6.91.54 10.11 1.54l26.622-123.762zm-391.77 2.04l1.22 56.337l25.56 24.89l9.592-32.842l-36.37-48.386zm150.585 2.91l-24.483 51.36l28.955 43.885l24.922-44.08l-29.395-51.166zm204.453 135.962c-8.712 0-15.575 6.862-15.575 15.572s6.863 15.574 15.575 15.574s15.572-6.863 15.572-15.573s-6.86-15.572-15.572-15.572zM63.2 278.58c-8.71 0-15.573 6.864-15.573 15.574s6.862 15.573 15.574 15.573s15.573-6.862 15.573-15.573s-6.86-15.574-15.572-15.574zm130.33 17.842c18.812 0 34.26 15.45 34.26 34.262c0 18.81-15.448 34.26-34.26 34.26c-18.813 0-34.262-15.45-34.262-34.26s15.45-34.262 34.26-34.262zm131.234 0c18.812 0 34.26 15.45 34.26 34.262c0 18.81-15.448 34.26-34.26 34.26c-18.813 0-34.262-15.45-34.262-34.26s15.45-34.262 34.262-34.262m-131.235 18.69c-8.713 0-15.573 6.86-15.573 15.572c0 8.71 6.86 15.574 15.572 15.574c8.71 0 15.572-6.864 15.572-15.574s-6.86-15.573-15.573-15.573zm131.234 0c-8.712 0-15.573 6.86-15.573 15.572c0 8.71 6.862 15.574 15.574 15.574s15.574-6.864 15.574-15.574s-6.862-15.573-15.574-15.573z\"/>","dragon-head":"<path fill=\"currentColor\" d=\"M200.947 18.686c-6.98.087-14.64.774-22.85 1.9c27.57 20.468 51.098 45.25 67.594 70.527c1.66 0 3.312.012 4.958.047c18.066.39 35.487 2.906 53.217 7.2c-15.695-28.457-29.935-50.19-47.45-63.22c-13.817-10.278-30.063-16.168-52.52-16.454q-1.45-.02-2.948 0zm-91.66 22.96q-1.094-.002-2.195.022c-14.045.31-29.36 3.92-46.86 11.13c56.18 18.807 106.985 50.468 133.907 83.585c18.377-5.13 29.44-14.72 36.454-28.817C195.84 78.18 168.118 56.19 140.65 46.96c-10.168-3.418-20.433-5.306-31.363-5.315zm-.203 52.786c-39.42 6.758-74.73 31.854-87.822 74.19v322.345h212.73C100.352 442.58 61.19 206.49 187.115 230.104c5.838-14.164 9.92-28.027 11.018-41.465l18.627 1.522c-1.684 20.592-8.828 40.49-18.033 59.943c-.732 2.035-1.472 4.12-2.186 6.063c32.842 85.24 113.77 160.69 169.495 168.197c.915.033 1.905-.002 2.953-.09c17.016 1.035 35.86-4.222 52.21-22.304l7.984-8.83l-10.473-5.658c-6.507-3.515-14.29-7.094-18.167-10.925c-1.938-1.916-2.793-3.47-3.074-5.194c-.282-1.725-.13-4.227 2.23-8.578l10.673-19.656l-21.484 6.222c-6.304 1.825-17.305-3.032-23.224-10.71c-2.96-3.84-4.408-7.907-4.387-10.843c.02-2.938.72-5.125 4.747-8.05l19.453-14.125l-23.884-2.72c-9.974-1.137-16.37-6.658-19.17-12.294c-2.802-5.634-2.312-10.084 1.375-13.31l12.204-10.677l-15.358-5.205c-6.717-2.276-10.296-7.555-10.357-10.633c-.028-1.373.238-2.666 1.843-4.476c10.93-2.39 21.258-.45 28.088 6.374c6.154 6.146 8.35 15.128 6.977 24.832c8.55-2.254 16.985-1.616 24.112 2.494c9.34 5.387 14.647 15.692 15.67 27.965c15.212-10.132 32.152-12.725 45.262-5.164c15.467 8.92 21.36 29.513 16.805 51.75c23.992-33.355 34.588-75.717 5.617-120.43c-46.726-4.442-81.693-30.676-93.293-67.64c-5.026-16.016-21.284-28.67-42-37.904l-.08.217c-29.74-10.823-55.575-17.35-82.604-18.733l.08.155c-2.294-.093-4.56-.16-6.762-.172c-9.537 22.874-28.662 39.9-57.436 46.054l-5.906 1.262l-3.576-4.864c-14.216-19.33-41.23-40.452-74.002-58.074zm156.215 65.26c27.927-.073 44.874 11.617 42.09 44.45c-35.844 3.39-51.933-16.683-63.074-42.632c7.507-1.155 14.538-1.8 20.983-1.817zm48.407 66.363c3.708.07 7.14.994 10.014 2.812a35 35 0 0 0-4.16 3.543c-5.246 5.24-8.087 12.122-7.956 18.742c.183 9.322 5.27 17.184 12.68 22.56c-3.14 8.103-2.452 17.455 1.407 25.22c3.813 7.668 10.54 14.273 19.302 18.398c-1.445 3.366-2.375 6.862-2.4 10.33c-.062 8.407 3.38 16.042 8.273 22.39c6.792 8.81 16.862 15.936 28.026 17.91c-.183 2.18-.204 4.333.133 6.407c1.05 6.444 4.515 11.66 8.38 15.48c3.41 3.37 7.19 5.892 10.798 7.993c-6.345 4.792-12.414 7.056-18.618 7.79c-6.515-7.937-9.71-19.084-9.41-31.454c-11.767 6.177-24.21 7.156-34.12 1.44c-14.668-8.46-19.393-29.036-13.187-50.33c-11.336 2.77-22.13.92-29.187-6.132c-8.875-8.865-9.535-23.626-3.094-37.95c-3.676-.615-6.963-2.166-9.525-4.725c-8.808-8.798-5.773-26.09 6.776-38.626c7.843-7.835 17.546-11.957 25.87-11.8z\"/>","dragon-shield":"<path fill=\"currentColor\" d=\"M111.9 33.4c24.8 45.04 23.8 88 8.4 124.5c-16.3 38.6-47.47 70.4-78.91 94.6c1.8 12.4 11.15 31.8 26.2 52.9c16.81 23.7 40.01 49.9 64.81 74.6c24.7 24.8 51 48.1 73.9 66.1c21.1 16.5 39.6 28.2 49.7 32.5c10.1-4.3 28.6-16 49.7-32.5c22.9-18 49.2-41.3 73.9-66.1c24.8-24.7 48-50.9 64.8-74.6c15.1-21.1 24.4-40.5 26.2-52.9c-31.4-24.2-62.6-56-78.9-94.6c-15.4-36.5-16.4-79.46 8.4-124.5H354c-64.8 31.74-131.2 31.74-196 0zm49.2 46h49l1.9.95c22.1 11.01 33.7 15.75 44 15.75s21.9-4.74 44-15.75l1.9-.95h49l-1.6 10.38c-11.9 76.52 25 129.12 67.5 161.02l3.6 2.7v4.5c0 15.2-8.9 30.9-21.3 48.3c-12.4 17.5-29 36.1-46.5 53.7c-17.6 17.6-36.2 34.1-52.7 47c-16.5 13-30 22.3-41.1 25.9l-2.8 1l-2.8-1c-11.1-3.6-24.6-12.9-41.1-25.9c-16.4-12.9-35-29.4-52.6-47s-34.2-36.2-46.6-53.7c-12.4-17.4-21.19-33.1-21.19-48.3v-4.5l3.59-2.7c42.4-31.9 79.4-84.5 67.4-161.01zm20.6 18c7.9 75.5-28.9 130.8-71.3 164.4c1.5 7.8 7.4 20.3 17.2 34.1c11.5 16.2 27.6 34.3 44.6 51.4c17.1 17.1 35.3 33.2 51 45.6c13.9 10.8 26.1 18.6 32.8 21.6c6.7-3 18.9-10.8 32.8-21.6c15.8-12.4 33.9-28.5 51-45.6s33.1-35.2 44.7-51.4c9.8-13.8 15.7-26.3 17.2-34.1c-42.5-33.6-79.2-88.9-71.4-164.4h-24.2c-21.2 10.5-35.1 16.7-50.1 16.7s-28.9-6.2-50.1-16.7zm74.3 26.3l44.7 44.7l-44.7 44.7l-44.7-44.7l38.3-38.4zm0 25.4l-19.3 19.3l19.3 19.3l19.3-19.3zm0 86.6l76.7 76.7l-76.7 76.7l-76.7-76.7l70.3-70.4zm0 25.4l-51.3 51.3l51.3 51.3l51.3-51.3z\"/>","fly":"<path fill=\"currentColor\" d=\"m230.885 20.055l-13.77 11.593l6.04 7.172a55.4 55.4 0 0 0-9.505 2.094c-9.973 3.122-18.352 8.67-24.072 15.83s-8.89 16.632-6.168 25.797a23.6 23.6 0 0 0 1.639 4.047c-1.28 2.858-2.049 5.954-2.049 9.263c0 9.994 4.36 22.052 16.104 29.64c.098.063.205.121.304.185a56 56 0 0 0-7.584 8.629l-40.709-13.569l-30.576-91.73l-17.078 5.691l33.424 100.27l47.28 15.76c-.774 3.14-1.165 6.214-1.165 9.124v.64l4.637 32.458a204 204 0 0 1 16.338-9.148c.166-.083.337-.156.505-.235l-2.607-18.246c20.454-8.814 37.288-13.142 54.121-13.084c16.815.058 33.654 4.492 54.125 13.14l-2.598 18.19c.168.079.339.152.504.235a204 204 0 0 1 16.338 9.148L329 160.49v-.639c0-2.91-.387-5.985-1.158-9.127l47.273-15.757l33.424-100.27l-17.078-5.691l-30.576 91.73l-40.705 13.568a56.2 56.2 0 0 0-8.455-9.435C323.115 117.577 329 106.51 329 95.851c0-3.31-.769-6.405-2.049-9.263a23.6 23.6 0 0 0 1.639-4.047c2.722-9.165-.448-18.636-6.168-25.797c-5.72-7.16-14.099-12.708-24.072-15.83a55.4 55.4 0 0 0-9.506-2.094l6.04-7.172l-13.769-11.593l-21.148 25.113a27.7 27.7 0 0 0-3.965 3.568a27.6 27.6 0 0 0-3.967-3.566zm-2.27 36.474c3.079-.065 5.88.314 8.178 1.024c4.596 1.418 6.709 3.642 7.398 5.962c.69 2.321.147 5.379-2.896 9.188s-8.478 7.675-15.29 9.807c-6.81 2.131-13.423 2.035-18.019.617s-6.707-3.642-7.396-5.963s-.147-5.378 2.896-9.188c3.043-3.809 8.479-7.674 15.29-9.806c3.405-1.066 6.76-1.576 9.84-1.64zm54.77 0c3.078.065 6.434.575 9.84 1.64c6.81 2.133 12.244 5.998 15.287 9.807s3.588 6.865 2.898 9.186s-2.802 4.546-7.398 5.965s-11.207 1.514-18.018-.617c-6.81-2.132-12.244-6-15.287-9.809c-3.043-3.81-3.588-6.865-2.898-9.186c.689-2.32 2.802-4.544 7.398-5.962c2.298-.71 5.1-1.09 8.178-1.024M255.998 82.89q.39.53.799 1.045c5.72 7.161 14.099 12.707 24.072 15.828c9.974 3.122 19.94 3.319 28.58.653c.336-.104.667-.222 1-.336c-.977 3.412-3.471 6.69-9.08 10.055c-2.06 1.235-4.582 2.417-7.578 3.494c-10.16-4.362-22.672-7.069-37.791-7.069c-15.691 0-28.579 2.913-38.938 7.569c-3.44-1.157-6.152-2.441-8.19-3.758c-5.206-3.363-7.034-6.489-7.62-10.39a35 35 0 0 0 1.299.435c8.64 2.666 18.608 2.47 28.582-.653c9.973-3.121 18.35-8.667 24.07-15.828c.273-.341.534-.693.795-1.045m.002 41.67c27.754 0 42.266 9.836 49.26 19.66c-17.278-6.13-33.264-9.267-49.254-9.314c-15.946-.047-31.902 2.982-49.154 9.152c7.037-9.77 21.547-19.498 49.148-19.498M34.846 183.312l-5.692 17.078l43.73 14.577l17.304 51.906l27.69-7.912c6.314-8.508 13.038-16.716 20.204-24.494l-36.27 10.363l-14.697-44.094zm442.308 0l-52.27 17.424l-14.697 44.094l-36.269-10.363c7.166 7.778 13.89 15.986 20.203 24.494l27.692 7.912l17.302-51.906l43.73-14.577zm-263.357 15.844c-.26.023-.71.216-1.772.746c-60.828 30.414-104.05 96.492-127.537 159.08c-11.743 31.294-18.567 61.648-20.494 85.58c-1.926 23.933 2.616 41.173 6.37 44.926c1.759 1.76 4.358 2.784 9.677 2.363c5.32-.42 12.717-2.639 21.07-6.642c16.708-8.007 37.225-22.893 56.707-41.305C196.783 407.081 231 355.348 231 319.851c0-16-.046-51.745-3.922-80.81c-1.938-14.533-5.06-27.476-8.582-34.324c-1.761-3.425-3.516-4.99-4.088-5.288c-.286-.148-.352-.296-.611-.273m84.406 0c-.259-.023-.325.125-.611.273c-.572.298-2.327 1.863-4.088 5.288c-3.522 6.848-6.644 19.791-8.582 34.324c-3.876 29.065-3.922 64.81-3.922 80.81c0 35.497 34.217 87.23 73.182 124.053c19.482 18.412 40 33.298 56.707 41.305c8.353 4.003 15.75 6.222 21.07 6.642c5.32.421 7.918-.604 9.678-2.363c3.753-3.753 8.295-20.993 6.369-44.926c-1.927-23.932-8.75-54.286-20.494-85.58c-23.487-62.588-66.71-128.666-127.537-159.08c-1.061-.53-1.513-.723-1.772-.746M256 262.851a77 77 0 0 0-8.512.473c.408 6.14.708 12.198.924 18.02a60 60 0 0 1 7.588-.493a41 41 0 0 1 7.578.735a626 626 0 0 1 .924-18.11a60 60 0 0 0-8.502-.625M222.324 395.37c-3.43 5.326-7.116 10.594-10.994 15.783c4.639 6.388 9.726 12.19 15.275 17c8.513 7.378 18.395 12.7 29.395 12.7s20.882-5.322 29.395-12.7c5.55-4.81 10.636-10.612 15.275-17c-3.878-5.189-7.565-10.457-10.994-15.783c-5.005 7.675-10.559 14.405-16.07 19.182c-6.488 5.622-12.606 8.3-17.606 8.3s-11.118-2.678-17.605-8.3c-5.512-4.777-11.066-11.507-16.07-19.182z\"/>","gem-necklace":"<path fill=\"currentColor\" d=\"M26.537 18.69c-5.14 13.737 1.93 32.374 21.42 32.374c1.11 0 2.175-.07 3.205-.185c-14.21 12.198-9.28 41.503 15.158 41.503c3.21 0 6.075-.513 8.612-1.418c-7.113 13.846-.416 34.93 20.31 34.93c5.08 0 9.312-1.273 12.71-3.39c-5.43 13.773 1.582 32.77 21.26 32.77c3.985 0 7.446-.785 10.395-2.142c-2.018 11.57 3.74 24.662 17.375 27.35l-55.47 76.296l169.78 233.525L441.067 256.78L364.97 152.11c13.87-2.34 19.88-15.235 18.147-26.84c1.81.403 3.756.625 5.852.625c20.725 0 27.42-21.084 20.307-34.93c2.537.905 5.403 1.418 8.612 1.418c24.436 0 29.365-29.305 15.157-41.504c1.03.115 2.095.184 3.205.184c19.49 0 26.56-18.637 21.42-32.375h-42.84c-3.445 9.207-1.397 20.607 6.19 27.13a28 28 0 0 0-3.133-.175c-20.563 0-27.425 21.08-20.367 34.925c-2.524-.904-5.373-1.414-8.554-1.414c-17 0-24.62 14.408-22.767 27.225a26.6 26.6 0 0 0-5.832-.628c-10.137 0-16.94 5.126-20.39 11.982L298.366 60.5L271.29 23.256l-7.558 10.394l-81.398 111.96c-3.543-6.543-10.237-11.366-20.068-11.366c-3.973 0-7.43.792-10.38 2.162c2.21-12.973-5.388-27.87-22.673-27.87c-5.053 0-9.275 1.28-12.67 3.405c5.38-13.772-1.77-32.784-21.3-32.784c-3.184 0-6.034.51-8.56 1.416c7.06-13.846.2-34.927-20.363-34.927a28 28 0 0 0-3.134.175c7.588-6.523 9.636-17.923 6.19-27.13zm271.83 73.59l38.38 52.788L326 185.18a45.3 45.3 0 0 0-8.377-.795c-3.85 0-7.593.504-11.203 1.422l-20.498-76.41zm-26.578 36.558l17.48 65.16c-4.572 3.337-8.695 7.403-12.225 12.022c-3.006 3.932-5.625 8.27-7.824 12.927l-44.646-25.168l47.215-64.942zm79.095 35.68l32.416 44.587l-17.308 9.772c-2.192-4.632-4.8-8.947-7.79-12.86c-4.17-5.453-9.16-10.144-14.75-13.76l7.433-27.74zm-33.262 38.554c9.644 0 18.64 5.02 25.73 14.297c7.092 9.277 11.81 22.688 11.81 37.696c0 15.01-4.72 28.42-11.81 37.7c-7.094 9.278-16.086 14.296-25.73 14.296s-18.638-5.018-25.73-14.296c-7.092-9.28-11.813-22.69-11.813-37.7c0-15.007 4.72-28.42 11.813-37.697c7.092-9.28 16.086-14.298 25.73-14.298zm-104.11 5.924l49.716 28.03a88.8 88.8 0 0 0-1.84 18.04c0 7.44.913 14.623 2.606 21.395L213.72 304.85l-34.947-48.07l34.74-47.782zm180.85 15.324l23.598 32.46l-23.73 32.642l-22.982-12.955c1.694-6.774 2.606-13.958 2.606-21.4c0-6.252-.647-12.32-1.854-18.12zm-123.666 69.82c1.87 3.546 3.988 6.888 6.348 9.975c3.883 5.08 8.48 9.495 13.607 13l-18.314 68.36l-47.555-65.41l45.914-25.924zm93.85.003l18.62 10.498l-32.774 45.08l-8.313-30.988c6.148-3.716 11.614-8.72 16.12-14.617a71 71 0 0 0 6.347-9.972zm-56.576 30.55c3.13.682 6.352 1.06 9.653 1.06c2.323 0 4.604-.2 6.846-.542l11.79 43.948l-37.893 52.12l-11.89-16.356z\"/>","goblin-head":"<path fill=\"currentColor\" d=\"M256 33c-8.5 0-21.318 5.745-35.06 16.17s-28.429 25.055-42.167 40.756c-19.597 22.397-37.26 47.053-48.41 64.597l49.582 37.188l49.23 12.307l2.288-6.864l17.074 5.692l-14.957 44.873l22.42 56.05l22.42-56.05l-14.957-44.873l17.074-5.692l2.287 6.864l49.23-12.307l49.583-37.188c-11.15-17.544-28.813-42.2-48.41-64.597c-13.738-15.7-28.424-30.33-42.166-40.756C277.318 38.745 264.5 33 256 33m-91.49 95.213l76 44l-9.02 15.574l-76-44zm182.98 0l9.02 15.574l-76 44l-9.02-15.574zM17.21 146.625c31.804 32.973 63.213 73.408 76.3 111.857c1.59-2.708 3.38-5.333 5.292-7.882c5.009-6.68 11.036-12.972 17.14-19.153c-8.95-12.884-11.752-29.088-12.605-42.886c-29.308-24.142-53.916-37.693-86.127-41.936m477.582 0c-32.21 4.243-56.819 17.794-86.127 41.936c-.853 13.798-3.654 30.002-12.605 42.886c6.104 6.181 12.131 12.474 17.14 19.153c1.912 2.55 3.703 5.174 5.291 7.882c13.088-38.449 44.497-78.884 76.301-111.857m-373.645 23.484c-.023.045-.054.1-.078.145c.137 16.376 2.007 44.095 13.295 55.383l6.364 6.363l-6.364 6.363c-8 8-15.74 15.805-21.164 23.037c-4.688 6.251-7.327 11.823-7.965 16.452l81.118 30.418c4.7-6.847 9.904-13.253 15.285-18.633l16.029-16.03l-.67 22.659c-.25 8.431-.383 16.131-.232 23.41l30.84 11.564L214.707 249h-50.98l-13.364 13.363l-12.726-12.726l11.312-11.313l-13.531-57.512zm269.708 0l-14.272 10.703l-13.531 57.512l11.312 11.313l-12.726 12.726L348.273 249h-50.98l-32.897 82.24l30.842-11.566c.15-7.278.018-14.978-.232-23.408l-.672-22.659l16.03 16.03c5.38 5.38 10.584 11.788 15.284 18.634l55.192-20.697l25.926-9.722c-.638-4.63-3.277-10.2-7.965-16.452c-5.424-7.232-13.164-15.037-21.164-23.037L371.273 232l6.364-6.363c11.288-11.288 13.158-39.007 13.295-55.383c-.024-.045-.055-.1-.078-.145zM157.867 197.65l7.848 33.35H183v-19.975l-10.945-2.736zm196.266 0l-14.188 10.64L329 211.024V231h17.285zM201 215.525V231h19.18l3.287-9.857zm110 0l-22.467 5.618L291.82 231H311zm-205.791 62.51a16 16 0 0 0-.117 1.256c7.79 37.424 34.985 88.461 66.066 129.256c15.682 20.582 32.34 38.649 47.582 51.271C233.983 472.441 248 479 256 479s22.017-6.559 37.26-19.182s31.9-30.689 47.582-51.271c31.081-40.795 58.277-91.832 66.066-129.256c-.02-.41-.063-.83-.117-1.256l-48.027 72.043L256 435.715l-102.764-85.637zm45.756 36.188l15.799 23.699l2.968 2.474c1.753-5.409 4.259-10.906 7.176-16.445zm210.07 0l-25.943 9.728c2.917 5.539 5.423 11.036 7.176 16.445l2.968-2.474zm-162.129 7.73c-1.782 2.76-3.48 5.558-5.006 8.356c-4.27 7.83-7.176 15.717-8.328 21.255l19.67 13.114c-4.116-14.232-5.864-28.048-6.336-42.725m114.188 0c-.472 14.677-2.22 28.493-6.336 42.725l19.67-13.114c-1.152-5.538-4.057-13.425-8.328-21.255c-1.527-2.798-3.224-5.596-5.006-8.356m-19.227 17.457L265 350.236v54.55l7.793-6.495l7.158-14.316c8.04-16.081 12.051-29.95 13.916-44.565m-75.734.002c1.864 14.614 5.876 28.483 13.916 44.563l7.158 14.316l7.793 6.494v-54.549z\"/>","gold-mine":"<path fill=\"currentColor\" d=\"m403.818 33.117l-369.554 15.4v46.012L426.97 79.425l-23.152-46.31zM385.334 99.04l-30.408 1.17l9.78 185.806l38.554-7.71zm-135.152 5.198l-18.39.71l-2.694 15.61l-26.578 18.75l.13.866l-.273-.047l-3.063 17.738l6.188 1.07l4.617 30.395l31.532 5.445l14.543-27.088l6.186 1.07l3.063-17.74l-.273-.046l.416-.773l-18.75-26.578zm-77.444 2.98l-22.82.878l-39.47 54.775l-1.692 33.138l63.982-88.79zm-77.625 2.985l-31.275 1.203l-28.72 272.832l45.66 6.733l14.335-280.767zM236.928 128.1l14.457 20.49l-34.947-6.035zm-20.516 32.718l28.87 4.985l-7.012 13.064l-19.63-3.39l-2.228-14.66zM437.12 289.89l-76.434 15.288l-44.99-14.998l-28.706 28.703h169.457zm-260.05 2.268l-9.42 20.725h-16.386v18h8.205l-7.275 16h-22.93v18h14.75l-8.183 18h-26.568v18h18.386l-13.636 30h-24.75v18h16.568l-8.762 19.275l16.387 7.45l12.147-26.725h143.423l-6.75-18H133.785l13.637-30h103.605l-6.75-18h-88.673l8.18-18h73.74l-6.75-18h-58.807l7.273-16h45.535l-4.498-12h41.258l6-6h-80.113l6.035-13.276l-16.387-7.45zm69.182 44.725l40.36 107.635c6.022-8.242 15.748-13.635 26.652-13.635c11.916 0 22.43 6.438 28.234 16h55.53c5.804-9.562 16.32-16 28.236-16c10.424 0 19.768 4.93 25.832 12.564l26.64-106.564zm67.012 112c-8.39 0-15 6.61-15 15s6.61 15 15 15s15-6.61 15-15s-6.61-15-15-15m112 0c-8.39 0-15 6.61-15 15s6.61 15 15 15s15-6.61 15-15s-6.61-15-15-15\"/>","griffin-symbol":"<path fill=\"currentColor\" d=\"M219.756 18.604c4.052 15.357 3.397 24.041 25.824 32.28c-11.984 2.437-17.24 4.507-36.502-4.966c3.663 15.35 4.19 26.554 30.022 29.95c-12.1 29.8-9.43 68.721 6.771 101.05C202.175 135.722 175.955 26.476 180.8 19.01c-16.578 15.218-29.301 30.44-38.373 51.594c-17.433 59.912-22.848 130.145 11.465 186.052c18.791 24.069 46.468 35.866 82.117 25.237c-19.815 21.2-61.112 22.051-60.274 51.793c-23.867.12-62.388 50.074-80.752 28.255c-17.04-20.245 42.624-48.484 36.143-74.14c-4.908-19.427-42.686-26.202-70.23-49.643c7.915-29.149-15.428-39.194-40.99-45.695c12.544 14.59 14.274 38.384 8.67 52.271c.993.497 13.347-1.809 17.945 2.08c19.335 16.358 78.757 33.365 61.193 52.356c-21.627 23.384-54.648 50.988-38.718 75.239c18.849 28.694 75.356 19.427 105.27-3.641c-.646 21.619-16.875 46.225-47.435 52.722c-11.366 1.646-5.19 37.526-33.92 56.473c5.498 4.408 31.43 21.09 38.424 16.185c16.572-11.619 36.787-25.491 61.875 1.211c-7.23-29.056-14.994-37.351-56.01-30.507c8.758-9.139 37.773-18.964 55.918-10.903c54.972-19.776 31.988-37.868 66.926-72.05c30.825 9.253 22.75 44.758 43.98 56.726c29.066-5.264 44.414-10.73 51.756-2.137c7.306 9.274 11.514 11.72 29.24 11.084c11.7 2.646 23.577 15.721 2.686 33.266c40.79-5.645 37.187-35.145 10.467-53.123c8.726-30.173 36.299-6.263 48.135 3.957c-6.592-41.814-51.232-51.059-69.44-16.371c-11.71-8.922-21.316-18.63-40.031-20.047c3.35-27.712-1.264-36.928-8.512-55.35c15.492-14.416 27.208-27.594 37.441-44.102c37.842 7.222 90.616 15.978 79.995 51.612c40.211-42.77-8.803-40.885-4.623-54.281c4.071-13.05 30.22-16.567 39.304 4.453c4-40.592-44.39-41.118-52.69-21.375c-19.237-.065-27.955-9.57-43.263-19.854a160 160 0 0 0 6.06-26.912c16.883-4.655 34.953-7.128 49.891-20.533c25.367 9.855 42.736-4.934 42.174-27.07c0 0-32.033 35.189-33.7-1.795c-.681-15.082 18.625-29.18 43.183-13.656c-17.624-40.296-63.094-24.75-62.852 16.8c-15.843 7.322-28.376 7.113-41.28 2.614c-10.32-30.437-43.035-39.44-60.757-52.116c-10.889-7.788 9.06-25.721 27.973-17.61c18.912 8.11 36.923-1.29 45.836-10.24c-26.242 2.808-48.716-14.667-48.141-17.93c.6-3.41 29.811-7.592 51.326 5.825c-1.565-34.591-30.833-35.783-52.08-37.105c-18.792-34.937-43.299-38.584-71.062-24.748c-19.344-1.381-43.732-6.665-61.303-15.277zM85.154 25.355a2 2 0 0 0-.265.604c.09-.202.174-.402.265-.604m-.265.604c-43.453 96.534-16.103 179.77 41.088 215.559c-20.947-50.153-17.93-106.467-5.967-156.57c-19.158-25.464-36.877-52.809-35.121-58.989m221.45 17.627c1.756 0 29.795 15.652 29.795 15.652l-23.078 3.16z\"/>","hammer-nails":"<path fill=\"currentColor\" d=\"M170.375 18.594c-1.155 0-2.32.014-3.47.03c-25.176.37-49.134 5.08-68.78 13.94c84.13 7.937 156.965 61.77 119.28 122.53c-2.017 3.254-4.033 6.445-6.03 9.625l.47.186c-.933 2.4-.566 5.203 2.343 9.53c2.908 4.33 8.322 9.22 14.75 12.97c6.427 3.752 13.838 6.392 20.28 7.22c5.992.768 10.808-.054 14-1.94c1.7-2.696 3.416-5.415 5.157-8.155c21.695-8.632 57.903 11.51 65.22 29.22c1.34-14.225 6.522-29.91 15.342-45.188c6.697-11.598 14.627-21.517 23.157-29.25c-20.304 7.277-30.037-6.764-38.563-34.187c-8.197-26.38-36.394-47.365-58.155-59.844c-31.287-17.92-69.206-26.65-105-26.686zm239.03 121.937c-4.01-.034-9.278 1.558-15.592 5.564c-9.622 6.103-20.325 17.327-28.688 31.812c-8.363 14.486-12.713 29.366-13.188 40.75c-.474 11.385 2.692 17.85 6.688 20.156c3.996 2.307 11.222 1.823 20.844-4.28c9.62-6.104 20.323-17.297 28.686-31.782s12.713-29.365 13.188-40.75c.474-11.385-2.693-17.88-6.688-20.188c-.998-.576-2.206-.973-3.594-1.156c-.52-.068-1.083-.12-1.656-.125zm-210.81 44.282C80.93 367.197 4.35 418.813 21.937 462.875c8.065 20.204 31.467 36.36 55.218 28.78c49.34-15.74 59.974-94.006 173.094-278.124a55 55 0 0 1-3.406-.343c-9.516-1.22-18.924-4.76-27.313-9.656c-8.387-4.895-15.804-11.11-20.874-18.655c-.016-.024-.046-.04-.062-.063zM492 256.97l-110.438 22.436l51.313 15.53l31.47 148.94l18.31-3.845l-31.467-148.81zm-200.125 15.874l-80 79.375l51.438-15.19l68.093 67.564L308.28 489.5l18.064 4.906l20.312-74.656l24.72 24.5L384.53 431l-32.217-31.97l14-51.5l52.125-12.56l-108.97-28.75l38.75 36.56l-11.187 41.095l-60.467-60l15.312-51.03z\"/>","hooded-assassin":"<path fill=\"currentColor\" d=\"M332.031 66.13c-28.807-.01-55.439 14.149-67.88 40.65c20.79 1.744 16 55.07 16 55.07c-11.814 16.687-24.73 33.186-36.589 50.146c0 0-99.046 132.283-178.378 168.025c-28.049 22.593-33.305 36.532-44.137 52.649c-4.877 9.54 9.257 14.324 11.701 13.2c22.726-10.461 25.176-20.866 47.07-35.675c12.805-5.026 23.839-15.9 31.854-11.049c34.962 20.86 107.556 44.28 118.271 38.706c17.857-9.263-5.78-43.585 16.174-89.057c31.97-3.352 58.916-.885 88.332-12.094c3.483 50.279 10.106 54.59 6.766 107.092l71.2 1.045l.698-14.61l-41.814-11.105c11.528-56.054 11.816-78.996 4.672-127.996c-.956-6.622-53.746-8.275-81.012-3.79c24.449-24.202 40.274-45.24 47.506-68.44l.027.189c7.637 15.923 30.083 33.958 35.336 37.125c27.704 11.048 38.214 7.982 62.955 3.887c4.907-.784 27.47 24.537 44.807 9.597c2.642-20.238 16.522-20.369-4.938-32.71c-4.847-2.73-27.063 7.462-31.418 6.898c-20.21-2.481-30.954-5.211-58.45-12.703c-10.23-13.187-32.676-56.136-55.43-59.744c6.535-14.15 28.226-53.108 73.664-66.237c-20.943-26.54-49.925-39.057-76.987-39.068zm82.405 46.722c-46.658 19.516-58.266 50.4-58.266 50.4l9.916 7.644s9.646-4.765 48.35-58.044m23.04 160.005l-4.658 11.418c5.233-.083 10.425.47 15.328 1.608c-12.774 30.856-23.938 59.635-28.181 93.094l-.908 7.558l4.863-5.889c20.805-25.671 32.303-55.25 44.95-85.78c4.203 2.656 8.24 5.885 12.071 9.35l4.78-11.374l-20.518-8.526l-31.767 66.579l24.062-69.713z\"/>","laurels":"<path fill=\"currentColor\" d=\"M234.7 18.05c-21 .2-38.8 2.5-62 10.2c-4.1 2-8.2 4.1-12.2 6.2c.8 5.26 3.2 10.77 5.5 14.7c-4.9 4.2-9.6 8.4-14.1 12.8c-3.7-5.5-6.6-11.4-8.3-17.4c-14.2 9.2-27.7 19.6-40.1 31.4c1.9 9.5 9.2 18.21 15.2 24.15c-3.7 5.2-7.2 10.4-10.5 15.7c-8.22-7.2-15.12-15.5-19.32-24.65C74.97 108.1 61.92 126 53.08 142.3c5.29 13 19.01 22.7 29.8 28.4c-2 6.1-3.7 12.2-5.1 18.4c-13.5-6.4-26.3-15.7-34.5-26.6c-8.7 20.1-14.7 40.7-18.2 61.4c9.63 15.5 30.57 22.9 46 25.9q.15 9.6.9 19.2c-17.79-2.7-37.26-9.6-49.9-20.4c-1.6 22.3-.5 44.5 3.4 66.2c15.25 13.7 41.14 15.3 58.6 13.7c2 6.1 4.1 12.2 6.5 18.1c-18.61 4.5-43.29 1.1-59.3-6.2c6.6 23.7 16.4 46.4 29.2 67.4c19.33 8.6 44.52 3.6 61.72-2.5c3.7 5.3 7.6 10.5 11.6 15.5c-17.8 9.5-39.9 11.5-57.52 10.1c12.3 16.3 26.62 31.2 42.72 44.4c4.9 1.1 10.5 1.1 16.7.3c11.7-1.7 25.2-7 37.9-14.7c16.7 13.5 34.9 24.7 54.1 33.1l7.5-17.2c-16-6.9-31.3-16.2-45.6-27.3c13.3-10.9 24.3-24 30.2-36.5c4.7-9.7 6.3-18.4 4.5-26.3c-10.7-5.7-20.6-12.5-29.5-20.3c-7.8 20.8-26.4 36.1-43.5 46c-4-4.9-7.9-9.9-11.6-15c16.8-9.8 39.9-27.5 39.1-47.1c-8.9-10.3-16.6-21.8-22.9-34.1c-12 14-30.7 22.5-46.5 26.7c-2.4-5.8-4.6-11.6-6.6-17.6c16.8-5.2 37.9-13 44.1-29.7c-4.3-11.5-7.5-23.6-9.7-36c-13.8 8.4-32 11.1-46.32 10.9c-.6-6.2-1-12.4-1.2-18.7c15.52-.6 33.92-2.5 44.92-14.3c-.8-12.6-.5-25.5.9-38.5c-13.4 2.8-29 .3-40.42-3.2c1.3-6 2.9-12.1 4.8-18.1c12.82 3.2 27.12 6.7 38.82.8c2.7-13.6 6.7-27.3 12-40.8c-9.9-1.8-20.2-6.3-27.7-10.7c3.3-5.3 6.8-10.5 10.5-15.7c8.1 4.2 16.3 8.8 25.2 8.4c5.7-11.6 12.3-22.65 19.5-32.75c-5.1-2.7-10-6.4-14.4-10.6c4.4-4.3 9.1-8.5 13.9-12.7c3.8 3.54 8 6.18 12.3 8.2c15.9-18.6 35.9-36.23 49-53.8zm38.4 0c15.4 20.75 33.8 35.63 48.9 53.7c4.6-1.76 9.1-5.23 12.3-8.1c4.9 4.2 9.5 8.4 13.9 12.7c-4.4 4.2-9.2 7.9-14.4 10.6c7.3 10.1 13.9 21.05 19.6 32.65c9-.1 18.4-4.4 25.2-8.4c3.7 5.2 7.2 10.4 10.4 15.7c-8.8 5.9-18.2 9.6-27.6 10.7c5.3 13.5 9.3 27.2 12 40.8c12.3 5.4 27.3 2.7 38.7-.8c1.9 6 3.5 12.1 4.9 18.1c-14.2 3.4-27.3 6.2-40.4 3.3c1.4 12.9 1.6 25.8.8 38.5c11.4 12.3 30.2 14.4 44.9 14.2c-.2 6.3-.5 12.5-1.2 18.7c-17.1-.5-32.8-2.5-46.3-10.9c-2.1 12.4-5.3 24.5-9.6 36.1c8.2 17.4 27.8 25.3 44.1 29.6c-2 6-4.2 11.8-6.6 17.6c-18.5-5.6-34.9-13-46.6-26.7c-6.3 12.4-13.9 23.8-22.9 34.1c1.5 22.4 22.4 37.8 39.2 47.1c-3.7 5.1-7.6 10.1-11.6 15c-19-11.8-36.6-25.8-43.5-46c-9 7.8-18.8 14.6-29.6 20.3c-1.8 7.9-.1 16.6 4.5 26.3c6 12.5 17 25.6 30.3 36.5c-14.3 11.1-29.6 20.4-45.6 27.3l7.4 17.2c19.3-8.4 37.4-19.6 54.1-33.2c12.7 7.8 26.2 13.1 38 14.8c6.2.8 11.8.8 16.7-.3c16.1-13.2 30.4-28.1 42.7-44.4c-18 1.7-37.9-2.3-56.5-9.7c-.3-.1-.7-.3-1.1-.4c4.1-5 7.9-10.2 11.7-15.5c18.2 7.8 43.7 11.7 61.6 2.5c12.8-21 22.6-43.7 29.2-67.4c-.4.2-.8.4-1.2.5c-20.5 6.4-40.1 7.6-58.1 5.7c2.4-5.9 4.5-12 6.5-18c19.1 1.7 45.2.1 58.6-13.8c3.9-21.7 5.1-43.9 3.4-66.2c-14.4 10.7-34.9 17.9-49.9 20.4c.5-6.4.9-12.8 1-19.2c16.8-4.8 37.9-10 45.9-25.9c-3.5-20.7-9.5-41.3-18.2-61.4c-9.4 11.6-23.1 21-34.4 26.5c-1.5-6.1-3.2-12.2-5.2-18.3c12-7.4 25.1-15.3 29.9-28.4c-10.1-18.7-22.2-35.8-35.9-51.05c-4.2 9.05-11.1 17.45-19.2 24.65c-3.3-5.3-6.8-10.5-10.6-15.7c6.2-7.17 14.2-14.71 15.2-24.15c-12.4-11.8-25.8-22.2-40-31.4c-1.8 6-4.7 11.9-8.3 17.4c-4.5-4.4-9.2-8.6-14.1-12.8c2.7-4.82 4.7-9.62 5.4-14.7c-4-2.1-8.1-4.2-12.2-6.2c-24.7-8.2-43.3-10.3-66.2-10.2\"/>","mammoth":"<path fill=\"currentColor\" d=\"M337.2 56.85c2.6 4.01 5 10.08 9.6 14.39c-6 14.4-22.9 25.94-42.7 25.66l16.1 15.6l25.9-14.9l20.3 17l19.4-9.5l19.6 7.5L419.6 98c-20.7-7-20.6-23.84-28.8-36.5c-1.6-2.43-5.2-3.51-9.8-3.59c-7.6-.14-18 2.48-26.1 6.27c-7-2.17-10.1-5.32-17.7-7.33M299.8 112c-23.3 14.8-47.7 29.3-74 28.8c-16.4-7.3-39.8-12.2-66.8-15.9c3.5 5.1 4.6 10.5 4.4 16.2c-1.3.1-2.6.1-3.9.2c-11.5-3.3-27-4.9-50.4-2.9c6.3 1.9 11.8 4 15.4 6.8c-34.78 6.1-72.74 15-87.27 47.8c-4.11 9.3-6.83 18.8-8.6 28.4l-9.09 25.7l6.61-4.5c-.98 16.6 0 33.6.86 50.6l-6.43 35l7.44-11.9c.24 8.8.23 17.6-.33 26.3l21.74-56.2l11.13 71.5c1.66 11.9-3.98 22.2-7.88 33.2l7.69-.6l-.1 10.5l-10.02 30.7l9.86-4.7l-.12 22.6c18.75 13.3 39.44 10.7 61.01.7l7.3-100.7c4.9-10.8 11.1-21.3 16.5-30.4c5.8-10 10.6-19.8 11.4-25.1l17.8 2.8c-3.4 13.9-9.6 24.8-16.1 35.5c23.5-1.2 44.8-5.7 64.1-13.9c-.8-6.9-3.2-15.1-3.6-21l18-1.2c1.1 6.7 3.1 18.5 4.5 26c2.7 15.2 6.3 35.1 9.9 54.8c6.6 36.7 12.8 70.2 13.7 75.1c21 8.4 45.2 6.2 60.1 1.9l-2.9-55.5l7.2 3.6l-7.9-15.9l-.2-3.6l8.1 6l-9.8-38.6l-.2-3.9l9 2.2l-10.7-35.7l-1.1-20.5c12.9-4.1 25.1-8.3 37-12.8c-2.3-2.5-4.6-5.1-6.8-7.9c-9.3-11.3-14.4-26.5-12.3-40.6c1.1-7.1 4.1-15.4 11.5-18.5c9.1-3.8 24.1-7.4 30.4 1.7c22.6 31.9 40.5 45.2 51.4 47.8c5.5 1.3 9.3.6 13.3-1.7c14.3-10.4 14.5-15.1 14-32.2c-7.2-18.7-12.9-37.7-18.6-56.7l14.3 2.9c-7.5-9-16.3-14.5-22-27.9c-2.5-7.8-5.1-15.6-7.9-23.4l-6 12.5l-27.8-10.7l-22.8 11.3l-19.7-16.5l-31.5 18.2zm82.5 58.8l26.8 15.4c-3.4 3.8-6.6 7.9-15.3 6c-9.3-2.1-12-13-11.5-21.4m107.1 16c-3.4 24-9.8 51-21.7 70.3c-4.8 7.8-10.6 14.4-18.2 18.7c-7.5 4.4-16.9 5.9-26.3 3.6c-18.4-4.3-37.1-20.6-59.8-52c-6.5-1.5-10.8.9-11.6 6.2c-1 6.9 2.6 19.4 8.4 26.5h.1c20.9 25.7 41.6 36.7 59.7 38.6s34.4-5.1 47.3-18.4c20-20.5 30.9-56 22.1-93.5m-39.9 126c-9.8 3.5-20.4 4.9-31.4 3.8c-2.5-.3-5.1-.7-7.6-1.2c-1.5 17-5.5 33.2-14.4 42.3c-11.1 11.4-47.3 6.7-47.3 6.7c-10.9-2.5-11.4 52.2 12.5 43.3c0 0 51.2-14.6 66.3-33.5c3.8-4.8 7.2-10.7 10-17.3l3.2 10.3l.7-20.6c.9-2.8 1.8-5.8 2.6-8.7l7 9.2zm-224.3 23.5l-6.6 1.8l-1 113.4c9.8 5.5 19.1 3.6 28.2-.7c-1.7-9.8-6.8-37.4-12.7-70.5c-2.8-15.5-5.5-30.5-7.9-44m-36.7 9.1c-13 .9-44.9 6.6-46.3 10.1l-1.8 95.3c18.2 10.1 35.7 5.3 53.2.2z\"/>","nest-eggs":"<path fill=\"currentColor\" d=\"M263.4 75.12c-13 0-24.4 6.3-34.8 17.96c-10.3 11.62-18.9 28.52-24.6 47.62c-8.6 28.5-10.4 61.8-4.8 88.8l65.8-9.4l62.9 7.4c5.2-26.6 3.3-59-5.1-86.8c-5.7-19.1-14.3-36-24.6-47.62c-10.4-11.66-21.8-17.96-34.8-17.96m144 35.08c-11.6 0-21.9 5.7-31.3 16.5c-9.3 10.8-17.2 26.6-22.4 44.4c-1.9 6.6-3.5 13.4-4.7 20.3c.4 12.5-.5 24.8-2.6 36.4c0 .6 0 1.2.1 1.9l29.9 3.5l-61.9 10.9l-49.3-5.8l-168.44 24l83.54 30l109.2-18.6l-106 54.1l-115.68-61.3l-28.93 4.1L47.3 302l-29.27-11.9l37.91 44.2l4.73 17.7l43.83 20.9l63.1-16.5l-56.8 41.9l-42.17-16.5l10.86 40.6l24.01 7l-41.99 17.2l97.39.4l-52.8 21.9l107.1-7.6c73.4 25.8 90.3 22.4 173.3 30.1l-68.2-25.5l24.3-12.6l-57.9-39.6c77.9 24.1 107.9 16.5 183.6 2.3l-42.2-6.2l51.8-27l.4-12.7l27.5-57.6l-26.3 18.6l1-29.4l-63.2 51.5l-113-34.4l116.2 7.9l60.1-28.9l.5-14.1l16.1-40.9l-30.6 19.1l-37.1-4.3l-77.4 8.7s22.1-6.9 42.9-13.2l21.6-15.2l50.5 5.9c3-23 .8-49.6-6-72.7c-5.2-17.8-13.1-33.6-22.4-44.4c-9.4-10.8-19.7-16.5-31.3-16.5M139.6 121c-12.1 0-22.6 5.5-32.1 15.4c-9.48 10-17.39 24.6-22.65 41c-7.12 22.1-9.18 47.5-5.73 69.2l102.08-14.5c-5.3-25.4-4.3-54.1 1.5-80.9c-3.3-5.6-7-10.6-11-14.8c-9.5-9.9-20-15.4-32.1-15.4m68.2 244.4l73.2 13.8l78-9l-79.6 30.8z\"/>","ogre":"<path fill=\"currentColor\" d=\"M256 25c-28.625 0-56.434 16.22-82.44 43.912c-26.005 27.692-49.672 66.468-69.4 108.883C64.705 262.625 41 362.57 41 416c0 7 6.83 16.013 21.684 25.064c14.854 9.052 36.296 17.43 59.836 24.295C169.598 479.091 225.5 487 256 487s86.402-7.91 133.48-21.64c23.54-6.866 44.982-15.244 59.836-24.296C464.171 432.013 471 423 471 416c0-53.429-23.705-153.376-63.16-238.205c-19.728-42.415-43.395-81.191-69.4-108.883C312.433 41.221 284.624 25 256 25m-77.154 142.46S227 183 256 183s77.154-15.54 77.154-15.54l5.692 17.08S291 201 256 201s-82.846-16.46-82.846-16.46zM133.4 184.8l63.32 47.491C228.18 248.012 243.108 255 256 255s27.821-6.988 59.28-22.709l63.32-47.49l10.8 14.398l-45.875 34.406c-5.22 22.311-12.93 40.726-21.722 54.29c-5.809 8.961-12.03 16.3-19.078 20.683l12.673 31.684l-7.285 3.742s-8.11 4.173-18.414 8.34S267.28 361 256 361s-23.395-4.49-33.7-8.656c-10.303-4.167-18.413-8.34-18.413-8.34l-7.285-3.742l12.673-31.684c-7.049-4.383-13.27-11.722-19.078-20.683c-8.791-13.564-16.502-31.979-21.722-54.29L122.6 199.2l10.8-14.398zm-86.455 9.798c-2.155.07-4.096.84-5.916 1.927c.008 23.442.097 52.783 1.944 76.786c.407 5.3.947 10.084 1.56 14.496a808 808 0 0 1 24.86-74.29c-2.305-7.398-6.916-12.736-12.024-15.8c-3.638-2.183-7.184-3.224-10.424-3.12zm418.11 0c-3.24-.105-6.786.936-10.424 3.119c-5.108 3.064-9.72 8.402-12.024 15.8a808 808 0 0 1 24.86 74.29a236 236 0 0 0 1.56-14.496c1.847-24.003 1.936-53.344 1.944-76.786c-1.82-1.088-3.761-1.857-5.916-1.927m-273.07 55.459c3.988 11.3 8.61 20.784 13.318 28.048c3.836 5.919 7.759 10.042 11.066 12.74l9.838-24.591c-9.536-3.85-20.536-9.347-34.223-16.197zm128.03 0c-13.686 6.85-24.686 12.348-34.222 16.197l9.838 24.592c3.307-2.699 7.23-6.822 11.066-12.74c4.709-7.265 9.33-16.75 13.319-28.05zM138.34 269.313c12.116.012 25.91 3.348 41.433 10.517l-7.546 16.34c-19.592-9.048-33.85-10.228-43.932-7.682s-16.82 8.716-21.684 17.455c-9.728 17.48-8.685 45.782-2.56 58.032l-16.102 8.05c-9.875-19.75-10.503-50.693 2.934-74.836c6.718-12.071 17.773-22.306 33.004-26.152c3.807-.961 7.824-1.531 12.052-1.683a65 65 0 0 1 2.4-.041zm235.32 0a65 65 0 0 1 2.4.04c4.229.153 8.246.723 12.053 1.684c15.23 3.846 26.286 14.081 33.004 26.152c13.437 24.143 12.809 55.086 2.934 74.836l-16.102-8.05c6.125-12.25 7.168-40.552-2.56-58.032c-4.864-8.74-11.601-14.909-21.684-17.455s-24.34-1.366-43.932 7.682l-7.546-16.34c15.524-7.17 29.317-10.505 41.433-10.517m-130.236 2.355l-23.922 59.805c2.786 1.28 5.783 2.661 9.547 4.183C238.529 339.49 250.413 343 256 343s17.471-3.51 26.951-7.344c3.764-1.522 6.761-2.902 9.547-4.183l-23.922-59.805c-4.217.864-8.35 1.332-12.576 1.332s-8.36-.468-12.576-1.332m-107.549 60.207l94.418 47.21C238.301 376.514 246.871 375 256 375s17.699 1.513 25.707 4.086l94.418-47.211l-41.537 83.076c10.698 11.12 18.648 21.558 23.775 26.686l-12.726 12.726C327.515 436.242 298 393 256 393s-71.515 43.242-89.637 61.363l-12.726-12.726c5.128-5.128 13.078-15.567 23.777-26.688zm40.252 40.252l14.34 28.68l14.34-14.34zm159.746 0l-28.68 14.34l14.34 14.34z\"/>","padlock":"<path fill=\"currentColor\" d=\"M254.28 17.313c-81.048 0-146.624 65.484-146.624 146.406V236h49.594v-69.094c0-53.658 43.47-97.187 97.03-97.187c53.563 0 97.032 44.744 97.032 97.186V236h49.594v-72.28c0-78.856-65.717-146.407-146.625-146.407zM85.157 254.688c-14.61 22.827-22.844 49.148-22.844 76.78c0 88.358 84.97 161.5 191.97 161.5c106.998 0 191.968-73.142 191.968-161.5c0-27.635-8.26-53.95-22.875-76.78H85.155zM254 278.625c22.34 0 40.875 17.94 40.875 40.28c0 16.756-10.6 31.23-25.125 37.376l32.72 98.126h-96.376l32.125-98.125c-14.526-6.145-24.532-20.62-24.532-37.374c0-22.338 17.972-40.28 40.312-40.28z\"/>","resize":"<path fill=\"currentColor\" d=\"m29 30l1 90h36V66h26V30zm99 0v36h72V30zm108 0v36h72V30zm108 0v36h72V30zm102 0v78h36V30zm-206 80v36h100.543l-118 118H30v218h218V289.457l118-118V272h36V110zm206 34v72h36v-72zM30 156v72h36v-72zm416 96v72h36v-72zm0 108v72h36v-72zm-166 86v36h72v-36zm108 0v36h72v-36z\"/>","scroll-unfurled":"<path fill=\"currentColor\" d=\"M103.432 17.844a87 87 0 0 0-3.348.08q-3.822.163-7.604.678c-20.167 2.747-39.158 13.667-52.324 33.67c-24.613 37.4 2.194 98.025 56.625 98.025c.536 0 1.058-.012 1.583-.022v.704h60.565c-10.758 31.994-30.298 66.596-52.448 101.43a283 283 0 0 0-6.29 10.406l34.878 35.733l-56.263 9.423c-32.728 85.966-27.42 182.074 48.277 182.074v-.002l9.31.066c23.83-.57 46.732-4.298 61.325-12.887c4.174-2.458 7.63-5.237 10.467-8.42h-32.446c-20.33 5.95-40.8-6.94-47.396-25.922c-8.956-25.77 7.52-52.36 31.867-60.452a55.6 55.6 0 0 1 17.565-2.834v-.406h178.33c-.57-44.403 16.35-90.125 49.184-126c23.955-26.176 42.03-60.624 51.3-94.846l-41.225-24.932l38.272-6.906l-43.37-25.807h-.005l.002-.002l.002.002l52.127-8.85c-5.232-39.134-28.84-68.113-77.37-68.113C341.14 32.26 222.11 35.29 149.34 28.496c-14.888-6.763-30.547-10.723-45.908-10.652m.464 18.703c13.137.043 27.407 3.804 41.247 10.63l.033-.07c4.667 4.735 8.542 9.737 11.68 14.985H82.92l10.574 14.78c10.608 14.83 19.803 31.99 21.09 42.024c.643 5.017-.11 7.167-1.814 8.836c-1.705 1.67-6.228 3.875-15.99 3.875c-40.587 0-56.878-44.952-41.012-69.06C66.238 46.64 79.582 39.22 95.002 37.12a64 64 0 0 1 8.894-.573M118.5 80.78h46.28c4.275 15.734 3.656 33.07-.544 51.51H131.52c1.9-5.027 2.268-10.574 1.6-15.77c-1.527-11.913-7.405-24.065-14.62-35.74m101.553 317.095c6.44 6.84 11.192 15.31 13.37 24.914c3.797 16.736 3.092 31.208-1.767 43.204c-4.526 11.175-12.576 19.79-22.29 26h237.19c14.448 0 24.887-5.678 32.2-14.318c7.312-8.64 11.2-20.514 10.705-32.352a47.7 47.7 0 0 0-2.407-13.18l-69.91-8.205l42.017-20.528c-8.32-3.442-18.64-5.537-31.375-5.537H220.053zm-42.668.506a37 37 0 0 0-3.457.153a34.8 34.8 0 0 0-7.824 1.63c-15.11 5.02-25.338 21.54-20.11 36.583c3.673 10.57 15.347 17.71 25.654 13.938l1.555-.57h43.354c.946-6.36.754-13.882-1.358-23.192c-3.71-16.358-20.543-28.483-37.815-28.54z\"/>","spears":"<path fill=\"currentColor\" d=\"m433.877 19.855l-78.62 158.668l47.82 53.934l-15.673 260.824h38.79l15.697-261.233l51.04-45.25l-59.053-166.942zm-130.48 20.598L216.073 152.55l28.397 49.186l-28.616 106.387l-.102-.176l-9.545 35.62l.076.134l-40.234 149.58h32.68l29.676-111.186l.026.045l9.527-35.556l-.054-.09L274.56 209.15l48.415-27.95L303.4 40.452h-.002zM111.632 153.21l14.48 116.54l44.42 11.904L193 320.648l9.555-35.66l-9.256-16.1l12.022-44.87l-93.69-70.81zm-49.357 74.31l-42.68 79.31l23.57 28.455L30.786 493.28h18.746L61.83 336.26l27.608-22.865zh-.002zm257.06 10.878l-22.354 87.248l29.686 21.932L345.04 493.28h18.84l-18.823-149.235l21.293-28.824zm175.103 28.614l-40.108 226.27h18.98l21.128-119.188zm-339.903 38.886l-55.35 71.05l18.618 32.247l-20.41 84.086h19.233l19.51-80.385l30.81-17.788l-12.408-89.21h-.002zm96.623 63.645l-9.517 35.516l50.837 88.22h29.8z\"/>","stone-wall":"<path fill=\"currentColor\" d=\"m18.08 23l.1 18H494V23zM254.3 54.93L133 61.6l30.1 68.5l98.1-3.6zm115.9.28l-92.9.53l3 71.96l96.8-.9zM18.23 56.43l.35 74.67l72.27-2.4l24.35-72.27zM393 64.24l-.5 47.16l15.7 21.5l85.8-6.3V64.93zM120.8 84.68l-17.6 49.82l41.1-1l-8.2-34.02zm354.7 56.02l-4 75.5l22.5-.6v-74.9zm-25.7 3.5l-97.3 10.7L346 219l110.7-3.2zm-243.8.7l-4 75.5l126.1-3.9l7-71.1zm-145.33 2.7l-3.9 75.5l126.13-3.9l-6.9-71.6zm-42 1.5l.33 72.4l24.77-.8l-6.9-71.6zm278.93 84.3L276 277.2l2.1 42l128.7-1.9l-7.6-79.7zm-40.2 1.4l-127.2 6l8 69.5l124.7 6.6zm236.6 3.1l-66.5 2.9l-7.5 75.8l74-5.2zm-474.89 7l.31 65.8l100.78-3.1l-6.9-62.7zm470.29 81.2l-115.9 10.5l-3.3 65l121.5-3.5zm-422.36 4.1l-47.52 2l.34 72.9l51.1-1.3zm17.84 0l3.98 68.5l138.64 9.6l-3-78.1zm161.22 4.3l-5.5 69l107.5 5.4l-1-73.5zm185.4 81.1l-4 75.5l66.5-.6v-73.8zm-9.8 1.2l-39 3.6l27.4 28zm-399.46 1.8l-2.13 40.6l.16 34.8H145.4v-68.9l-46.56-2.5l-18.4 14L68.56 421zm247.96.3l-111.3 1.5l3.5 72.5l114.7-2.4zm101.2 4.3l-72.2 5.9l-8.9 62.1l125.6.6l-6.2-27z\"/>","strong":"<path fill=\"currentColor\" d=\"M257.375 20.313c-13.418 0-26.07 7.685-35.938 21.75c-9.868 14.064-16.343 34.268-16.343 56.75c0 22.48 6.475 42.654 16.344 56.718c9.868 14.066 22.52 21.75 35.937 21.75c13.418 0 26.038-7.684 35.906-21.75c9.87-14.063 16.376-34.236 16.376-56.718c0-22.48-6.506-42.685-16.375-56.75c-9.867-14.064-22.487-21.75-35.905-21.75zm-150.25 43.062c-20.305.574-23.996 13.892-31.78 29.03c-23.298 45.304-55.564 164.75-55.564 164.75l160.47-5.436l29.125 137.593l-22.78 106.03h149.093l-22.282-106l24.25-137.5l157.53 5.313c.002 0-32.264-119.447-55.56-164.75c-7.787-15.14-11.477-28.457-31.782-29.03c-17.898 0-32.406 15.552-32.406 34.718s14.508 34.72 32.406 34.72c3.728 0 7.258-.884 10.594-2.126l7.937 74.406L309.437 165c-.285.42-.552.867-.843 1.28c-12.436 17.724-30.604 29.69-51.22 29.69c-20.614 0-38.782-11.966-51.218-29.69c-.277-.395-.54-.816-.812-1.218l-116.75 40.032l7.937-74.406c3.337 1.242 6.867 2.125 10.595 2.125c17.898 0 32.406-15.553 32.406-34.72c0-19.165-14.507-34.718-32.405-34.718z\"/>","tank":"<path fill=\"currentColor\" d=\"M130.613 43.002v66.926c-22.925 19.7-38.03 48.177-40.533 80.252h234.51c-2.666-34.175-19.637-64.265-45.133-84.006H149.303V43.002zM472.62 58.738l-41.53 11.127l16.504 61.588l41.525-11.127zm-54.042 36.627l-98.787 26.47a136.6 136.6 0 0 1 13.647 25.15l92.342-24.745zM121.53 206.342l-78.364 37.045l.002 50.3l18.207-7.556H442.11l19.316 6.413c0-51.397-119.076-83.53-183.166-86.2H121.53zm-38.17 97.88v.038c-35.936.645-65.065 30.15-65.065 66.232c0 36.484 29.777 66.26 66.262 66.26c1.286 0 2.563-.046 3.832-.12h106.473c1.27.074 2.545.12 3.832.12s2.563-.046 3.832-.12h107.34c1.27.074 2.545.12 3.832.12s2.562-.046 3.83-.12H423.7c1.268.074 2.544.12 3.83.12c36.486 0 66.263-29.776 66.263-66.26s-29.777-66.262-66.262-66.262c-.276 0-.55.02-.827.022v-.03zm47.2 18.686h22.13a67 67 0 0 0-11.063 14.014a66.7 66.7 0 0 0-11.066-14.014zm114.14 0h22.995a66.8 66.8 0 0 0-11.498 14.766a66.8 66.8 0 0 0-11.498-14.766zm115.003 0h21.824a67 67 0 0 0-10.912 13.748a67 67 0 0 0-10.912-13.748m-275.146.012a47.43 47.43 0 0 1 47.572 47.572a47.41 47.41 0 0 1-44.333 47.45H83.36v.09a47.414 47.414 0 0 1-46.378-47.54a47.434 47.434 0 0 1 47.575-47.572m114.138 0a47.43 47.43 0 0 1 47.573 47.572a47.41 47.41 0 0 1-44.332 47.45h-6.48a47.41 47.41 0 0 1-44.335-47.45a47.434 47.434 0 0 1 47.575-47.572zm115.004 0a47.43 47.43 0 0 1 47.57 47.533v.078a47.41 47.41 0 0 1-44.33 47.413h-6.48a47.41 47.41 0 0 1-44.335-47.45a47.434 47.434 0 0 1 47.574-47.573zm113.83 0a47.43 47.43 0 0 1 47.575 47.572a47.43 47.43 0 0 1-47.574 47.572c-.277 0-.55-.016-.827-.02v-.1h-2.412a47.41 47.41 0 0 1-44.33-47.413v-.078a47.43 47.43 0 0 1 47.57-47.532zm-171.333 80.39a66.8 66.8 0 0 0 11.362 14.633h-22.724a66.7 66.7 0 0 0 11.36-14.632zm-114.572.75a67 67 0 0 0 10.93 13.883h-21.858a66.8 66.8 0 0 0 10.928-13.882zm228.99.266a66.8 66.8 0 0 0 10.776 13.617h-21.55a66.8 66.8 0 0 0 10.775-13.617z\"/>","tower-flag":"<path fill=\"currentColor\" d=\"M151 32v247h18V32zm247 9.574l-13.428 7.59c-31.626 17.876-61.492 12.267-93.138 4.356c-31.647-7.912-64.83-18.84-97.946-4.807L188 51.039v115.549l12.512-5.3c25.883-10.968 54.201-2.396 86.554 5.692s68.988 14.98 106.362-6.144l4.572-2.584zM73 297v67.271l32 32V487h302v-90.729l32-32V297h-46v39h-18v-39h-46v39h-18v-39h-46v39h-18v-39h-46v39h-18v-39h-46v39h-18v-39z\"/>","trophy":"<path fill=\"currentColor\" d=\"M256.156 21.625c-45.605 0-86.876 2.852-117.22 7.563c-15.17 2.355-27.554 5.11-36.874 8.53c-4.66 1.71-8.568 3.515-11.968 6.094c-3.238 2.457-6.65 6.36-6.97 11.75h-.75c0 10.08.362 20.022 1.064 29.813H57.53c-.12-7.952.003-15.922.376-23.875l-26.812-6.28C22.55 161.892 64.1 265.716 140.564 339.655l15.655-29.594a251 251 0 0 1-12.157-10.75a143.5 143.5 0 0 1 19.28-16.843c13.468 13.172 28.182 23.565 43.813 30.655c22.114 17.744 8.053 29.368-23.5 36.25c58.863 10.6 38.948 62.267-14.125 92.313c-2.14.27-4.256.523-6.28.812c-12.047 1.718-21.876 3.71-29.406 6.25c-3.765 1.27-6.958 2.6-9.906 4.656c-2.95 2.055-6.626 5.705-6.626 11.406s3.677 9.32 6.626 11.375c2.948 2.055 6.14 3.387 9.906 4.657c7.53 2.54 17.36 4.532 29.406 6.25c24.094 3.436 56.784 5.53 92.906 5.53s68.812-2.094 92.906-5.53c12.048-1.718 21.877-3.71 29.407-6.25c3.764-1.27 6.957-2.602 9.905-4.656c2.948-2.055 6.625-5.674 6.625-11.375c0-5.702-3.677-9.352-6.625-11.407s-6.14-3.387-9.906-4.656c-7.53-2.54-17.36-4.532-29.408-6.25c-2.013-.287-4.12-.544-6.25-.813c-53.076-30.045-72.99-81.71-14.125-92.312c-31.568-6.886-45.63-18.522-23.468-36.28c15.74-7.15 30.547-17.655 44.092-30.97c6.648 4.773 12.84 10.038 18.47 15.72a301 301 0 0 1-12.72 12.217l16.188 29.594c79.118-71.955 116.195-179.53 110.03-285l-27.342 7.97c.45 7.61.64 15.19.562 22.75h-25.594a417 417 0 0 0 1.063-29.814h-.75c-.323-5.39-3.763-9.293-7-11.75c-3.402-2.58-7.31-4.383-11.97-6.093c-9.32-3.422-21.704-6.177-36.875-8.532c-30.342-4.71-71.613-7.563-117.22-7.563zm0 18.688c44.822 0 85.426 2.854 114.344 7.343c14.46 2.245 26.06 4.932 33.313 7.594c1.04.382 1.775.75 2.625 1.125c-.85.375-1.58.742-2.625 1.125c-7.252 2.662-18.854 5.38-33.313 7.625c-28.918 4.49-69.522 7.344-114.344 7.344c-44.82 0-85.425-2.855-114.344-7.345c-14.46-2.245-26.06-4.963-33.312-7.625c-1.05-.386-1.77-.748-2.625-1.125c.853-.376 1.577-.74 2.625-1.125c7.252-2.662 18.853-5.35 33.313-7.594c28.918-4.49 69.522-7.343 114.343-7.343zm-197.25 71.874H86.25c8.057 57.878 28.23 108.83 56.188 146.25c-6.974 5.74-13.407 11.968-19.188 18.688c-38.648-46.456-59.042-104.647-64.344-164.938m367.188 0h27C447.51 171.82 425.336 228.34 388.03 275a158.5 158.5 0 0 0-17.842-16.97c27.81-37.38 47.873-88.175 55.906-145.842z\"/>","two-coins":"<path fill=\"currentColor\" d=\"M264.4 95.01c-35.6-.06-80.2 11.19-124.2 34.09C96.27 152 61.45 182 41.01 211.3c-20.45 29.2-25.98 56.4-15.92 75.8c10.07 19.3 35.53 30.4 71.22 30.4c35.69.1 80.29-11.2 124.19-34c44-22.9 78.8-53 99.2-82.2c20.5-29.2 25.9-56.4 15.9-75.8c-10.1-19.3-35.5-30.49-71.2-30.49m91.9 70.29c-3.5 15.3-11.1 31-21.8 46.3c-22.6 32.3-59.5 63.8-105.7 87.8c-46.2 24.1-93.1 36.2-132.5 36.2c-18.6 0-35.84-2.8-50.37-8.7l10.59 20.4c10.08 19.4 35.47 30.5 71.18 30.5c35.7 0 80.3-11.2 124.2-34.1c44-22.8 78.8-52.9 99.2-82.2c20.4-29.2 26-56.4 15.9-75.7zm28.8 16.8c11.2 26.7 2.2 59.2-19.2 89.7c-18.9 27.1-47.8 53.4-83.6 75.4c11.1 1.2 22.7 1.8 34.5 1.8c49.5 0 94.3-10.6 125.9-27.1c31.7-16.5 49.1-38.1 49.1-59.9s-17.4-43.4-49.1-59.9c-16.1-8.4-35.7-15.3-57.6-20m106.7 124.8c-10.2 11.9-24.2 22.4-40.7 31c-35 18.2-82.2 29.1-134.3 29.1c-21.2 0-41.6-1.8-60.7-5.2c-23.2 11.7-46.5 20.4-68.9 26.1c1.2.7 2.4 1.3 3.7 2c31.6 16.5 76.4 27.1 125.9 27.1s94.3-10.6 125.9-27.1c31.7-16.5 49.1-38.1 49.1-59.9z\"/>","upgrade":"<path fill=\"currentColor\" d=\"m256 29.816l-231 154v106.368l231-154l231 154V183.816zm0 128.043L105 259.783v90.283l151-101.925l151 101.925v-90.283zm0 112l-87 58.725v67.6l87-58l87 58v-67.6zm0 89.957l-87 58v64.368l87-58l87 58v-64.368z\"/>","wheat":"<path fill=\"currentColor\" d=\"M98.344 16.688C79.692 43.785 68.498 69.01 65.5 89.56l23.938 39.157l28.624-33.47c.868-21.213-5.49-48.677-19.718-78.563zM472.5 19.625C444.04 36.055 423.112 54 411.562 71.25l4.75 45.688L456.563 99c9.89-18.777 15.938-46.29 15.938-79.375zm-91.75 27.28c-10.153 21.036-16.8 40.84-20.156 58.314l18.375 57.686l19.78-34.25l-6.5-62.22h.03a277 277 0 0 0-11.53-19.53zM27.25 80.782c-.125 23.364 2.393 44.102 6.875 61.314L75.5 186.25l3.125-39.406L46 93.47l.03-.032a280 280 0 0 0-18.78-12.657zm132.844 10.532c-8.415 3.504-16.29 7.213-23.594 11.094l-39.25 45.97l-3.094 39.374l50.438-39.094c6.712-15.904 12.09-35.263 15.5-57.344m177.22 21.626c-24.024 58.09-16.16 97.86 7.873 108.5l21.157-36.625l-19.594-61.438a274 274 0 0 0-9.438-10.438zm146.03.218c-4.55-.028-8.97.084-13.28.28L414.935 138l-19.78 34.28l62.343-13.655c12.897-11.47 26.09-26.626 38.656-45.094c-4.358-.216-8.64-.348-12.812-.374zm-226.094 8.72c-23.24 23.238-38.832 46.003-45.53 65.655l16.436 42.907l34.22-27.75c4.695-20.704 3.436-48.856-5.126-80.812M16.406 159.06c3.28 62.77 27.482 95.31 53.75 94.594l3.344-42.22l-44.063-47a279 279 0 0 0-13.03-5.374zm143.22 11.375a272 272 0 0 0-18.5 4.563l-48.97 37.938l-3.312 41.75c26.492 7.51 57.16-20.567 70.78-84.25zm16.06 1.563c-4.36 22.935-5.65 43.762-4.374 61.5l32.688 51l10.22-38.188l-22.407-58.437h.03a277 277 0 0 0-16.155-15.875zm267.408 8.938l-60.563 13.218l-20.936 36.25c20.682 18.195 60.438 6.035 100.125-45.625a275 275 0 0 0-18.626-3.843m-138.688 25.53c-8.912 1.92-17.304 4.16-25.187 6.657l-46.97 38.03l-10.22 38.19l56.69-29.283c9.493-14.424 18.323-32.49 25.686-53.593zm155.125 25.063c-25.85 20.324-44.046 41.06-53.03 59.782l11.22 44.532l37.28-23.47c7.126-19.99 9.236-48.088 4.53-80.843zm-123.342 8.595c-34.435 77.573-59.394 159.06-62.97 253.03h18.72c3.558-90.792 27.573-169.428 61.312-245.436l-17.063-7.595zm-185.375 6.906c-8.173 62.347 9.714 98.713 35.687 102.75l10.97-40.874l-34.814-54.25a279 279 0 0 0-11.844-7.625zm221.75 24.532c-7.053 22.243-10.817 42.77-11.657 60.532l26.406 54.594L402 349.967l-15.28-60.687h.06c-4.3-5.848-9.033-11.76-14.217-17.717zm-302.47 1.532c-8.664 74.584-8.13 147.835 12.188 220.062h19.44c-20.877-70.772-21.764-143.02-13.064-217.906l-18.562-2.156zm219.47 11.094c-6.613.16-12.953.54-19.032 1.125L215.5 313.78l-10.844 40.408c24.69 12.23 59.938-9.82 84.906-70zm206.718 36.937c-9.072.844-17.664 2.052-25.78 3.594l-51.156 32.217l-14.688 36.657l59.75-22.313c11.14-13.193 22.055-30.075 31.875-50.155zm-157.31 22c-15.528 60.938-2.096 99.19 23.217 106.28l15.72-39.28l-28.094-58.03c-3.43-3-7.053-5.985-10.844-8.97zM183.25 368.72c-12.674 41.233-22.26 82.547-26.844 124.436h18.813c4.507-39.722 13.69-79.23 25.905-118.97l-17.875-5.467zm270 26.655l-58 21.688l-15.563 38.875c23.056 15.098 60.673-2.606 92.625-59.407a273 273 0 0 0-19.062-1.155zM356.5 469.03c-1.874 7.713-3.185 15.757-3.656 24.126h18.687c.45-6.686 1.55-13.206 3.126-19.687l-18.156-4.44z\"/>","wing-cloak":"<path fill=\"currentColor\" d=\"M254.22 19.78c-8.89 0-17.316 4.814-24.064 14.032c-6.748 9.22-11.28 22.648-11.28 37.657c0 15.007 4.532 28.437 11.28 37.655s15.174 14.03 24.063 14.03s17.313-4.812 24.06-14.03c6.75-9.218 11.283-22.648 11.283-37.656c0-15.01-4.534-28.44-11.282-37.657c-6.747-9.22-15.172-14.032-24.06-14.032zm-71 80.564c-3.742.026-7.026 1.21-9.532 3.72h-.032c-15.052 15.07 13.468 37.41 3.97 77.06c-15.963 66.63-95.553 120.79-159.22 151.75c25.314 24.212 73.335-.004 113.47-37.843c-27.484 36.044-59.557 67.277-89.564 94.095c37.994 20.533 88.767-26.55 124.094-86.25c-24.198 53.547-58.515 101.02-90.812 141.563c45.916 15.528 92.305-48.115 118.875-121.25c-13.033 61.304-35.024 119.312-57.22 170.25c98.32 7.795 132.337-254.94 88.656-355.063c-10.166-23.302-29.326-38.127-42.687-38.03zm141.968 0c-13.36-.096-32.522 14.73-42.688 38.03c-43.68 100.123-9.694 362.86 88.625 355.063c-22.196-50.937-44.187-108.945-57.22-170.25c26.57 73.136 72.992 136.78 118.908 121.25c-32.298-40.543-66.646-88.015-90.844-141.562c35.326 59.7 86.13 106.783 124.124 86.25c-30.007-26.818-62.11-58.05-89.594-94.094c40.134 37.84 88.186 62.056 113.5 37.845c-63.666-30.96-143.288-85.12-159.25-151.75c-9.5-39.652 19.02-61.99 3.97-77.063c-2.508-2.51-5.79-3.692-9.533-3.718z\"/>","wizard-staff":"<path fill=\"currentColor\" d=\"M335.656 19.53c-24.51.093-48.993 5.235-71.062 15.626c-22.46 10.577-43.112 34.202-58.375 62.563c-15.264 28.36-25.182 61.262-27.69 88.75c-7.487 82.112-51.926 155.352-159.78 252.56l-.188 21.44C89.216 403.443 139.915 346.632 176.313 290l.063.03c-9.293 32.473-22.623 63.18-43.594 87.97c-31.47 35.584-69.222 71.1-114.468 106.53l-.062 8.25l25 .064h.47l1.28-1.156c24.405-16.498 48.607-31.488 72.594-41.5l.187.187l-46.436 42.5l28.937.063c48.372-41.685 94.714-90.58 129.626-137c33.587-44.658 56.02-87.312 60.688-116.844c-1.268-2.32-2.552-4.628-3.656-7.094c-18.833-42.06-4.273-96.424 40.218-116.063c32.73-14.45 74.854-3.165 90.438 31.344c.15.333.324.634.47.97c13.302 24.062 6.175 49.48-9.345 61.97c-7.866 6.328-18.442 9.528-28.75 6.56c-10.31-2.966-19.043-11.772-24.5-25.124l17.28-7.062c3.992 9.764 8.667 13.15 12.375 14.22c3.708 1.066 7.767.148 11.875-3.158c8.216-6.61 14.282-21.91 4.406-39.03l-.28-.47l-.22-.5c-10.7-24.82-41.96-33.333-66.22-22.625c-34.063 15.037-45.594 58.052-30.686 91.345c20.527 45.846 77.97 61.177 122.375 40.875c60.157-27.5 80.13-103.328 53.094-161.813c-24.737-53.503-81.41-82.484-138.908-83.843c-1.633-.04-3.272-.07-4.906-.063zm-25.75 26.72c3.238.035 6.363.348 9.406.906c10.343 1.898 19.946 6.753 29.032 13.25c-30.623-5.437-58.324 4.612-80.78 24.782c-22.44 20.152-39.16 50.59-45.783 84.718c-4.655-11.358-7.166-21.462-6.686-31.72c.296-6.343 1.715-12.956 4.78-20.217c9.094-18.016 21.032-33.946 35.22-46.69c7.824-7.026 16.39-13.07 25.53-17.905c10.932-5.212 20.522-7.22 29.282-7.125zm122.938 62.313c22.583 13.167 34.365 41.86 32.937 70.656c-.564 11.395-3.466 22.975-8.905 33.624c-12.48 18.937-35.53 25.51-49.97 20.875l-.092-.25c27.943-10.365 39.18-32.377 40.312-55.19c.124-2.5.115-4.994-.03-7.468c1.447-13.31-.412-28.793-5.47-43.437c-2.244-6.496-5.15-12.89-8.844-18.72l.064-.093zm-135.563 1.312c-20.97 19.342-29.406 35.252-33.25 51.25c-3.848 16.023-2.788 32.84-2.905 52.875c-.14 23.79-2.56 51.542-18.438 85.688c-.005.012-.025.018-.03.03c-21.095 26.753-45.276 52.25-68.907 67.376l-.063-.03c64.195-71.545 68.527-114.792 68.75-153.19c.112-19.197-1.253-37.594 3.438-57.124a98 98 0 0 1 2-7.125h.03c8.098-17.036 16.572-26.058 25.47-31.563c7.18-4.44 15.035-6.697 23.906-8.187z\"/>"};</script>
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s);
+const ic=(n,c='')=>`<svg class="${c}" viewBox="0 0 512 512">${ICONS[n]||''}</svg>`;
+document.querySelectorAll('[data-i]').forEach(e=>{if(e.tagName==='svg')e.innerHTML=ICONS[e.dataset.i];else e.innerHTML=ic(e.dataset.i);});
+const fmt=n=>{n=Math.floor(n);if(n<10000)return ''+n;const u=['k','M','B','T','Qa','Qi'];let i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++;}return n.toFixed(n<10?2:n<100?1:0)+u[i];};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ================= DONNÉES ================= */
+const BT={
+ hall:{n:"Hôtel de ville",i:'castle',d:"Cœur du royaume : son niveau débloque bâtiments, plafonds et nouveautés."},
+ farm:{n:"Ferme",i:'wheat',d:"Les champs poussent puis se récoltent : la nourriture paie les recrues et les rations.",cost:60,res:'gold',max:4,req:1},
+ mine:{n:"Mine d'or",i:'gold-mine',d:"Extrait l'or des collines pour bâtir et recruter.",cost:80,res:'food',max:3,req:1},
+ barracks:{n:"Caserne",i:'barracks',d:"+10 places d'armée par niveau.",cost:160,res:'gold',max:2,req:1},
+ tavern:{n:"Taverne des mercenaires",i:'beer-stein',d:"Recrute des mercenaires. Chaque niveau réduit leur prix de 8 %.",cost:200,res:'gold',max:1,req:1},
+ nest:{n:"Nid de dragon",i:'nest-eggs',d:"Abrite le dragon. Son niveau fixe le plafond de croissance (×5).",cost:200,res:'food',max:1,req:2},
+};
+const TR={
+ lancier:{n:"Lancier",tag:'tank',tg:'Tank',r:"Encaisse en première ligne, réduit les pertes",i:'spears',pw:5,g:18,f:8,col:0x4f74b8},
+ archer:{n:"Archère",tag:'dist',tg:'Distance',r:"Tire par-dessus la mêlée",i:'bowman',pw:7,g:26,f:6,col:0x3f8a3a},
+ berserk:{n:"Berserker",tag:'choc',tg:'Choc',r:"Dégâts énormes, aucune peur",i:'barbarian',pw:16,g:60,f:22,col:0xb03a22,u:'berserk'},
+ mage:{n:"Mage de braise",tag:'siege',tg:'Siège',r:"×2 puissance contre forteresses et fiefs",i:'wizard-staff',pw:24,g:140,f:30,col:0x8a44c8,u:'wall'},
+ assassin:{n:"Assassin du Voile",tag:'pil',tg:'Pillage',r:"+4 % de butin chacun",i:'hooded-assassin',pw:14,g:110,f:20,col:0x2a2a38,u:'assassin'},
+};
+const CAMPS=[
+ {id:'gob',n:"Campement gobelin",i:'goblin-head',base:22,pb:14,x:14,z:-3},
+ {id:'brig',n:"Repaire des brigands",i:'hooded-assassin',base:62,pb:22,x:-2,z:-15},
+ {id:'riv',n:"Fief rival · Maison Corvane",i:'tower-flag',base:150,pb:40,x:-15,z:4,fort:1},
+ {id:'ogre',n:"Forteresse des Ogres",i:'ogre',base:520,pb:90,x:7,z:14,fort:1,u:'ogres'},
+];
+const SLOTS={griffes:{n:'Griffes',i:'claw',st:'puissance du dragon'},armure:{n:'Armure',i:'dragon-shield',st:'puissance du dragon'},ailes:{n:'Ailes',i:'wing-cloak',st:"puissance de l'armée"},couronne:{n:'Couronne',i:'crown',st:'butin'}};
+const INAMES={griffes:["Griffes de silex","Serres d'acier","Griffes runiques"],armure:["Écailles de bronze","Plastron runique","Carapace d'obsidienne"],ailes:["Voilure de cuir","Ailes d'orage","Ailes de tempête"],couronne:["Diadème terni","Couronne d'ambre","Couronne des rois"]};
+const SPECIAL={griffes:{n:"Griffes de magma",t:"Les camps vaincus brûlent : +50 % butin et points"},armure:{n:"Écaille d'ombre",t:"Un clone d'ombre du dragon combat à ses côtés (+70 %)"},ailes:{n:"Ailes de cendre",t:"Le dragon part chasser seul toutes les 20 s"},couronne:{n:"Couronne du percepteur",t:"Récolte automatiquement toutes les bulles"}};
+const RAR=['Commun','Rare','Épique','Légendaire'];
+const LEAGUE=[['Bronze III',0],['Bronze II',50],['Bronze I',120],['Argent III',200],['Argent II',300],['Argent I',420],['Or III',560],['Or II',720],['Or I',900],['Platine III',1100],['Platine II',1350],['Platine I',1650],['Diamant III',2000],['Diamant II',2400],['Diamant I',2850],['Maître III',3350],['Maître II',3900],['Maître I',4500]];
+function league(pb){let k=0;for(let i=0;i<LEAGUE.length;i++)if(pb>=LEAGUE[i][1])k=i;if(pb>=5200){const s=1+Math.floor((pb-5200)/800);return{n:'Légende ★'+s,next:5200+s*800,k:18+s};}return{n:LEAGUE[k][0],next:k<17?LEAGUE[k+1][1]:5200,k};}
+const STAGES=[[1,'Dragonnet'],[5,'Drake'],[12,'Wyrm'],[25,'Ancien']];
+const stageOf=l=>{let s=0;STAGES.forEach((x,i)=>{if(l>=x[0])s=i;});return s;};
+
+/* ================= ÉTAT ================= */
+const KEY='fiefs-de-braise-v1';
+function fresh(){
+ const cells=Array(25).fill(null);
+ cells[12]={t:'hall',lvl:1};cells[11]={t:'farm',lvl:1,st:6};cells[13]={t:'mine',lvl:1,st:4};cells[17]={t:'tavern',lvl:1};
+ return{gold:150,food:120,pb:0,hall:1,cells,army:{lancier:3,archer:0,berserk:0,mage:0,assassin:0},
+  dragon:{st:'none',lvl:0,xp:0,warm:0},inv:[],eq:{griffes:null,armure:null,ailes:null,couronne:null},
+  camps:{gob:{lvl:1,dead:0},brig:{lvl:1,dead:0},riv:{lvl:1,dead:0},ogre:{lvl:1,dead:0}},
+  wins:0,q:0,wall:0,unl:{},st:{collect:0,recruit:0,ogre:0},iid:1,
+  rivals:[['Les Lames Grises',30],['Clan Ossepierre',65],['Maison Corvane',95],['Ordre du Givre',140],["Baronnie d'Ystre",185],['Les Crocs Rouges',240],['Fief de Varn',310],['Compagnie Noire-Aile',390],['Dame Elsine',520]]};
+}
+let S=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&o.cells)S=Object.assign(fresh(),o);}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+const count=t=>S.cells.filter(c=>c&&c.t===t).length;
+const findCell=t=>S.cells.findIndex(c=>c&&c.t===t);
+const rateOf=c=>c.t==='farm'?3*Math.pow(1.6,c.lvl-1):c.t==='mine'?2.6*Math.pow(1.6,c.lvl-1):0;
+const capOf=c=>rateOf(c)*30;
+const armyN=()=>Object.values(S.army).reduce((a,b)=>a+b,0);
+const armyCap=()=>{let c=12+S.hall*4;S.cells.forEach(x=>{if(x&&x.t==='barracks')c+=10*x.lvl;});return c;};
+const tavLvl=()=>{const i=findCell('tavern');return i<0?0:S.cells[i].lvl;};
+const nestLvl=()=>{const i=findCell('nest');return i<0?0:S.cells[i].lvl;};
+const eqBonus=k=>{let s=0;Object.entries(S.eq).forEach(([sl,it])=>{if(it&&SLOTS[sl].st===k)s+=it.v;});return s/100;};
+const hasSpec=sl=>S.eq[sl]&&S.eq[sl].sp;
+const dragonAlive=()=>S.dragon.st==='alive';
+function dragonPower(){if(!dragonAlive())return 0;const l=S.dragon.lvl;let p=12*Math.pow(l,1.35)*(1+eqBonus('puissance du dragon'));if(hasSpec('armure'))p*=1.7;if(l>30)p*=1+0.03*(l-30);return p;}
+function armyPower(cid){const fort=cid&&CAMPS.find(c=>c.id===cid).fort;let p=0;for(const k in S.army)p+=S.army[k]*TR[k].pw*(k==='mage'&&fort?2:1);return p*(1+eqBonus("puissance de l'armée")+S.wall*0.08);}
+const campDef=id=>CAMPS.find(c=>c.id===id);
+const campPower=id=>campDef(id).base*Math.pow(1.5,S.camps[id].lvl-1);
+const lootMult=()=>1+eqBonus('butin')+S.army.assassin*0.04+(hasSpec('griffes')?0.5:0);
+const troopUnlocked=k=>!TR[k].u||S.unl[TR[k].u];
+const trCost=k=>{const m=1-0.08*(tavLvl()-1);return[Math.ceil(TR[k].g*m),Math.ceil(TR[k].f*m)];};
+const buildCost=t=>Math.round(BT[t].cost*Math.pow(1.9,count(t)));
+const upCost=c=>c.t==='hall'?[Math.round(220*Math.pow(3.2,S.hall-1)),'gold']:[Math.round(BT[c.t].cost*1.4*Math.pow(2.1,c.lvl-1)),BT[c.t].res];
+const wallCost=()=>Math.round(700*Math.pow(2.4,S.wall));
+const feedCost=()=>Math.round(30*Math.pow(1.28,S.dragon.lvl));
+
+/* ================= THREE ================= */
+const stage=$('#stage'),cv=$('#cv'),ov=$('#ov');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+renderer.setPixelRatio(Math.min(1.5,window.devicePixelRatio||1));
+const FOG=0x4a3048;
+renderer.setClearColor(FOG);
+const scene=new THREE.Scene();
+scene.fog=new THREE.Fog(FOG,50,92);
+const cam=new THREE.OrthographicCamera(-1,1,1,-1,1,200);
+const camT=new THREE.Vector3(0,0,0);let viewH=20,SW=400,SH=430;
+function placeCam(){cam.position.set(camT.x+28,30,camT.z+28);cam.lookAt(camT);}
+function resize(){SW=stage.clientWidth;SH=stage.clientHeight;renderer.setSize(SW,SH,false);const a=SW/SH;cam.left=-viewH*a/2;cam.right=viewH*a/2;cam.top=viewH/2;cam.bottom=-viewH/2;cam.updateProjectionMatrix();placeCam();}
+scene.add(new THREE.HemisphereLight(0xffd6a8,0x2c3458,0.62));
+const sun=new THREE.DirectionalLight(0xffa860,1.05);sun.position.set(-25,22,12);scene.add(sun);
+const rim=new THREE.DirectionalLight(0x8a7cff,0.25);rim.position.set(20,10,-20);scene.add(rim);
+
+const MC={},GC={};
+const mat=(c,o={})=>{const k=c+JSON.stringify(o);return MC[k]||(MC[k]=new THREE.MeshPhongMaterial(Object.assign({color:c,flatShading:true,shininess:6},o)));};
+const G=(k,f)=>GC[k]||(GC[k]=f());
+function M(geo,m,x=0,y=0,z=0){const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);return o;}
+const box=(w,h,d,c,x,y,z)=>M(G(`b${w},${h},${d}`,()=>new THREE.BoxGeometry(w,h,d)),mat(c),x,y,z);
+const cyl=(a,b,h,c,s,x,y,z)=>M(G(`c${a},${b},${h},${s}`,()=>new THREE.CylinderGeometry(a,b,h,s)),mat(c),x,y,z);
+const cone=(r,h,c,s,x,y,z)=>M(G(`k${r},${h},${s}`,()=>new THREE.ConeGeometry(r,h,s)),mat(c),x,y,z);
+const rock=(r,c,x,y,z)=>M(G(`r${r}`,()=>new THREE.DodecahedronGeometry(r,0)),mat(c),x,y,z);
+// ombre simulée
+const shTex=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,2,32,32,31);gr.addColorStop(0,'rgba(0,0,0,.55)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);})();
+const shMat=new THREE.MeshBasicMaterial({map:shTex,transparent:true,depthWrite:false});
+function blob(s,g){const m=M(G('sh',()=>new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2)),shMat,s*0.18,0.04,-s*0.08);m.scale.set(s,1,s*0.8);g.add(m);return m;}
+
+// Eau animée
+const wGeo=new THREE.PlaneGeometry(150,150,34,34).rotateX(-Math.PI/2);
+const water=new THREE.Mesh(wGeo,new THREE.MeshPhongMaterial({color:0x1f7a8c,flatShading:true,shininess:70,specular:0xffb070,transparent:true,opacity:.92}));
+water.position.y=-0.9;scene.add(water);
+const wPos=wGeo.attributes.position;
+// Île
+const isl=new THREE.CylinderGeometry(20,22.5,4,22,1);
+{const p=isl.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),a=Math.atan2(z,x),f=1+0.07*Math.sin(a*3)+0.05*Math.cos(a*5+1);p.setX(i,x*f);p.setZ(i,z*f);}isl.computeVertexNormals();}
+const island=M(isl,mat(0x6d9a3e),0,-2,0);scene.add(island);
+const sand=M(new THREE.CylinderGeometry(22.8,24.5,1.6,22,1),mat(0xd9b77a),0,-1.25,0);scene.add(sand);
+const cliff=M(new THREE.CylinderGeometry(23.5,19,5,22,1),mat(0x6a5446),0,-4.4,0);scene.add(cliff);
+// parcelles
+const plotGroup=new THREE.Group();scene.add(plotGroup);
+for(let i=0;i<25;i++){const p=cellPos(i);const t=box(2.75,0.08,2.75,(i+Math.floor(i/5))%2?0x7fa84a:0x77a044,p.x,0.02,p.z);plotGroup.add(t);}
+const path=box(1,0.05,13,0xb89a6a,0,0.03,0);path.visible=false;
+// décor : arbres, rochers, herbe
+const rng=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647;})();
+const trees=[];
+for(let n=0;n<70;n++){const a=rng()*Math.PI*2,r=9.5+rng()*7.5;const x=Math.cos(a)*r,z=Math.sin(a)*r;if(CAMPS.some(c=>Math.hypot(c.x-x,c.z-z)<4.5))continue;
+ const g=new THREE.Group();g.position.set(x,0,z);const s=0.7+rng()*0.7;g.scale.setScalar(s);
+ if(rng()<0.6){g.add(cyl(0.12,0.16,0.8,0x6a4528,5,0,0.4,0));g.add(cone(0.75,1.5,rng()<.5?0x2f6a32:0x3d7a35,6,0,1.4,0));g.add(cone(0.55,1.1,0x4a8a3a,6,0,2.1,0));}
+ else{g.add(cyl(0.12,0.16,0.9,0x6a4528,5,0,0.45,0));g.add(rock(0.75,rng()<.5?0xc86a2a:0x9aa83a,0,1.35,0));}
+ blob(2,g);g.rotation.y=rng()*6;scene.add(g);trees.push(g);}
+for(let n=0;n<40;n++){const a=rng()*Math.PI*2,r=8.5+rng()*9;const x=Math.cos(a)*r,z=Math.sin(a)*r;if(CAMPS.some(c=>Math.hypot(c.x-x,c.z-z)<3.5))continue;const o=rng()<.4?rock(0.3+rng()*0.4,0x8a8478,x,0.1,z):cone(0.12,0.4,0x8ac04a,3,x,0.2,z);o.rotation.y=rng()*6;scene.add(o);}
+
+function cellPos(i){return new THREE.Vector3((i%5-2)*3,0,(Math.floor(i/5)-2)*3);}
+
+/* ---- Modèles de bâtiments ---- */
+function roofPrism(w,d,h,c){const g=G(`pr${w},${d},${h}`,()=>{const s=new THREE.CylinderGeometry(0.01,1,1,4,1);s.rotateY(Math.PI/4);return s;});const m=M(g,mat(c));m.scale.set(w*0.72,h,d*0.72);return m;}
+function makeBuilding(c){
+ const g=new THREE.Group(),L=c.t==='hall'?S.hall:c.lvl,R={g};
+ if(c.t==='hall'){
+  g.add(box(2.6,0.5,2.6,0x8c8578,0,0.25,0));
+  const h=1.3+L*0.25;g.add(box(1.6,h,1.6,0xe8d8b8,0,0.5+h/2,0));
+  const roof=roofPrism(2,2,1.2,0xb83a2a);roof.position.y=0.5+h+0.6;g.add(roof);
+  const tw=[[-1,-1],[1,1],[1,-1],[-1,1]].slice(0,Math.min(4,L+1));
+  tw.forEach(([x,z])=>{const th=1.2+L*0.3;g.add(cyl(0.32,0.38,th,0xd8c8a8,7,x*1.05,0.5+th/2,z*1.05));g.add(cone(0.45,0.8,0x3a5ab0,7,x*1.05,0.5+th+0.4,z*1.05));});
+  if(L>=3)g.add(box(1.7,0.15,1.7,0xf0c040,0,0.5+h,0));
+  g.add(box(0.06,1.1,0.06,0x553322,0,0.5+h+1.5,0));
+  R.flag=box(0.6,0.35,0.03,0xff6a2b,0.3,0.5+h+1.85,0);g.add(R.flag);
+  g.add(box(0.5,0.7,0.1,0x4a2a18,0,0.85,0.81));blob(4,g);
+ }else if(c.t==='farm'){
+  g.add(box(2.6,0.14,1.5,0x6a4426,0,0.07,0.55));
+  R.wm=mat(0x6aa84f).clone();R.wheat=[];
+  const n=Math.min(18,8+L*2);for(let k=0;k<n;k++){const w=M(G('wh',()=>new THREE.ConeGeometry(0.13,0.7,4).translate(0,0.35,0)),R.wm,-1.1+(k%6)*0.44,0.14,0.15+Math.floor(k/6)*0.4);R.wheat.push(w);g.add(w);}
+  g.add(box(1.0,0.7,0.8,0xa8382a,-0.7,0.35,-0.75));const rf=roofPrism(1.1,0.9,0.5,0x5a3a2a);rf.position.set(-0.7,0.95,-0.75);g.add(rf);
+  g.add(box(0.3,0.4,0.05,0xf0e0c0,-0.7,0.3,-0.33));
+  if(L>=2)for(let k=0;k<6;k++)g.add(box(0.06,0.35,0.06,0x8a6a40,-1.3+k*0.52,0.17,1.35));
+  if(L>=3){g.add(cyl(0.18,0.28,1.6,0xe0d0b0,6,0.8,0.8,-0.8));R.blades=new THREE.Group();R.blades.position.set(0.8,1.5,-0.55);for(let k=0;k<4;k++){const b=box(0.12,0.9,0.03,0xf5ecd8,0,0.45,0);const p=new THREE.Group();p.add(b);p.rotation.z=k*Math.PI/2;R.blades.add(p);}g.add(R.blades);}
+  blob(3.4,g);
+ }else if(c.t==='mine'){
+  const m1=rock(1.1,0x8a7f72,-0.3,0.5,-0.4);m1.scale.set(1.2,0.8+L*0.08,1);g.add(m1);g.add(rock(0.7,0x77706a,0.8,0.35,-0.7));
+  g.add(box(0.7,0.8,0.3,0x221812,-0.1,0.4,0.45));g.add(box(0.9,0.1,0.35,0x7a5230,-0.1,0.85,0.48));g.add(box(0.1,0.85,0.1,0x7a5230,-0.5,0.42,0.6));g.add(box(0.1,0.85,0.1,0x7a5230,0.3,0.42,0.6));
+  g.add(box(0.6,0.3,0.4,0x5a4030,0.7,0.25,0.75));R.nug=new THREE.Group();R.nug.position.set(0.7,0.42,0.75);
+  for(let k=0;k<5+L;k++){const n=M(G('ng',()=>new THREE.IcosahedronGeometry(0.11,0)),mat(0xffcc33,{emissive:0x553300,shininess:80}),rnd(-0.22,0.22),rnd(0,0.12),rnd(-0.14,0.14));R.nug.add(n);}g.add(R.nug);
+  if(L>=2){g.add(cyl(0.04,0.04,1,0x553322,4,-0.75,0.5,0.6));g.add(M(G('lamp',()=>new THREE.SphereGeometry(0.1,6,4)),new THREE.MeshBasicMaterial({color:0xffb040}),-0.75,1.05,0.6));}
+  blob(3.2,g);
+ }else if(c.t==='barracks'){
+  g.add(box(2.4,0.9,1.4,0x9a8a70,0,0.45,-0.3));const rf=roofPrism(2.5,1.5,0.6,0x3a2f40);rf.position.set(0,1.2,-0.3);g.add(rf);
+  if(L>=2){g.add(box(1.2,0.7,1.1,0xa89878,0,1.3,-0.3));const r2=roofPrism(1.3,1.2,0.5,0x3a2f40);r2.position.set(0,1.9,-0.3);g.add(r2);}
+  [-0.9,0.9].forEach(x=>{g.add(box(0.05,1.3,0.05,0x553322,x,0.65,0.7));g.add(box(0.35,0.5,0.03,0xb03030,x+0.18,1.05,0.7));});
+  g.add(cyl(0.08,0.08,0.7,0x8a6a40,5,0.2,0.35,0.9));g.add(box(0.4,0.1,0.1,0x8a6a40,0.2,0.55,0.9));blob(3.4,g);
+ }else if(c.t==='tavern'){
+  const h=0.9+L*0.2;g.add(box(1.9,h,1.5,0xe6d2a8,0,h/2,-0.1));
+  [-0.9,0.9].forEach(x=>g.add(box(0.1,h,1.55,0x5a3a22,x,h/2,-0.1)));g.add(box(1.95,0.1,1.55,0x5a3a22,0,h,-0.1));
+  const rf=roofPrism(2.2,1.8,0.9,0x7a4a2a);rf.position.set(0,h+0.45,-0.1);g.add(rf);
+  g.add(box(0.25,0.9,0.25,0x6a6058,0.55,h+0.6,-0.4));R.chim=new THREE.Vector3(0.55,h+1.1,-0.4);
+  g.add(box(0.4,0.6,0.05,0x3a2414,0,0.3,0.66));g.add(box(0.05,0.5,0.05,0x553322,0.95,0.9,0.8));g.add(box(0.45,0.3,0.04,0xf0b040,1.15,0.75,0.8));
+  g.add(cyl(0.18,0.18,0.35,0x8a5a2a,7,-0.7,0.17,0.85));blob(3.2,g);
+ }else if(c.t==='nest'){
+  for(let k=0;k<7;k++){const a=k/7*Math.PI*2;g.add(rock(0.35+(k%2)*0.12,0x6a625a,Math.cos(a)*1.05,0.2,Math.sin(a)*1.05));}
+  const t=M(G('tor',()=>new THREE.TorusGeometry(0.75,0.25,5,10).rotateX(Math.PI/2)),mat(0xb08a3a),0,0.25,0);g.add(t);
+  if(L>=2)g.add(cyl(1.4,1.5,0.15,0x5a4a3a,8,0,0.07,0));
+  if(L>=3)[[-1.1,-1.1],[1.1,-1.1]].forEach(([x,z])=>{g.add(cyl(0.12,0.16,1.6,0x777068,5,x,0.8,z));g.add(M(G('br',()=>new THREE.SphereGeometry(0.15,6,4)),new THREE.MeshBasicMaterial({color:0xff8a2a}),x,1.7,z));});
+  blob(3.4,g);
+ }
+ return R;
+}
+
+/* ---- Camps ---- */
+function makeCamp(def){
+ const g=new THREE.Group(),R={g};
+ if(def.id==='gob'){
+  [[-1,-0.6],[0.9,-0.8],[0,0.9]].forEach(([x,z],k)=>{g.add(cone(0.85,1.3,k%2?0x6a7a3a:0x8a6a3a,4,x,0.65,z));});
+  for(let k=0;k<10;k++){const a=k/10*Math.PI*2;const s=cone(0.1,0.7,0x7a5a3a,4,Math.cos(a)*2,0.35,Math.sin(a)*2);g.add(s);}
+  g.add(cyl(0.12,0.12,1.6,0x5a3a22,5,1.4,0.8,0.8));g.add(box(0.4,0.4,0.4,0x3a6a2a,1.4,1.7,0.8));
+  R.fire=cone(0.25,0.5,0xff7a20,5,0,0.25,0);R.fire.material=new THREE.MeshBasicMaterial({color:0xff8a20});g.add(R.fire);
+ }else if(def.id==='brig'){
+  g.add(box(1.6,1,1.2,0x7a5a3a,-0.5,0.5,0));const rf=roofPrism(1.8,1.4,0.6,0x4a3020);rf.position.set(-0.5,1.3,0);g.add(rf);
+  [[-0.8,-0.8],[0.8,-0.8],[0.8,0.6],[-0.8,0.6]].forEach(([x,z])=>g.add(box(0.1,2,0.1,0x5a3a22,x+1.2,1,z*0.5)));
+  g.add(box(1,0.15,0.8,0x6a4a2a,1.2,2,0));g.add(box(0.5,0.5,0.5,0x8a6a40,0.6,0.25,1));g.add(box(0.4,0.4,0.4,0x8a6a40,1.1,0.2,1.2));
+  R.fire=cone(0.22,0.4,0xff7a20,5,-0.2,0.2,1.1);R.fire.material=new THREE.MeshBasicMaterial({color:0xff8a20});g.add(R.fire);
+ }else if(def.id==='riv'){
+  g.add(box(2.2,1.2,2.2,0x8a8090,0,0.6,0));g.add(box(1.2,1.2,1.2,0xa098a8,0,1.8,0));
+  [[-1,-1],[1,1],[1,-1],[-1,1]].forEach(([x,z])=>{g.add(cyl(0.3,0.35,2,0x9a90a0,6,x*1.1,1,z*1.1));g.add(cone(0.42,0.7,0x5a2a8a,6,x*1.1,2.35,z*1.1));});
+  g.add(box(0.05,1,0.05,0x333333,0,2.9,0));g.add(box(0.5,0.3,0.03,0x8a3ad8,0.25,3.2,0));
+ }else{
+  g.add(box(3.2,1.6,3.2,0x3a3036,0,0.8,0));g.add(box(2,1.6,2,0x4a3a40,0,2.4,0));
+  [[-1,-1],[1,1],[1,-1],[-1,1]].forEach(([x,z])=>{g.add(cyl(0.45,0.55,3,0x2e262a,6,x*1.6,1.5,z*1.6));const s=cone(0.55,1,0x6a1a1a,5,x*1.6,3.5,z*1.6);g.add(s);});
+  for(let k=0;k<8;k++){const a=k/8*Math.PI*2;const sp=cone(0.15,0.9,0x2a2228,4,Math.cos(a)*2.4,0.4,Math.sin(a)*2.4);sp.rotation.z=Math.cos(a)*0.6;sp.rotation.x=-Math.sin(a)*0.6;g.add(sp);}
+  R.fire=M(G('og',()=>new THREE.SphereGeometry(0.35,8,6)),new THREE.MeshBasicMaterial({color:0xff3010}),0,3.4,0);g.add(R.fire);
+ }
+ blob(def.fort?6:5,g);
+ return R;
+}
+function makeRuins(){const g=new THREE.Group();for(let k=0;k<6;k++){const r=rock(0.3+Math.random()*0.3,0x3a3430,rnd(-1.2,1.2),0.1,rnd(-1.2,1.2));g.add(r);}g.add(box(1.2,0.15,0.2,0x2a1a10,0.3,0.1,0.2));return g;}
+
+/* ---- Dragon ---- */
+const shadowM=new THREE.MeshBasicMaterial({color:0x2a0f50,transparent:true,opacity:.55});
+function makeDragon(lvl,shadow){
+ const st=stageOf(lvl),g=new THREE.Group(),body=new THREE.Group();g.add(body);
+ const C=[0xd8502a,0xc8402a,0xa82a2a,0x7a1424][st],Bc=[0xffc070,0xf0a050,0xe08a40,0xd8a040][st],Wc=[0xa83a22,0x8a2a1e,0x6a1a1a,0x3a0a14][st],Hc=st>=3?0xf0c040:0x2a1a1a;
+ const m=c=>shadow?shadowM:mat(c),mw=shadow?shadowM:mat(Wc,{side:THREE.DoubleSide});
+ const b=M(G('ds',()=>new THREE.SphereGeometry(0.6,8,6)),m(C),0,0.75,0);b.scale.set(0.9,0.75,1.35);body.add(b);
+ const bl=M(G('ds',()=>new THREE.SphereGeometry(0.6,8,6)),m(Bc),0,0.6,0.1);bl.scale.set(0.7,0.55,1.1);body.add(bl);
+ const nk=cyl(0.17,0.27,0.8,C,6,0,1.15,0.75);nk.rotation.x=0.7;if(shadow)nk.material=shadowM;body.add(nk);
+ const head=new THREE.Group();head.position.set(0,1.5,1.1);body.add(head);
+ [[box(0.46,0.36,0.6,C,0,0,0)],[box(0.32,0.22,0.4,C,0,-0.05,0.42)],[box(0.3,0.06,0.3,Bc,0,-0.17,0.4)]].forEach(([o])=>{if(shadow)o.material=shadowM;head.add(o);});
+ [-0.14,0.14].forEach(x=>{const h=cone(0.07,0.42,Hc,4,x,0.25,-0.2);h.rotation.x=-0.8;if(shadow)h.material=shadowM;head.add(h);head.add(M(G('eye',()=>new THREE.BoxGeometry(0.08,0.06,0.04)),new THREE.MeshBasicMaterial({color:shadow?0xb070ff:0xffe060}),x*1.3,0.07,0.22));});
+ let tz=-0.75,tr=0.26;const tail=new THREE.Group();body.add(tail);
+ for(let k=0;k<3;k++){const t=cone(tr,0.85,C,5,0,0.7-k*0.08,tz);t.rotation.x=-Math.PI/2;if(shadow)t.material=shadowM;tail.add(t);tz-=0.7;tr*=0.65;}
+ for(let k=0;k<4;k++){const s=cone(0.08,0.28,Hc,4,0,1.22-k*0.05,0.5-k*0.4);if(shadow)s.material=shadowM;body.add(s);}
+ [[-0.3,0.35],[0.3,0.35],[-0.3,-0.35],[0.3,-0.35]].forEach(([x,z])=>{const l=cyl(0.08,0.1,0.45,C,5,x,0.22,z);if(shadow)l.material=shadowM;body.add(l);});
+ const ws=new THREE.Shape();ws.moveTo(0,0);ws.lineTo(1.7,0.35);ws.lineTo(2.0,-0.15);ws.lineTo(1.35,-0.35);ws.lineTo(0.95,-0.85);ws.lineTo(0.45,-0.6);ws.lineTo(0,-0.45);
+ const wg=G('wing',()=>new THREE.ShapeGeometry(ws).rotateX(-Math.PI/2));
+ const wings=[-1,1].map(sd=>{const p=new THREE.Group();p.position.set(sd*0.32,1.05,0.25);const w=M(wg,mw);w.scale.x=sd;p.add(w);body.add(p);return p;});
+ const sc=Math.min(2.6,0.8+lvl*0.06)+st*0.08;g.scale.setScalar(sc);
+ if(!shadow)blob(2.4,g);
+ return{g,body,head,wings,tail,sc};
+}
+
+/* ---- Particules ---- */
+const PN=420,pPos=new Float32Array(PN*3),pCol=new Float32Array(PN*3),pBase=new Float32Array(PN*3),pVel=new Float32Array(PN*3),pLife=new Float32Array(PN),pMax=new Float32Array(PN),pGrav=new Float32Array(PN);
+for(let i=0;i<PN;i++)pPos[i*3+1]=-999;
+const pGeo=new THREE.BufferGeometry();pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
+const pts=new THREE.Points(pGeo,new THREE.PointsMaterial({size:7*Math.min(1.5,window.devicePixelRatio||1),sizeAttenuation:false,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+pts.frustumCulled=false;scene.add(pts);let pI=0;
+function emit(x,y,z,n,col,spd=3,up=2,life=0.8,grav=6,dir){const c=new THREE.Color(col);for(let k=0;k<n;k++){const i=pI;pI=(pI+1)%PN;pPos[i*3]=x;pPos[i*3+1]=y;pPos[i*3+2]=z;
+ if(dir){pVel[i*3]=dir.x+rnd(-spd,spd)*.3;pVel[i*3+1]=dir.y+rnd(-spd,spd)*.3;pVel[i*3+2]=dir.z+rnd(-spd,spd)*.3;}else{const a=Math.random()*6.283,s=Math.random()*spd;pVel[i*3]=Math.cos(a)*s;pVel[i*3+1]=rnd(0.3,1)*up;pVel[i*3+2]=Math.sin(a)*s;}
+ const v=rnd(0.7,1.1);pBase[i*3]=c.r*v;pBase[i*3+1]=c.g*v;pBase[i*3+2]=c.b*v;pLife[i]=pMax[i]=life*rnd(0.6,1.2);pGrav[i]=grav;}}
+function updParticles(dt){for(let i=0;i<PN;i++){if(pLife[i]<=0)continue;pLife[i]-=dt;if(pLife[i]<=0){pPos[i*3+1]=-999;pCol[i*3]=pCol[i*3+1]=pCol[i*3+2]=0;continue;}
+ pVel[i*3+1]-=pGrav[i]*dt;pPos[i*3]+=pVel[i*3]*dt;pPos[i*3+1]+=pVel[i*3+1]*dt;pPos[i*3+2]+=pVel[i*3+2]*dt;const f=pLife[i]/pMax[i];pCol[i*3]=pBase[i*3]*f;pCol[i*3+1]=pBase[i*3+1]*f;pCol[i*3+2]=pBase[i*3+2]*f;}
+ pGeo.attributes.position.needsUpdate=true;pGeo.attributes.color.needsUpdate=true;}
+// fumée (sphères)
+const puffs=[];for(let k=0;k<10;k++){const p=M(G('puff',()=>new THREE.IcosahedronGeometry(0.22,0)),new THREE.MeshLambertMaterial({color:0xcfc4bc,transparent:true,opacity:0,depthWrite:false}));p.userData.t=k/10*3;scene.add(p);puffs.push(p);}
+
+/* ================= SCÈNE ↔ ÉTAT ================= */
+const BM=[],CM={},anims=[];let dragonObj=null,shadowObj=null,eggObj=null,wallGrp=null;
+const selRing=box(2.9,0.1,2.9,0xffd060,0,0.06,0);selRing.material=new THREE.MeshBasicMaterial({color:0xffd060,transparent:true,opacity:.4,depthWrite:false});selRing.visible=false;scene.add(selRing);
+const campRing=M(new THREE.TorusGeometry(2.8,0.08,4,28).rotateX(Math.PI/2),new THREE.MeshBasicMaterial({color:0xff5a3a,transparent:true,opacity:.7}));campRing.visible=false;scene.add(campRing);
+function pop(obj,dur=0.6){obj.scale.setScalar(0.001);anims.push({o:obj,t:0,d:dur,s:obj.userData.s||1});}
+function bubbleEl(cls){const e=document.createElement('div');e.className='bubble hide '+cls;e.innerHTML=ic(cls==='food'?'wheat':'two-coins');ov.appendChild(e);return e;}
+function placeBuilding(i,animate){
+ const c=S.cells[i];if(BM[i]){scene.remove(BM[i].g);if(BM[i].bub)BM[i].bub.remove();BM[i]=null;}if(!c)return;
+ const R=makeBuilding(c),p=cellPos(i);R.g.position.copy(p);R.g.rotation.y=0;scene.add(R.g);BM[i]=R;
+ if(c.t==='farm'||c.t==='mine'){R.bub=bubbleEl(c.t==='farm'?'food':'gold');R.bub.addEventListener('pointerdown',e=>{e.stopPropagation();collect(i);});}
+ if(animate){pop(R.g);emit(p.x,0.3,p.z,30,0xd8c8a0,3,3,0.9,5);setTimeout(()=>emit(p.x,1.5,p.z,24,0xffd060,2.5,4,0.8,4),250);}
+ if(c.t==='nest')placeDragon(false);
+}
+function placeDragon(anim){
+ [dragonObj,shadowObj,eggObj].forEach(o=>o&&scene.remove(o.g||o));dragonObj=shadowObj=eggObj=null;
+ const ni=findCell('nest');if(ni<0)return;const p=cellPos(ni);
+ if(S.dragon.st==='egg'){const e=new THREE.Group();const m=M(G('egg',()=>new THREE.SphereGeometry(0.42,10,8)),new THREE.MeshPhongMaterial({color:0x6a3aa8,emissive:0x40106a,flatShading:true,shininess:60}),0,0.65,0);m.scale.y=1.3;e.add(m);
+  for(let k=0;k<5;k++){const s=M(G('esp',()=>new THREE.SphereGeometry(0.08,5,4)),new THREE.MeshBasicMaterial({color:0xffb040}),Math.cos(k*1.3)*0.36,0.5+k*0.08,Math.sin(k*1.3)*0.36);e.add(s);}
+  e.position.copy(p);scene.add(e);eggObj=e;if(anim)pop(e);}
+ if(dragonAlive()){dragonObj=makeDragon(S.dragon.lvl,false);dragonObj.g.position.set(p.x,0.25,p.z);dragonObj.g.rotation.y=Math.PI/4;dragonObj.g.userData.s=dragonObj.sc;scene.add(dragonObj.g);if(anim)pop(dragonObj.g,0.9);
+  if(hasSpec('armure')){shadowObj=makeDragon(S.dragon.lvl,true);shadowObj.g.scale.multiplyScalar(0.85);scene.add(shadowObj.g);}}
+}
+function placeCamp(id,anim){
+ const def=campDef(id);if(CM[id]){scene.remove(CM[id].g);if(CM[id].ruin)scene.remove(CM[id].ruin);}else{CM[id]={};}
+ if(def.u&&!S.unl[def.u]){if(CM[id].lbl)CM[id].lbl.remove();CM[id]={g:new THREE.Group(),hidden:true};return;}
+ const R=makeCamp(def);R.g.position.set(def.x,0,def.z);R.g.rotation.y=Math.atan2(-def.x,-def.z);scene.add(R.g);
+ R.lbl=CM[id].lbl||document.createElement('div');R.lbl.className='clabel';ov.appendChild(R.lbl);
+ R.ruin=makeRuins();R.ruin.position.copy(R.g.position);scene.add(R.ruin);
+ CM[id]=R;const dead=S.camps[id].dead>0;R.g.visible=!dead;R.ruin.visible=dead;
+ if(anim){pop(R.g,0.9);emit(def.x,0.5,def.z,60,0xff5a20,5,5,1.2,5);}
+}
+function buildWall(anim){
+ if(wallGrp)scene.remove(wallGrp);wallGrp=null;if(!S.wall)return;
+ const g=new THREE.Group(),h=0.7+S.wall*0.25,R=8.1;
+ for(let s=0;s<4;s++){for(let k=-3;k<=3;k++){if(s===3&&k===0)continue;const seg=box(2.2,h,0.45,0x9a9088,0,h/2,0);const a=s*Math.PI/2;const x=k*2.3,z=R;seg.position.set(Math.cos(a)*x-Math.sin(a)*z,h/2,Math.sin(a)*x+Math.cos(a)*z);seg.rotation.y=-a;g.add(seg);
+  if(k%3===0){const tw=cyl(0.5,0.55,h+0.8,0xaaa098,6,seg.position.x,(h+0.8)/2,seg.position.z);g.add(tw);g.add(cone(0.65,0.7,0x3a5ab0,6,seg.position.x,h+1.15,seg.position.z));}}}
+ g.userData.s=1;scene.add(g);wallGrp=g;if(anim){pop(g,0.8);emit(0,1,8,40,0xd8c8a0,6,3,1,5);}
+}
+function rebuildAll(){for(let i=0;i<25;i++)placeBuilding(i,false);CAMPS.forEach(c=>placeCamp(c.id,false));buildWall(false);placeDragon(false);}
+
+/* ================= UI : overlay ================= */
+const _v=new THREE.Vector3();
+function proj(x,y,z){_v.set(x,y,z).project(cam);return[(_v.x+1)/2*SW,(1-_v.y)/2*SH];}
+function dmgNum(x,y,z,txt,cls=''){const[px,py]=proj(x,y,z);const e=document.createElement('div');e.className='dmg '+cls;e.textContent=txt;e.style.left=px+rnd(-14,14)+'px';e.style.top=py+'px';ov.appendChild(e);setTimeout(()=>e.remove(),900);}
+const HUD={gold:$('#hGold'),food:$('#hFood'),pb:$('#hPb'),army:$('#hArmy')};
+function flyLoot(x,y,z,kind,n){const[px,py]=proj(x,y,z);const sr=stage.getBoundingClientRect(),tr=HUD[kind].getBoundingClientRect();
+ for(let k=0;k<n;k++){const e=document.createElement('div');e.className='fly';e.style.background=kind==='gold'?'radial-gradient(#fff1b8,#d39a22)':kind==='food'?'radial-gradient(#e5ffb8,#5aa82a)':'radial-gradient(#cfe2ff,#3f6fc8)';e.innerHTML=ic(kind==='gold'?'two-coins':kind==='food'?'wheat':'laurels');
+  const sx=sr.left+px-13+rnd(-20,20),sy=sr.top+py-13+rnd(-15,15);e.style.left=sx+'px';e.style.top=sy+'px';document.body.appendChild(e);
+  const a=e.animate([{transform:'translate(0,0) scale(.4)'},{transform:`translate(${rnd(-25,25)}px,${rnd(-40,-15)}px) scale(1.1)`,offset:.3},{transform:`translate(${tr.left+8-sx}px,${tr.top+2-sy}px) scale(.6)`}],{duration:750+k*70,easing:'cubic-bezier(.5,0,.6,1)'});
+  a.onfinish=()=>{e.remove();HUD[kind].classList.remove('bump');void HUD[kind].offsetWidth;HUD[kind].classList.add('bump');};}}
+let toastT;function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),1800);}
+const bq=[];let bBusy=false;
+function banner(icon,t,s){bq.push([icon,t,s]);if(!bBusy)nextBanner();}
+function nextBanner(){const b=bq.shift();if(!b){bBusy=false;return;}bBusy=true;$('#banner').innerHTML=`<div class="bn"><div class="bi">${ic(b[0])}</div><div><small>NOUVEAU !</small><b>${b[1]}</b><span>${b[2]}</span></div></div>`;setTimeout(nextBanner,3500);}
+
+/* ================= LOGIQUE ================= */
+function pay(g,f){if(S.gold<g){toast("Pas assez d'or");return false;}if(S.food<f){toast('Pas assez de nourriture');return false;}S.gold-=g;S.food-=f;return true;}
+function collect(i){const c=S.cells[i];if(!c||c.st<1)return;const p=cellPos(i);const k=c.t==='farm'?'food':'gold';const v=Math.floor(c.st);S[k]+=v;c.st=0;S.st.collect++;
+ flyLoot(p.x,1.5,p.z,k,4);emit(p.x,1.2,p.z,20,k==='food'?0xb8ff6a:0xffd040,2.5,4,0.7,6);dmgNum(p.x,2,p.z,'+'+fmt(v),'heal');if(BM[i])BM[i].bub.classList.add('hide');dirty=true;}
+function build(i,t){const T=BT[t];if(S.cells[i])return;if(S.hall<T.req)return toast(`Hôtel de ville Nv ${T.req} requis`);if(count(t)>=T.max)return toast('Limite atteinte');
+ const c=buildCost(t);if(!pay(T.res==='gold'?c:0,T.res==='food'?c:0))return;S.cells[i]={t,lvl:1,st:0};
+ if(t==='nest'&&S.dragon.st==='none')S.dragon.st='egg';placeBuilding(i,true);dirty=true;save();}
+function upgrade(i){const c=S.cells[i];if(!c)return;const[cost,res]=upCost(c);
+ if(c.t!=='hall'){const cap=c.t==='nest'?S.hall+1:S.hall*2;if(c.lvl>=cap)return toast(`Améliore l'hôtel de ville d'abord`);}
+ if(!pay(res==='gold'?cost:0,res==='food'?cost:0))return;
+ if(c.t==='hall'){S.hall++;c.lvl=S.hall;}else c.lvl++;
+ placeBuilding(i,true);dmgNum(cellPos(i).x,3,cellPos(i).z,'NIVEAU '+(c.t==='hall'?S.hall:c.lvl),'crit');dirty=true;save();}
+function recruit(k,n){if(!troopUnlocked(k))return;const room=armyCap()-armyN();if(room<=0)return toast('Armée pleine : construis une caserne');n=Math.min(n,room);const[g,f]=trCost(k);
+ const af=Math.min(n,Math.floor(S.gold/g),Math.floor(S.food/f));if(af<=0)return toast('Ressources insuffisantes');pay(g*af,f*af);S.army[k]+=af;S.st.recruit+=af;
+ const ti=findCell('tavern');if(ti>=0){const p=cellPos(ti);emit(p.x,1.2,p.z,14,TR[k].col,2,3,0.7,5);}dirty=true;save();}
+function warmEgg(){if(S.dragon.st!=='egg')return;if(!pay(0,25))return;S.dragon.warm++;const p=cellPos(findCell('nest'));emit(p.x,0.8,p.z,25,0xff8a2a,1.5,3,0.8,2);
+ if(S.dragon.warm>=3)hatch();dirty=true;}
+function hatch(){const p=cellPos(findCell('nest'));let t=0;const iv=setInterval(()=>{t++;if(eggObj){eggObj.rotation.z=Math.sin(t*1.7)*0.25*(t/12);}emit(p.x,0.9,p.z,4,0xffc040,1,2,0.5,2);
+ if(t>=14){clearInterval(iv);S.dragon.st='alive';S.dragon.lvl=1;emit(p.x,1,p.z,120,0xffb030,7,7,1.3,5);emit(p.x,1,p.z,60,0xb070ff,5,6,1.2,4);placeDragon(true);dmgNum(p.x,3,p.z,'ÉCLOSION !','crit');dirty=true;save();}},90);}
+function feed(){if(!dragonAlive())return;const cap=nestLvl()*5;if(S.dragon.lvl>=cap)return toast('Améliore le Nid pour dépasser le Nv '+cap);if(!pay(0,feedCost()))return;levelDragon(1);}
+function levelDragon(n){const before=stageOf(S.dragon.lvl);S.dragon.lvl+=n;const p=dragonObj?dragonObj.g.position:cellPos(findCell('nest'));emit(p.x,1.5,p.z,40,0xffd060,3,5,1,5);dmgNum(p.x,3.4,p.z,'Dragon Nv '+S.dragon.lvl,'crit');
+ const after=stageOf(S.dragon.lvl);if(after!==before)banner('dragon-head','Évolution : '+STAGES[after][1],'Ton dragon change de forme et de puissance');if(!battle)placeDragon(false);dirty=true;save();}
+function equip(id){if(!dragonAlive())return toast("Fais d'abord éclore ton dragon");const it=S.inv.find(x=>x.id===id);if(!it)return;S.eq[it.sl]=it;if(!battle)placeDragon(false);
+ if(it.sp)banner(SLOTS[it.sl].i,it.n,SPECIAL[it.sl].t);const p=dragonObj?dragonObj.g.position:new THREE.Vector3();emit(p.x,1.5,p.z,50,[0xaaaaaa,0x4aa3ff,0xb56cff,0xffb13b][it.r],3,5,1,4);dirty=true;save();}
+function makeItem(lvl,force){let r=force?force.r:(()=>{const x=Math.random()+lvl*0.03;return x>0.97?3:x>0.84?2:x>0.55?1:0;})();
+ const sl=force?force.sl:Object.keys(SLOTS)[Math.floor(Math.random()*4)];const sp=force?true:r===3;
+ const v=Math.round([6,13,26,42][r]*rnd(0.85,1.2)+lvl*1.5);return{id:S.iid++,sl,r,v,sp,n:sp?SPECIAL[sl].n:INAMES[sl][Math.min(2,r)]};}
+function buildWallAct(){if(S.hall<3)return;if(S.wall>=S.hall)return toast("Améliore l'hôtel de ville d'abord");if(!pay(wallCost(),0))return;S.wall++;buildWall(true);dirty=true;save();}
+
+/* ---- Combat ---- */
+let battle=null;
+const unitPool=[];
+function makeUnit(k){const g=new THREE.Group(),c=TR[k].col;g.add(cyl(0.14,0.2,0.45,c,6,0,0.28,0));g.add(M(G('hd',()=>new THREE.SphereGeometry(0.13,6,5)),mat(0xe8b890),0,0.62,0));
+ if(k==='lancier'){g.add(box(0.04,1,0.04,0x8a6a40,0.2,0.55,0.05));g.add(cone(0.06,0.18,0xdddddd,4,0.2,1.1,0.05));g.add(box(0.05,0.3,0.25,0x7a8aa8,-0.18,0.35,0.05));}
+ else if(k==='archer'){const b=M(G('bow',()=>new THREE.TorusGeometry(0.22,0.025,3,8,Math.PI)),mat(0x6a4a2a),0.2,0.45,0);b.rotation.z=-Math.PI/2;g.add(b);}
+ else if(k==='berserk'){g.add(box(0.05,0.6,0.05,0x5a3a22,0.22,0.5,0));g.add(box(0.25,0.18,0.04,0xcccccc,0.22,0.78,0));}
+ else if(k==='mage'){g.add(box(0.04,0.9,0.04,0x4a2a5a,0.22,0.45,0));g.add(M(G('orb',()=>new THREE.SphereGeometry(0.09,6,4)),new THREE.MeshBasicMaterial({color:0xff7a30}),0.22,0.95,0));g.add(cone(0.16,0.3,0x5a2a8a,5,0,0.83,0));}
+ else{g.add(cone(0.15,0.3,0x1a1a24,5,0,0.78,0));g.add(box(0.03,0.3,0.03,0xdddddd,0.18,0.4,0.1));}
+ blob(0.7,g);return g;}
+function startAttack(cid,dragonOnly){
+ if(battle)return toast('Une attaque est déjà en cours');const cs=S.camps[cid],def=campDef(cid);if(def.u&&!S.unl[def.u])return;if(cs.dead>0)return toast('Camp en reconstruction');
+ const n=dragonOnly?0:armyN();if(n===0&&!dragonAlive())return toast("Recrute des mercenaires à la taverne d'abord");
+ if(S.food<n)return toast(`Rations insuffisantes (${n} nourriture)`);S.food-=n;
+ const ap=dragonOnly?0:armyPower(cid),dp=dragonPower(),tot=ap+dp,ep=campPower(cid);const win=tot*rnd(0.92,1.08)>=ep;
+ const losses={};const tank=S.army.lancier/Math.max(1,n);for(const k in S.army){if(dragonOnly){losses[k]=0;continue;}const c=S.army[k];losses[k]=win?Math.floor(c*Math.min(0.45,0.32*ep/tot)*(1-tank*0.5)):Math.ceil(c*0.5);}
+ const home=cellPos(12),tgt=new THREE.Vector3(def.x,0,def.z),dir=tgt.clone().sub(home).normalize(),side=new THREE.Vector3(-dir.z,0,dir.x);
+ const units=[];if(!dragonOnly){const show=Math.min(16,n);const keys=[];for(const k in S.army)for(let j=0;j<Math.ceil(S.army[k]/n*show);j++)keys.push(k);keys.length=Math.min(keys.length,16);
+  keys.forEach((k,j)=>{const u=makeUnit(k);const row=Math.floor(j/4),col=j%4-1.5;const off=side.clone().multiplyScalar(col*0.6).add(dir.clone().multiplyScalar(-row*0.6));
+   const a=home.clone().add(dir.clone().multiplyScalar(2)).add(off),b=tgt.clone().sub(dir.clone().multiplyScalar(2.6+row*0.5)).add(side.clone().multiplyScalar(col*0.7));u.position.copy(a);u.rotation.y=Math.atan2(dir.x,dir.z);scene.add(u);units.push({m:u,a,b,ph:Math.random()*6,alive:true});});}
+ const dist=tgt.distanceTo(home);
+ battle={cid,def,win,losses,units,t:0,ph:'march',dur:Math.max(2.2,dist/6),dragon:dragonAlive(),tgt,dir,ep,tot,hp:1,lbl:null,dmgT:0,dpos:dragonObj?dragonObj.g.position.clone():null};
+ const hb=document.createElement('div');hb.className='hpbar';hb.innerHTML='<i style="width:100%"></i>';ov.appendChild(hb);battle.hb=hb;
+ campRing.visible=false;battle.camFrom=camT.clone();dirty=true;
+}
+function updBattle(dt){
+ const B=battle;if(!B)return;B.t+=dt;const T=B.tgt;
+ if(!pd){const goal=B.ph==='return'?B.camFrom:T.clone().multiplyScalar(0.62);camT.lerp(goal,Math.min(1,dt*2.2));placeCam();}
+ const [hx,hy]=proj(T.x,B.def.fort?4.4:3,T.z);B.hb.style.left=hx+'px';B.hb.style.top=hy+'px';
+ if(B.ph==='march'){const f=Math.min(1,B.t/B.dur);B.units.forEach(u=>{u.m.position.lerpVectors(u.a,u.b,f);u.m.position.y=Math.abs(Math.sin(B.t*11+u.ph))*0.15;});
+  if(B.dragon&&dragonObj){const s=B.dpos,e=T.clone().sub(B.dir.clone().multiplyScalar(3));const p=dragonObj.g.position;p.lerpVectors(s,e,f);p.y=0.25+Math.sin(f*Math.PI*0.5)*4;dragonObj.g.rotation.y=Math.atan2(e.x-s.x,e.z-s.z);}
+  if(f>=1){B.ph='fight';B.t=0;}}
+ else if(B.ph==='fight'){const D=2.6,f=Math.min(1,B.t/D);
+  B.units.forEach(u=>{const lunge=Math.max(0,Math.sin(B.t*9+u.ph))*0.35;u.m.position.copy(u.b).add(B.dir.clone().multiplyScalar(lunge));u.m.position.y=0;});
+  const cm=CM[B.cid];if(cm&&cm.g){cm.g.position.x=B.def.x+rnd(-0.06,0.06);cm.g.position.z=B.def.z+rnd(-0.06,0.06);}
+  B.dmgT-=dt;if(B.dmgT<=0){B.dmgT=0.13;const crit=Math.random()<0.18;const v=Math.round(B.ep*rnd(0.05,0.1)*(crit?2.2:1));dmgNum(T.x,B.def.fort?3.8:2.4,T.z,(crit?'CRIT ':'')+fmt(v),crit?'crit':'');
+   emit(T.x+rnd(-1,1),rnd(0.5,1.8),T.z+rnd(-1,1),10,crit?0xffe060:0xff7a30,3,3,0.5,6);
+   const u=B.units[Math.floor(Math.random()*B.units.length)];if(u)emit(u.m.position.x,0.7,u.m.position.z,4,0xffffff,1.5,2,0.3,4);}
+  if(B.dragon&&dragonObj){const p=dragonObj.g.position;p.y=4+Math.sin(B.t*3)*0.3;dragonObj.g.lookAt(T.x,p.y,T.z);const hd=new THREE.Vector3();dragonObj.head.getWorldPosition(hd);const v=T.clone().setY(0.8).sub(hd).multiplyScalar(1.6);
+   emit(hd.x,hd.y,hd.z,5,Math.random()<.5?0xff5a10:0xffc030,2,0,0.65,-1,v);if(shadowObj)emit(shadowObj.g.position.x,shadowObj.g.position.y+1,shadowObj.g.position.z,3,0x9a50ff,2,0,0.6,-1,v);}
+  B.hp=B.win?1-f:1-f*clamp(B.tot/B.ep,0.2,0.85);B.hb.firstChild.style.width=(B.hp*100)+'%';
+  if(f>=1)endBattle();}
+ else if(B.ph==='return'){const f=Math.min(1,B.t/1.4);B.units.forEach(u=>{if(!u.alive)return;u.m.position.lerpVectors(u.b,u.a,f);u.m.position.y=Math.abs(Math.sin(B.t*13+u.ph))*0.15;u.m.rotation.y=Math.atan2(-B.dir.x,-B.dir.z);});
+  if(B.dragon&&dragonObj){const p=dragonObj.g.position,s=B.retFrom;p.lerpVectors(s,B.dpos,f);p.y=B.dpos.y+Math.sin((1-f)*Math.PI*0.5)*4;}
+  if(f>=1){B.units.forEach(u=>scene.remove(u.m));battle=null;placeDragon(false);dirty=true;save();}}
+}
+function endBattle(){
+ const B=battle,T=B.tgt,id=B.cid,cs=S.camps[id];B.hb.remove();
+ let lost=0;for(const k in B.losses){S.army[k]=Math.max(0,S.army[k]-B.losses[k]);lost+=B.losses[k];}
+ const nDead=Math.round(B.units.length*Math.min(1,lost/Math.max(1,armyN()+lost)));
+ B.units.slice(0,nDead).forEach(u=>{u.alive=false;scene.remove(u.m);emit(u.m.position.x,0.5,u.m.position.z,8,0x888888,1.5,2,0.5,3);});
+ if(B.win){const lm=lootMult(),ep=B.ep;const g=Math.round(ep*3.2*lm),f=Math.round(ep*1.6*lm),pb=Math.round(B.def.pb*(1+0.35*(cs.lvl-1))*(hasSpec('griffes')?1.5:1));
+  S.gold+=g;S.food+=f;S.pb+=pb;S.wins++;if(id==='ogre')S.st.ogre++;
+  emit(T.x,1,T.z,110,0xff7a20,7,7,1.3,6);emit(T.x,1,T.z,50,0xffe060,5,8,1.1,6);
+  dmgNum(T.x,4,T.z,'VICTOIRE','crit');setTimeout(()=>{dmgNum(T.x,3,T.z,'+'+fmt(g)+' or');flyLoot(T.x,1.5,T.z,'gold',6);},250);setTimeout(()=>{flyLoot(T.x,1.5,T.z,'food',4);flyLoot(T.x,1.5,T.z,'pb',3);dmgNum(T.x,2.4,T.z,'+'+pb+' points de bataille','heal');},500);
+  cs.dead=14;cs.lvl++;const cm=CM[id];if(cm&&cm.g){cm.g.visible=false;cm.g.position.set(B.def.x,0,B.def.z);cm.ruin.visible=true;}
+  if(B.dragon){S.dragon.xp+=0.6+0.1*cs.lvl;const cap=nestLvl()*5;let up=0;while(S.dragon.xp>=1&&S.dragon.lvl+up<cap){S.dragon.xp-=1;up++;}if(S.dragon.lvl+up>=cap)S.dragon.xp=Math.min(S.dragon.xp,0.99);if(up)setTimeout(()=>levelDragon(up),900);}
+  let it=null;if(S.wins===2)it=makeItem(cs.lvl,{sl:'armure',r:2});else if(S.wins===5)it=makeItem(cs.lvl,{sl:'couronne',r:3});else if(S.wins===9)it=makeItem(cs.lvl,{sl:'ailes',r:3});else if(Math.random()<0.55)it=makeItem(cs.lvl);
+  if(it){S.inv.unshift(it);if(S.inv.length>24)S.inv.length=24;setTimeout(()=>{toast(`Butin : ${it.n} (${RAR[it.r]})`);if(it.sp)banner(SLOTS[it.sl].i,'Relique : '+it.n,SPECIAL[it.sl].t);},1100);markTab('dra');}
+  markTab('lig');
+ }else{dmgNum(T.x,3.5,T.z,'DÉFAITE');toast(`Défaite : ${lost} mercenaires perdus. Renforce ton armée ou ton dragon.`);const cm=CM[id];if(cm&&cm.g)cm.g.position.set(B.def.x,0,B.def.z);}
+ B.ph='return';B.t=0;if(dragonObj)B.retFrom=dragonObj.g.position.clone();dirty=true;save();
+}
+
+/* ================= QUÊTES & DÉBLOCAGES ================= */
+const QUESTS=[
+ {t:'Récolte 3 bulles au-dessus des bâtiments',c:()=>S.st.collect>=3,p:()=>Math.min(3,S.st.collect)+'/3',r:[120,0]},
+ {t:'Construis une 2e ferme (touche une parcelle libre)',c:()=>count('farm')>=2,r:[60,60]},
+ {t:'Recrute 6 mercenaires à la taverne',c:()=>S.st.recruit>=6,p:()=>Math.min(6,S.st.recruit)+'/6',r:[0,90]},
+ {t:'Pille le Campement gobelin (onglet Attaque)',c:()=>S.wins>=1,r:[150,0]},
+ {t:"Améliore l'hôtel de ville au Nv 2",c:()=>S.hall>=2,r:[80,80],h:'Débloque : Nid de dragon'},
+ {t:'Construis le Nid de dragon',c:()=>count('nest')>=1,r:[0,120]},
+ {t:"Fais éclore l'œuf (onglet Bêtes)",c:()=>dragonAlive(),r:[0,150]},
+ {t:'Remporte 3 victoires',c:()=>S.wins>=3,p:()=>Math.min(3,S.wins)+'/3',r:[300,0],h:'Débloque : Berserker'},
+ {t:'Équipe une relique sur ton dragon',c:()=>Object.values(S.eq).some(x=>x),r:[250,100]},
+ {t:'Atteins la ligue Bronze I (120 points)',c:()=>S.pb>=120,p:()=>S.pb+'/120',r:[400,0],h:'Débloque : Forteresse des Ogres'},
+ {t:"Améliore l'hôtel de ville au Nv 3",c:()=>S.hall>=3,r:[0,500],h:'Débloque : Muraille + Mage de braise'},
+ {t:'Atteins la ligue Argent III (200 points)',c:()=>S.pb>=200,p:()=>S.pb+'/200',r:[800,300],h:'Débloque : Assassin du Voile'},
+ {t:'Rase la Forteresse des Ogres',c:()=>S.st.ogre>=1,r:[2000,800]},
+];
+function curQuest(){if(S.q<QUESTS.length)return QUESTS[S.q];const L=league(S.pb);return{t:`Monte en ligue : atteins ${league(L.next).n}`,c:()=>false,p:()=>S.pb+'/'+L.next,r:[0,0],h:'Progression infinie'};}
+const UNL=[
+ {id:'nest',c:()=>S.hall>=2,i:'nest-eggs',t:'Nouveau bâtiment : Nid de dragon',s:'Construis-le sur une parcelle libre',tab:'roy'},
+ {id:'league',c:()=>S.wins>=1,i:'laurels',t:'Ligue de pillage ouverte',s:'Chaque pillage rapporte des points de bataille',tab:'lig'},
+ {id:'relic',c:()=>S.inv.length>0,i:'gem-necklace',t:'Reliques',s:'Équipe-les sur ton dragon : certaines changent les règles',tab:'dra'},
+ {id:'hatch',c:()=>dragonAlive(),i:'dragon-head',t:'Éclosion du dragon !',s:"Ta première bête. Il grandit à chaque repas et chaque pillage",tab:'dra'},
+ {id:'berserk',c:()=>S.wins>=3,i:'barbarian',t:'Nouveau mercenaire : Berserker',s:'Choc : 16 de puissance par unité',tab:'tav'},
+ {id:'ogres',c:()=>S.pb>=120,i:'ogre',t:'Nouvel ennemi : Forteresse des Ogres',s:'Elle surgit au sud-est, gardée par des brutes',tab:'att'},
+ {id:'wall',c:()=>S.hall>=3,i:'stone-wall',t:'Muraille + Mage de braise',s:"Enceinte (+8 % puissance/niv.) et mercenaire de siège",tab:'tav'},
+ {id:'assassin',c:()=>S.pb>=200,i:'hooded-assassin',t:'Nouveau mercenaire : Assassin du Voile',s:'+4 % de butin par assassin',tab:'tav'},
+];
+function checkProgress(){
+ const q=curQuest();if(S.q<QUESTS.length&&q.c()){S.gold+=q.r[0];S.food+=q.r[1];S.q++;toast('Objectif accompli ! +'+(q.r[0]?q.r[0]+' or ':'')+(q.r[1]?q.r[1]+' nourriture':''));dirty=true;}
+ UNL.forEach(u=>{if(!S.unl[u.id]&&u.c()){S.unl[u.id]=1;banner(u.i,u.t,u.s);markTab(u.tab);flashLayers();if(u.id==='ogres'){placeCamp('ogre',true);shake=1;}dirty=true;save();}});
+}
+
+/* ================= PANNEAUX ================= */
+let tab='roy',sel=-1,selCamp=null,dirty=true;
+const panel=$('#panel');let pDown=false;panel.addEventListener('pointerdown',()=>pDown=true);window.addEventListener('pointerup',()=>setTimeout(()=>pDown=false,60));window.addEventListener('pointercancel',()=>pDown=false);
+function markTab(t){if(t!==tab)document.querySelector(`#tabs [data-tab=${t}]`).classList.add('new');}
+document.querySelectorAll('#tabs button').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));b.classList.remove('new');dirty=true;}));
+const costH=(g,f)=>(g?`<span class="cost g" data-g="${g}">${ic('two-coins')}${fmt(g)}</span>`:'')+(f?` <span class="cost f" data-f="${f}">${ic('wheat')}${fmt(f)}</span>`:'');
+const btn=(act,label,g=0,f=0,cls='')=>`<button class="btn ${cls}" data-act="${act}" data-g="${g}" data-f="${f}">${label}</button>`;
+let lastPanel='';
+function render(){
+ let h='';
+ if(tab==='roy'){
+  const c=sel>=0?S.cells[sel]:null;
+  if(sel>=0&&!c){h+=`<h3>${ic('hammer-nails')}Parcelle libre — que construire ?</h3><div class="grid">`;
+   ['farm','mine','barracks','nest','tavern'].forEach(t=>{const T=BT[t],lk=S.hall<T.req,full=count(t)>=T.max;if(t==='tavern'&&full)return;const co=buildCost(t);
+    h+=`<div class="card ${lk||full?'lock':''}"><div class="ci">${ic(lk?'padlock':T.i)}</div><div class="cb"><b>${T.n}</b>${lk?`Hôtel de ville Nv ${T.req}`:full?`Max ${T.max}`:`${count(t)}/${T.max}`}<div class="row">${lk||full?'':btn('build:'+t,'Bâtir',T.res==='gold'?co:0,T.res==='food'?co:0)}${lk||full?'':costH(T.res==='gold'?co:0,T.res==='food'?co:0)}</div></div></div>`;});
+   h+='</div>';}
+  else if(c){const T=BT[c.t],L=c.t==='hall'?S.hall:c.lvl,[co,res]=upCost(c);const cap=c.t==='hall'?99:c.t==='nest'?S.hall+1:S.hall*2;
+   h+=`<h3>${ic(T.i)}${T.n} <span class="badge">Nv ${L}</span></h3><p class="sub">${T.d}</p>`;
+   if(c.t==='farm'||c.t==='mine')h+=`<p class="sub">Production : <b>${(rateOf(c)).toFixed(1)}/s</b> · stock ${Math.floor(c.st)}/${Math.floor(capOf(c))}. Prochain niveau : ${(rateOf({t:c.t,lvl:c.lvl+1})).toFixed(1)}/s${c.lvl>=2?'':' + clôture'}${c.t==='farm'&&c.lvl<3?' · moulin au Nv 3':''}</p>`;
+   if(c.t==='hall')h+=`<p class="sub">Prochain niveau : +4 places d'armée, tours supplémentaires${S.hall===1?', <b>Nid de dragon</b>':S.hall===2?', <b>Muraille</b> et <b>Mage de braise</b>':', bâtiments plus hauts'}.</p>`;
+   h+=L>=cap?`<p class="sub">Niveau max actuel — améliore l'hôtel de ville.</p>`:`<div class="row">${btn('up',ic('upgrade')+'Améliorer → Nv '+(L+1),res==='gold'?co:0,res==='food'?co:0)}${costH(res==='gold'?co:0,res==='food'?co:0)}</div>`;
+   if(c.t==='tavern')h+=`<div class="row">${btn('tab:tav','Ouvrir la taverne',0,0,'blue')}</div>`;if(c.t==='nest')h+=`<div class="row">${btn('tab:dra','Voir le dragon',0,0,'blue')}</div>`;}
+  else{h+=`<h3>${ic('castle')}Ton royaume</h3><p class="sub">Touche une parcelle pour bâtir ou un bâtiment pour l'améliorer. Touche les bulles pour récolter. Fais glisser pour explorer l'île.</p>`;
+   const pf=S.cells.reduce((a,c)=>a+(c&&c.t==='farm'?rateOf(c):0),0),pg=S.cells.reduce((a,c)=>a+(c&&c.t==='mine'?rateOf(c):0),0);
+   h+=`<div class="grid"><div class="card"><div class="ci">${ic('wheat')}</div><div class="cb"><b>${pf.toFixed(1)}/s</b>nourriture</div></div><div class="card"><div class="ci">${ic('gold-mine')}</div><div class="cb"><b>${pg.toFixed(1)}/s</b>or</div></div></div>`;
+   h+=`<div class="card ${S.hall<3?'lock':''}" style="margin-top:7px"><div class="ci">${ic(S.hall<3?'padlock':'stone-wall')}</div><div class="cb"><b>Muraille ${S.wall?'Nv '+S.wall:''}</b>${S.hall<3?'Hôtel de ville Nv 3 requis':'+8 % de puissance par niveau'}<div class="row">${S.hall>=3&&S.wall<S.hall?btn('wall',S.wall?'Rehausser':'Bâtir',wallCost())+costH(wallCost(),0):''}</div></div></div>`;}
+ }else if(tab==='tav'){
+  const ti=findCell('tavern');h+=`<h3>${ic('beer-stein')}Taverne des mercenaires <span class="badge">Nv ${tavLvl()}</span></h3><p class="sub">Armée ${armyN()}/${armyCap()} · puissance <b>${fmt(armyPower())}</b>. Chaque attaque coûte 1 nourriture par mercenaire.</p>`;
+  if(ti<0)h+='<p class="sub">Construis une taverne pour recruter.</p>';
+  for(const k in TR){const t=TR[k],ok=troopUnlocked(k),[g,f]=trCost(k);const req={berserk:'3 victoires',mage:'Hôtel de ville Nv 3',assassin:'Ligue Argent III'}[k];
+   h+=`<div class="card ${ok?'':'lock'}" style="margin-bottom:6px"><div class="ci">${ic(ok?t.i:'padlock')}</div><div class="cb"><b>${t.n} ${ok?`<span style="color:var(--gold)">×${S.army[k]}</span>`:''}</b><span class="tag t-${t.tag}">${t.tg}</span>${t.r} · ${t.pw} puiss.
+   <div class="row">${ok&&ti>=0?btn(`rec:${k}:1`,'+1',g,f)+btn(`rec:${k}:5`,'+5',g*5,f*5)+costH(g,f):`<span class="sub" style="margin:0">Débloqué par : ${req}</span>`}</div></div></div>`;}
+  h+=`<p class="sub">+11 autres mercenaires dans la version complète : Chevaucheur, Ingénieur de siège, Druide, Paladin, Arbalétrier…</p>`;
+ }else if(tab==='dra'){
+  const d=S.dragon;h+=`<h3>${ic('dragon-head')}Bêtes</h3>`;
+  if(d.st==='none')h+=`<div class="card lock"><div class="ci">${ic('big-egg')}</div><div class="cb"><b>Œuf de dragon</b>${S.hall<2?"Hôtel de ville Nv 2 → Nid de dragon":'Construis le Nid de dragon sur une parcelle libre'}</div></div>`;
+  else if(d.st==='egg')h+=`<div class="card"><div class="ci">${ic('big-egg')}</div><div class="cb"><b>Œuf de dragon</b>L'œuf frémit… Réchauffe-le ${3-d.warm} fois.<div class="bar"><i style="width:${d.warm/3*100}%"></i></div>${btn('warm','Réchauffer',0,25)} ${costH(0,25)}</div></div>`;
+  else{const st=stageOf(d.lvl),cap=nestLvl()*5,fc=feedCost();
+   h+=`<div class="card"><div class="ci" style="color:#ff7a3a">${ic('dragon-head')}</div><div class="cb"><b>Braisecroc · ${STAGES[st][1]} <span class="badge">Nv ${d.lvl}</span></b>Puissance <b style="color:var(--ember)">${fmt(dragonPower())}</b> · plafond du nid Nv ${cap}${d.lvl>30?' · Parangon +'+(d.lvl-30):''}
+   <div class="bar"><i style="width:${d.xp*100}%"></i></div><div class="row">${d.lvl<cap?btn('feed','Nourrir → Nv '+(d.lvl+1),0,fc)+costH(0,fc):'<span class="sub" style="margin:0">Améliore le Nid pour grandir</span>'}</div>
+   <span class="sub">Évolutions : Dragonnet → Drake (5) → Wyrm (12) → Ancien (25) → Parangon infini (30+)</span></div></div>`;
+   h+=`<div class="slots">${Object.keys(SLOTS).map(sl=>{const it=S.eq[sl];return`<div class="slot ${it?'r'+it.r:''}">${ic(SLOTS[sl].i)}<small>${it?'+'+it.v+'%':SLOTS[sl].n}</small></div>`;}).join('')}</div>`;
+   const sp=Object.keys(S.eq).filter(sl=>hasSpec(sl));if(sp.length)h+=sp.map(sl=>`<p class="sub spec">★ ${SPECIAL[sl].n} : ${SPECIAL[sl].t}</p>`).join('');}
+  if(S.inv.length){h+=`<h3 style="margin-top:8px">${ic('gem-necklace')}Reliques (touche pour équiper)</h3><div class="grid">`;
+   S.inv.slice(0,12).forEach(it=>{const on=S.eq[it.sl]&&S.eq[it.sl].id===it.id;h+=`<div class="card item r${it.r}" data-act="eq:${it.id}"><div class="ci">${ic(SLOTS[it.sl].i)}</div><div class="cb"><b>${it.n}</b><span class="rb r${it.r}">${RAR[it.r]}</span> ${on?'<b style="display:inline;color:var(--ok)">équipé</b>':''}<br>+${it.v}% ${SLOTS[it.sl].st}${it.sp?`<br><span class="spec">★ ${SPECIAL[it.sl].t}</span>`:''}</div></div>`;});h+='</div>';}
+  h+=`<div class="grid" style="margin-top:8px"><div class="card lock"><div class="ci">${ic('griffin-symbol')}</div><div class="cb"><b>Griffon</b><span class="tag t-beast">Bête</span>Ligue Or</div></div><div class="card lock"><div class="ci">${ic('mammoth')}</div><div class="cb"><b>Mammouth de guerre</b><span class="tag t-beast">Bête</span>Royaume Nv 6</div></div></div>`;
+ }else if(tab==='att'){
+  h+=`<h3>${ic('crossed-swords')}Pillages</h3><p class="sub">Ta puissance : armée <b>${fmt(armyPower())}</b> + dragon <b>${fmt(dragonPower())}</b>. Chaque camp rasé revient plus fort (et rapporte plus).</p>`;
+  CAMPS.forEach(def=>{const cs=S.camps[def.id];if(def.u&&!S.unl[def.u]){h+=`<div class="card lock" style="margin-bottom:6px"><div class="ci">${ic('padlock')}</div><div class="cb"><b>???</b>Apparaît en ligue Bronze I</div></div>`;return;}
+   const ep=campPower(def.id),tot=armyPower(def.id)+dragonPower(),v=tot*0.92>=ep?['v-ok','Victoire assurée']:tot*1.08>=ep?['v-mid','Incertain']:['v-ko','Trop fort'];
+   h+=`<div class="card" style="margin-bottom:6px;${selCamp===def.id?'border-color:var(--ember)':''}"><div class="ci">${ic(def.i)}</div><div class="cb"><b>${def.n} <span class="badge">Nv ${cs.lvl}</span></b>Puissance ${fmt(ep)} · <span class="verdict ${v[0]}">${v[1]}</span><br>Butin ≈ ${fmt(ep*3.2*lootMult())} or · ${Math.round(def.pb*(1+0.35*(cs.lvl-1)))} pts${def.fort?' · <span class="spec">Mage ×2</span>':''}
+   <div class="row">${cs.dead>0?`<span class="sub" style="margin:0">Reconstruction… ${Math.ceil(cs.dead)} s</span>`:btn('atk:'+def.id,ic('crossed-swords')+'Attaquer',0,armyN(),'red')+(armyN()?costH(0,armyN()):'')}</div></div></div>`;});
+ }else if(tab==='lig'){
+  const L=league(S.pb);
+  if(!S.unl.league)h+=`<h3>${ic('laurels')}Ligue</h3><p class="sub">Remporte un premier pillage pour entrer en ligue.</p>`;
+  else{const prev=L.k<18?LEAGUE[L.k][1]:5200+(L.k-19)*800;h+=`<h3>${ic('laurels')}Ligue <span class="badge">${L.n}</span></h3><p class="sub">${S.pb} points de bataille · prochain rang <b>${league(L.next).n}</b> à ${L.next}</p><div class="bar"><i style="width:${clamp((S.pb-prev)/(L.next-prev),0,1)*100}%"></i></div>`;
+   const all=S.rivals.map(r=>({n:r[0],p:Math.floor(r[1])})).concat([{n:'Toi · Fiefs de Braise',p:S.pb,me:1}]).sort((a,b)=>b.p-a.p);
+   all.forEach((r,i)=>{h+=`<div class="lb ${r.me?'me':''}"><span class="rk">${i<3?ic(['trophy','laurels','checked-shield'][i]):i+1}</span>${r.n}<span class="pts">${r.p}</span></div>`;});
+   h+=`<p class="sub">Rangs : Bronze → Argent → Or → Platine → Diamant → Maître → Légende ★∞. Saisons, alliances et récompenses de fin de saison dans la version complète.</p>`;}
+ }
+ if(h===lastPanel){refreshBtns();return;}lastPanel=h;panel.innerHTML=h;panel.querySelectorAll('.lb .rk svg').forEach(s=>{s.style.width='16px';s.style.height='16px';s.style.color='var(--gold)';});
+ refreshBtns();
+}
+function refreshBtns(){panel.querySelectorAll('[data-g]').forEach(e=>{const g=+e.dataset.g||0,f=+e.dataset.f||0;const no=S.gold<g||S.food<f;if(e.tagName==='BUTTON')e.classList.toggle('no',no);else e.style.opacity=(e.dataset.g&&S.gold<g)||(e.dataset.f&&S.food<f)?.45:1;});
+ panel.querySelectorAll('[data-f]:not([data-g])').forEach(e=>{e.style.opacity=S.food<+e.dataset.f?.45:1;});}
+panel.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;const[a,x,y]=b.dataset.act.split(':');
+ if(a==='build')build(sel,x);else if(a==='up')upgrade(sel);else if(a==='rec')recruit(x,+y);else if(a==='warm')warmEgg();else if(a==='feed')feed();else if(a==='eq')equip(+x);else if(a==='wall')buildWallAct();
+ else if(a==='atk')startAttack(x);else if(a==='tab')document.querySelector(`#tabs [data-tab=${x}]`).click();dirty=true;});
+
+/* ---- Couches de progression + HUD ---- */
+const layersEl=$('#layers');let lastLayerKey='';
+function flashLayers(){layersEl.querySelectorAll('.lay').forEach(l=>{l.classList.remove('flash');void l.offsetWidth;l.classList.add('flash');});}
+function renderLayers(){const d=S.dragon,eqn=Object.values(S.eq).filter(Boolean).length;
+ const L=[['Royaume','Nv '+S.hall,true],['Armée',fmt(armyPower())+' ⚔',S.st.recruit>0||armyN()>0],['Dragon',dragonAlive()?STAGES[stageOf(d.lvl)][1]+' '+d.lvl:d.st==='egg'?'Œuf':'—',d.st!=='none'],['Reliques',eqn+'/4',S.inv.length>0],['Ligue',league(S.pb).n,!!S.unl.league]];
+ const key=L.map(x=>x.join()).join('|');if(key===lastLayerKey)return;lastLayerKey=key;layersEl.innerHTML=L.map(x=>`<div class="lay ${x[2]?'':'off'}">${x[0]}<b>${x[2]?x[1]:''}</b></div>`).join('');}
+function renderHUD(){HUD.gold.lastChild.textContent=fmt(S.gold);HUD.food.lastChild.textContent=fmt(S.food);HUD.army.lastChild.textContent=armyN()+'/'+armyCap();HUD.pb.lastChild.textContent=S.unl.league?league(S.pb).n.replace('Bronze','Br.').replace('Argent','Arg.'):S.pb;
+ const q=curQuest();$('#quest').innerHTML=`<div class="qi">${ic('scroll-unfurled')}</div><div class="qt">${q.t}${q.h?`<em>${q.h}</em>`:''}</div><div class="qp">${q.p?q.p():''}</div>`;}
+
+/* ================= ENTRÉES ================= */
+let pd=null,shake=0;
+stage.addEventListener('pointerdown',e=>{pd={x:e.clientX,y:e.clientY,moved:false,tx:camT.x,tz:camT.z};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(!pd)return;const dx=e.clientX-pd.x,dy=e.clientY-pd.y;if(Math.hypot(dx,dy)>7)pd.moved=true;if(!pd.moved)return;
+ const k=viewH/SH;const r=0.7071;camT.x=pd.tx-(dx*k*r)-(dy*k*1.66*r);camT.z=pd.tz+(dx*k*r)-(dy*k*1.66*r);const l=Math.hypot(camT.x,camT.z);if(l>15){camT.x*=15/l;camT.z*=15/l;}placeCam();});
+stage.addEventListener('pointerup',e=>{if(pd&&!pd.moved)tap(e);pd=null;});
+stage.addEventListener('pointercancel',()=>pd=null);
+const ray=new THREE.Raycaster(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
+function tap(e){const r=cv.getBoundingClientRect();ray.setFromCamera({x:(e.clientX-r.left)/r.width*2-1,y:-(e.clientY-r.top)/r.height*2+1},cam);if(!ray.ray.intersectPlane(plane,hit))return;
+ for(const def of CAMPS){if((def.u&&!S.unl[def.u]))continue;if(Math.hypot(hit.x-def.x,hit.z-def.z)<3){selCamp=def.id;sel=-1;selRing.visible=false;campRing.position.set(def.x,0.1,def.z);campRing.visible=true;document.querySelector('#tabs [data-tab=att]').click();return;}}
+ const col=Math.round(hit.x/3+2),row=Math.round(hit.z/3+2);
+ if(col>=0&&col<5&&row>=0&&row<5){sel=row*5+col;const p=cellPos(sel);selRing.position.set(p.x,0.06,p.z);selRing.visible=true;campRing.visible=false;selCamp=null;
+  const c=S.cells[sel];if(c&&c.st>=1&&(c.t==='farm'||c.t==='mine'))collect(sel);document.querySelector('#tabs [data-tab=roy]').click();}
+ else{sel=-1;selRing.visible=false;campRing.visible=false;dirty=true;}}
+$('#reset').addEventListener('click',()=>{try{localStorage.removeItem(KEY);}catch(e){}if(battle){battle.units.forEach(u=>scene.remove(u.m));battle.hb.remove();battle=null;}S=fresh();sel=-1;rebuildAll();dirty=true;});
+
+/* ================= BOUCLE ================= */
+let gt=0,uiT=0,saveT=0,huntT=20,last=0;
+function update(dt){
+ gt+=dt;
+ // eau
+ for(let i=0;i<wPos.count;i++){const x=wPos.getX(i),z=wPos.getZ(i);wPos.setY(i,Math.sin(x*0.35+gt*1.2)*0.22+Math.cos(z*0.3+gt*0.9)*0.2);}wPos.needsUpdate=true;wGeo.computeVertexNormals();
+ // production + visuels
+ const auto=hasSpec('couronne');
+ S.cells.forEach((c,i)=>{if(!c)return;const R=BM[i];
+  if(c.t==='farm'||c.t==='mine'){c.st=Math.min(capOf(c),(c.st||0)+rateOf(c)*dt);const ripe=c.st>=rateOf(c)*5;const f=Math.min(1,c.st/(rateOf(c)*5));
+   if(R){if(R.wheat){R.wheat.forEach((w,k)=>{w.scale.set(1,0.25+0.75*f,1);w.rotation.z=Math.sin(gt*2+k)*0.08;});R.wm.color.setHex(0x6aa84f).lerp(new THREE.Color(0xf0c850),f);}
+    if(R.nug)R.nug.scale.setScalar(0.4+0.6*f);if(R.blades)R.blades.rotation.z+=dt*1.5;if(R.bub)R.bub.classList.toggle('hide',!ripe);}
+   if(ripe&&auto&&Math.random()<dt*0.5)collect(i);}
+  if(R&&R.flag)R.flag.rotation.y=Math.sin(gt*3)*0.3;});
+ // fumée taverne
+ const ti=findCell('tavern');puffs.forEach(p=>{p.userData.t+=dt;const t=p.userData.t%3;if(ti<0||!BM[ti]||!BM[ti].chim){p.visible=false;return;}p.visible=true;const base=cellPos(ti).add(BM[ti].chim);p.position.set(base.x+t*0.25,base.y+t*0.6,base.z-t*0.1);p.scale.setScalar(0.6+t*0.7);p.material.opacity=0.55*(1-t/3);});
+ // camps
+ CAMPS.forEach(def=>{const cs=S.camps[def.id],cm=CM[def.id];if(!cm||cm.hidden)return;if(cm.fire){cm.fire.scale.y=0.8+Math.sin(gt*12+def.x)*0.25;if(Math.random()<dt*3&&cm.g.visible)emit(def.x,0.6,def.z,1,0xff8a20,0.3,1.5,0.9,-0.5);}
+  if(cs.dead>0){if(!(battle&&battle.cid===def.id&&battle.ph!=='return'))cs.dead-=dt;if(Math.random()<dt*4)emit(def.x+rnd(-1,1),0.4,def.z+rnd(-1,1),1,0xff5010,0.3,1.2,1,-0.6);if(cs.dead<=0){cs.dead=0;cm.ruin.visible=false;cm.g.visible=true;pop(cm.g,0.7);emit(def.x,0.5,def.z,30,0xd8c8a0,3,3,0.9,5);dirty=true;}}});
+ // dragon / œuf
+ if(eggObj){eggObj.children[0].rotation.y+=dt;eggObj.position.y=Math.sin(gt*2)*0.04;if(Math.random()<dt*2)emit(eggObj.position.x,1,eggObj.position.z,1,0xb070ff,0.4,1,1,-0.5);}
+ if(dragonObj){const fly=battle&&battle.dragon&&battle.ph!=='fight'?1:battle&&battle.dragon?1:0;const fl=fly?Math.sin(gt*9)*0.7+0.1:Math.sin(gt*1.5)*0.15+0.5;
+  dragonObj.wings[0].rotation.z=fl;dragonObj.wings[1].rotation.z=-fl;dragonObj.head.rotation.x=Math.sin(gt*1.3)*0.12;dragonObj.tail.rotation.y=Math.sin(gt*2)*0.25;
+  if(!fly)dragonObj.body.position.y=Math.sin(gt*2)*0.04;
+  if(shadowObj){const p=dragonObj.g.position;shadowObj.g.position.set(p.x-1.6,p.y+(fly?0.6:0.2),p.z+1.2);shadowObj.g.rotation.y=dragonObj.g.rotation.y;shadowObj.wings[0].rotation.z=fl;shadowObj.wings[1].rotation.z=-fl;}}
+ // chasse auto (Ailes de cendre)
+ if(hasSpec('ailes')&&dragonAlive()&&!battle){huntT-=dt;if(huntT<=0){huntT=20;const dp=dragonPower();const t=CAMPS.filter(d=>!(d.u&&!S.unl[d.u])&&S.camps[d.id].dead<=0&&campPower(d.id)<=dp).sort((a,b)=>campPower(b.id)-campPower(a.id))[0];if(t){toast('Ailes de cendre : le dragon part chasser seul !');startAttack(t.id,true);}}}
+ updBattle(dt);
+ // animations pop
+ for(let i=anims.length-1;i>=0;i--){const a=anims[i];a.t+=dt;const x=Math.min(1,a.t/a.d),c1=1.70158,c3=c1+1;const e=1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);a.o.scale.setScalar(Math.max(0.001,e*a.s));if(x>=1)anims.splice(i,1);}
+ selRing.material.opacity=0.25+Math.sin(gt*5)*0.15;campRing.rotation.y+=dt;
+ if(Math.random()<dt*6)emit(rnd(-18,18),0.3,rnd(-18,18),1,0xffc060,0.2,0.8,2.5,-0.15);
+ if(shake>0){shake-=dt;placeCam();if(shake>0){cam.position.x+=rnd(-0.4,0.4)*shake;cam.position.y+=rnd(-0.4,0.4)*shake;}}
+ updParticles(dt);
+ // rivaux
+ S.rivals.forEach(r=>{r[1]+=dt*rnd(0,0.5)*(1+r[1]/400);});
+ // overlay
+ S.cells.forEach((c,i)=>{const R=BM[i];if(R&&R.bub&&!R.bub.classList.contains('hide')){const p=cellPos(i);const[x,y]=proj(p.x,2.2,p.z);R.bub.style.left=x+'px';R.bub.style.top=y+'px';}});
+ CAMPS.forEach(def=>{const cm=CM[def.id];if(!cm||!cm.lbl)return;const[x,y]=proj(def.x,def.fort?4.6:2.8,def.z);cm.lbl.style.left=x+'px';cm.lbl.style.top=y+'px';cm.lbl.style.display=battle&&battle.cid===def.id&&battle.ph==='fight'?'none':'flex';});
+ uiT-=dt;if(uiT<=0){uiT=0.3;checkProgress();renderHUD();renderLayers();
+  CAMPS.forEach(def=>{const cm=CM[def.id];if(!cm||!cm.lbl)return;const cs=S.camps[def.id],ep=campPower(def.id),strong=armyPower(def.id)+dragonPower()<ep;cm.lbl.className='clabel '+(cs.dead>0?'dead':strong?'strong':'weak');cm.lbl.innerHTML=`<span class="lv">${cs.lvl}</span>${cs.dead>0?'Ruines '+Math.ceil(cs.dead)+'s':def.n.split(' · ')[0]+' · '+fmt(ep)}`;});
+  if(dirty&&!pDown){dirty=false;render();}else if(!pDown)render();}
+ saveT-=dt;if(saveT<=0){saveT=5;save();}
+}
+function loop(ts){requestAnimationFrame(loop);if(document.hidden){last=ts;return;}if(ts-last<32)return;const dt=Math.min(0.1,(ts-last)/1000);last=ts;update(dt);renderer.render(scene,cam);}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)last=performance.now();else save();});
+window.addEventListener('resize',resize);
+resize();rebuildAll();render();renderHUD();renderLayers();
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>
