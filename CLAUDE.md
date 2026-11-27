@@ -33,6 +33,7 @@ Une mise à jour demandée par le propriétaire se publie sans redemander confir
    `icons.js`) : prends-les **tous**. Exception : `ricochets` n'est pas un artefact, ses sources sont dans
    `asa601/nova-app-cle` (`source/ricochets/`, `build_web.py` produit un seul `index.html`).
 2. `python3 outils/maj_catalogue.py maj <id>` : recalcule la liste des fichiers et passe le jeu en version +1.
+   Si le jeu a changé de genre ou de description : ajoute `--genre "…" --desc "…"` (aussi `--nom`, `--orientation`).
 3. Si l'écran du jeu a changé, refais sa vignette (voir plus bas). La vignette suit la version du jeu.
 4. `python3 outils/maj_catalogue.py verifier` doit afficher « Tout est bon ».
 5. Commit puis `git -c push.negotiate=true push origin main` (l'avertissement « push negotiation failed »

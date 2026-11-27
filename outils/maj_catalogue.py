@@ -89,6 +89,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sp = ap.add_subparsers(dest='cmd', required=True)
     m = sp.add_parser('maj'); m.add_argument('ids', nargs='+')
+    m.add_argument('--nom'); m.add_argument('--genre'); m.add_argument('--desc')
+    m.add_argument('--orientation', choices=['portrait', 'paysage', 'auto'])
     a = sp.add_parser('ajouter'); a.add_argument('id')
     a.add_argument('--nom', required=True); a.add_argument('--groupe', required=True)
     a.add_argument('--genre', required=True); a.add_argument('--desc', required=True)
@@ -105,6 +107,10 @@ def main():
             if gid not in par_id:
                 sys.exit(f'ERREUR : {gid} n\'est pas dans le catalogue')
             j = par_id[gid]
+            infos = {k: getattr(x, k) for k in ('nom', 'genre', 'desc', 'orientation') if getattr(x, k)}
+            if infos and len(x.ids) > 1:
+                sys.exit('ERREUR : --nom/--genre/--desc/--orientation avec un seul jeu à la fois')
+            j.update(infos)
             rafraichir(j)
             j['version'] = int(j.get('version', 1)) + 1
             print(f"{j['nom']} : version {j['version']} ({len(j['fichiers'])} fichiers, {j['taille']} octets)")
