@@ -1,6 +1,6 @@
 {
- "version": "1.4.0",
- "rev": 5,
+ "version": "1.5.0",
+ "rev": 6,
  "apk": {
   "versionCode": 3,
   "versionName": "1.2",
@@ -38,16 +38,16 @@
    "id": "canards",
    "nom": "1 Milliard de Canards",
    "groupe": "principaux",
-   "genre": "Clicker idle",
-   "desc": "Tire sur les canards, ton chien les ramène au congélateur. Vends ta récolte, améliore ton fusil, tes chiens et ton équipe jusqu'à attraper 1 milliard de canards.",
-   "version": 1,
+   "genre": "Idle de chasse",
+   "desc": "Ton équipe chasse toute seule et monte sans limite. La nuit, défends ton camp contre le boss, puis migre pour repartir plus fort jusqu'à 1 milliard de canards.",
+   "version": 2,
    "orientation": "portrait",
    "nouveau": true,
-   "taille": 85303,
+   "taille": 100327,
    "fichiers": [
     {
      "p": "index.html",
-     "t": 85303
+     "t": 100327
     }
    ]
   },
