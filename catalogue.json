@@ -1,11 +1,11 @@
 {
- "version": "1.1.0",
- "rev": 2,
+ "version": "1.2.0",
+ "rev": 3,
  "apk": {
-  "versionCode": 1,
-  "versionName": "1.0",
+  "versionCode": 2,
+  "versionName": "1.1",
   "url": "apk/NovaApp.apk",
-  "taille": 12239343
+  "taille": 12243439
  },
  "firebase": {
   "apiKey": "",
