@@ -142,6 +142,47 @@ body.inmenu #hudL,body.inmenu #hudC,body.inmenu #hudR,body.inmenu #btnsL,body.in
 .reset{height:40px;padding:0 14px;border-radius:12px;background:var(--red);color:#fff;font-weight:900;font-size:14px;box-shadow:0 3px 0 var(--red2);flex:none;margin-left:10px}
 .mhead{display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:2px}
 .mx{position:absolute;right:-4px;top:-2px;width:36px;height:34px;border-radius:11px;background:var(--red);color:#fff;font-size:18px;font-weight:900;box-shadow:0 3px 0 var(--red2)}
+
+/* ---------- v2 : impulsions, solidité, surf ---------- */
+#impBox{position:absolute;left:50%;bottom:calc(10px + var(--sb));transform:translateX(-50%);display:flex;gap:10px;align-items:center;pointer-events:none}
+#impBox .imps,#impBox .shields{display:flex;gap:2px;background:rgba(18,28,44,.62);border-radius:14px;padding:3px 8px;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+#impBox i{font-style:normal;font-size:17px;filter:grayscale(1) brightness(.6);opacity:.55}
+#impBox i.on{filter:none;opacity:1}
+#impBox .surfbar{display:flex;align-items:center;gap:5px;background:rgba(18,28,44,.62);border-radius:14px;padding:3px 9px;font-size:16px}
+#impBox .surfbar b{display:block;width:70px;height:8px;border-radius:4px;background:rgba(255,255,255,.25);overflow:hidden}
+#impBox .surfbar u{display:block;height:100%;background:linear-gradient(90deg,#7fe6ff,#39b6e8);border-radius:4px}
+#impBox .surfbar.act b{box-shadow:0 0 8px #7fe6ff}
+#hint{bottom:calc(52px + var(--sb))}
+/* ---------- v2 : arbre d'améliorations ---------- */
+#pbody.treemode{padding:0;overflow:hidden;display:flex}
+.treewrap{display:flex;flex:1;min-height:0;width:100%}
+#tscroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;background:radial-gradient(circle at 30% 40%,#fff9ef,#f3e6cf)}
+.tree{position:relative}
+.tree svg{position:absolute;left:0;top:0}
+.tree path{fill:none;stroke:#d9c7a6;stroke-width:4;stroke-linecap:round}
+.tree path.on{stroke:#e8a93a}
+.node{position:absolute;width:50px;height:50px;border-radius:14px;background:#fff;box-shadow:0 3px 0 #d9c7a6;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0}
+.node .nic{font-size:23px;line-height:24px}
+.node .nlv{font-size:10px;font-weight:900;color:var(--ink2);line-height:12px}
+.node.lock{background:#ece2d1}
+.node.lock .nic{filter:grayscale(1);opacity:.45}
+.node .nlock{position:absolute;right:-6px;top:-7px;font-size:14px}
+.node.can{background:#e9f9e6;box-shadow:0 3px 0 var(--green2),0 0 0 2px var(--green)}
+.node.max{background:#fff3cf;box-shadow:0 3px 0 var(--gold2)}
+.node.max .nlv{color:var(--gold2)}
+.node.sel{outline:3px solid var(--blue);outline-offset:2px}
+.tdet{width:250px;flex:none;border-left:2px solid var(--line);padding:9px 10px;overflow-y:auto;background:#fffaf2}
+.dhead{display:flex;gap:9px;align-items:center}
+.dic{font-size:30px;width:48px;height:48px;border-radius:12px;background:#f4ead8;display:grid;place-items:center;flex:none}
+.dnom{font-weight:900;font-size:15.5px;line-height:18px}
+.dlv{font-size:12px;font-weight:800;color:var(--ink2)}
+.ddesc{font-size:12.5px;color:#6c5a4b;line-height:16px;margin:6px 0}
+.deff{font-size:12.5px;color:#2f7a4a;font-weight:800;line-height:17px;margin-bottom:6px}
+.deff b{color:#1f6a3a}
+.dlock{font-size:13px;font-weight:800;color:var(--red2);margin-top:6px}
+.tdet .bar{margin:4px 0 6px}
+.buy.wide{width:100%;height:46px}
+.buy.wide small{display:inline;font-size:11px}
 </style>
 </head>
 <body class="inmenu">
@@ -162,10 +203,11 @@ body.inmenu #hudL,body.inmenu #hudC,body.inmenu #hudR,body.inmenu #btnsL,body.in
   <div class="hud" id="hudR"><button class="rbtn" id="bHome" aria-label="Accueil">🏠</button><button class="rbtn" id="bSet" aria-label="Paramètres">⚙️</button></div>
   <div id="btnsL">
     <button class="bigbtn" id="bUp"><span class="emo">⬆️</span>Améliorer<span class="badge" id="upBadge" style="display:none"></span></button>
-    <button class="bigbtn" id="bLakes"><span class="emo">🗺️</span>Lacs<span class="badge" id="lkBadge" style="display:none">!</span></button>
+    <button class="bigbtn" id="bLakes"><span class="emo">🗺️</span>Carte<span class="badge" id="lkBadge" style="display:none">!</span></button>
     <button class="bigbtn sq" id="bMore" aria-label="Défis"><span class="emo">🏆</span><span class="badge" id="achBadge" style="display:none"></span></button>
   </div>
   <div id="hint"></div>
+  <div id="impBox" style="display:none"></div>
   <div id="powers"></div>
   <div id="result" style="display:none"></div>
   <div id="toasts"></div>
@@ -182,7 +224,7 @@ body.inmenu #hudL,body.inmenu #hudC,body.inmenu #hudR,body.inmenu #btnsL,body.in
       <button class="bigbtn" id="mQuit"><span class="emo">🚪</span>Quitter</button>
     </div>
     <div class="mstats" id="mStats"></div>
-    <div class="mver">v1.1</div>
+    <div class="mver">v2.0</div>
   </div>
   <div id="panel">
     <div id="ptop"><div id="tabs"></div><div id="pcur"></div><button id="pclose" aria-label="Fermer">✕</button></div>
@@ -249,85 +291,125 @@ function fmtTime(sec) {
 
 /* ======================= DONNÉES ======================= */
 const LACS = [
-  { id: 'etang', nom: 'Étang des Saules', desc: 'Un étang paisible couvert de nénuphars.', mult: 1, g: 9.8, need: 0, root: 60,
+  { id: 'etang', nom: 'Étang des Saules', desc: 'Le départ : un étang paisible couvert de nénuphars.', mult: 1, x0: 0, g: 9.8, root: 60,
     sky: ['#6cb8e6', '#9fd3ef', '#cfe9f3', '#f6e3c4'], sun: { x: 0.76, y: 0.15, r: 8, c: '#fff7d6', glow: '#fff0a6' },
     cloud: '#ffffff', cloudSh: '#d5e7f2', far: '#9cc0cc', farSnow: null, mid: '#78ad8c', farAmp: 0.36, midAmp: 0.2,
     tree: '#4f915f', treeSh: '#38704a', trunk: '#5a4434',
     water: ['#a8d8e6', '#7fc2d8', '#5ea8c7', '#478fb4', '#3679a1'], shine: '#eefaff', ripple: '#f4fcff', glit: '#fff8d8', reflA: 0.3,
     pad: '#4f9a4a', padSh: '#3b7a39', wood: '#a0714a', woodSh: '#6b4a30',
-    obj: { pad: 0.06, coin: 0.045, weed: 0.012, pearl: 0.0035 }, decor: 'saule', amb: 'petales' },
-  { id: 'pins', nom: 'Lac des Pins', desc: 'Un lac de montagne entouré de forêts et de rochers.', mult: 4, g: 9.8, need: 70, root: 62,
+    obj: { pad: 0.05, coin: 0.04, weed: 0.012, pearl: 0.003 }, ob: { nom: 'Souche', shape: 'souche', c: '#7a5a3c', s: '#54402c', h: '#a07a52' },
+    bird: { nom: 'Mouette', b: '#ffffff', w: '#e3e9ef', w2: '#d6dde5', t: '#5a6470', k: '#f2a33a' },
+    decor: 'saule', amb: 'petales' },
+  { id: 'pins', nom: 'Lac des Pins', desc: 'Un lac de montagne. Attention aux rochers !', mult: 2, x0: 120, g: 9.8, root: 62,
     sky: ['#5d97d1', '#8dbbe3', '#bcd8ec', '#f1d9b8'], sun: { x: 0.22, y: 0.18, r: 7, c: '#fff3cf', glow: '#ffe7a0' },
     cloud: '#f9fbff', cloudSh: '#c9d9e9', far: '#7f97b5', farSnow: '#eef4fa', mid: '#557f74', farAmp: 0.46, midAmp: 0.22,
     tree: '#2e5d49', treeSh: '#21473a', trunk: '#3d2e24',
     water: ['#86b9cc', '#5f9db7', '#467f9d', '#346683', '#27526d'], shine: '#e5f5ff', ripple: '#effaff', glit: '#fff3d0', reflA: 0.36,
     pad: '#4a8d4a', padSh: '#356d37', wood: '#8f6440', woodSh: '#5e4029',
-    obj: { pad: 0.025, coin: 0.045, rock: 0.02, weed: 0.01, pearl: 0.004 }, decor: 'pins', amb: 'feuilles' },
-  { id: 'couchant', nom: 'Rivière du Couchant', desc: 'Le courant t’emporte vers le soleil couchant.', mult: 16, g: 9.8, need: 180, root: 65,
+    obj: { pad: 0.022, coin: 0.042, obst: 0.011, weed: 0.008, pearl: 0.0035 }, ob: { nom: 'Rocher', shape: 'rocher', c: '#8a8f96', s: '#5a5f66', h: '#c4c8cc' },
+    bird: { nom: 'Héron', b: '#dfe6ee', w: '#a9b7c7', w2: '#8e9db0', t: '#3d4a5c', k: '#e8c23a' },
+    decor: 'pins', amb: 'feuilles' },
+  { id: 'couchant', nom: 'Rivière du Couchant', desc: 'Le courant t’emporte vers le soleil couchant. Gare aux troncs.', mult: 4, x0: 300, g: 9.8, root: 65,
     sky: ['#3a3466', '#8a4a78', '#e0766a', '#ffb36b', '#ffd99a'], sun: { x: 0.6, y: 0.37, r: 13, c: '#ffe7a8', glow: '#ffc56b' },
     cloud: '#ffb38a', cloudSh: '#c0607a', far: '#7c4c72', farSnow: null, mid: '#5a3758', farAmp: 0.3, midAmp: 0.16,
     tree: '#3b2440', treeSh: '#2a1a30', trunk: '#2a1a30',
     water: ['#f2a76f', '#c97a6c', '#8f5670', '#5e3d66', '#3f2a55'], shine: '#ffe1b8', ripple: '#ffe9cc', glit: '#fff0c0', reflA: 0.42,
     pad: '#5a8a4a', padSh: '#3f6a37', wood: '#7a4f36', woodSh: '#4e3022',
-    obj: { pad: 0.02, coin: 0.05, rock: 0.012, current: 0.035, pearl: 0.0045 }, decor: 'couchant', amb: 'oiseaux' },
-  { id: 'fjord', nom: 'Fjord Gelé', desc: 'Glisse sur les plaques de glace sans perdre de vitesse !', mult: 64, g: 9.8, need: 360, root: 57,
+    obj: { pad: 0.016, coin: 0.046, obst: 0.014, current: 0.03, pearl: 0.004 }, ob: { nom: 'Tronc', shape: 'tronc', c: '#6a4430', s: '#43291c', h: '#9a6a48' },
+    bird: { nom: 'Flamant', b: '#ffb3c6', w: '#ff8fb0', w2: '#f07a9e', t: '#2a2a2a', k: '#3a2a2a' },
+    decor: 'couchant', amb: 'oiseaux' },
+  { id: 'fjord', nom: 'Fjord Gelé', desc: 'Glisse sur les plaques de glace sans perdre de vitesse !', mult: 8, x0: 650, g: 9.8, root: 57,
     sky: ['#8fb0c9', '#b3cbdc', '#d5e3ec', '#edf3f7'], sun: { x: 0.3, y: 0.14, r: 7, c: '#ffffff', glow: '#e8f2ff' },
     cloud: '#f4f8fb', cloudSh: '#c4d4e0', far: '#a9bfd2', farSnow: '#ffffff', mid: '#7f9ab1', farAmp: 0.55, midAmp: 0.24,
     tree: '#46616f', treeSh: '#354c58', trunk: '#2e3d45', snow: '#f3f8fb',
     water: ['#a6c7d8', '#7aa5bf', '#5885a5', '#416a8a', '#30536f'], shine: '#ffffff', ripple: '#ffffff', glit: '#ffffff', reflA: 0.35,
     ice: '#e8f4fa', iceSh: '#b4d2e3', wood: '#7d6a5a', woodSh: '#54463a',
-    obj: { ice: 0.03, coin: 0.05, rock: 0.015, pearl: 0.005 }, decor: 'fjord', amb: 'neige' },
-  { id: 'minuit', nom: 'Lagon de Minuit', desc: 'Le plancton lumineux multiplie tes pièces.', mult: 256, g: 9.8, need: 600, root: 58,
+    obj: { ice: 0.03, coin: 0.048, obst: 0.016, pearl: 0.0045 }, ob: { nom: 'Bloc de glace', shape: 'glace', c: '#d6ecf7', s: '#9cc4da', h: '#ffffff' },
+    bird: { nom: 'Harfang', b: '#ffffff', w: '#f1f4f7', w2: '#cfd8e0', t: '#56606a', k: '#2a2a2a' },
+    decor: 'fjord', amb: 'neige' },
+  { id: 'minuit', nom: 'Lagon de Minuit', desc: 'Le plancton lumineux multiplie tes pièces.', mult: 16, x0: 1300, g: 9.8, root: 58,
     sky: ['#070b24', '#121a45', '#1f2b63', '#33427e'], sun: { x: 0.7, y: 0.16, r: 8, c: '#f4f1d6', glow: '#c9d6ff', moon: true },
     stars: true, cloud: '#26325f', cloudSh: '#1a2449', far: '#1b275a', farSnow: null, mid: '#141e48', farAmp: 0.22, midAmp: 0.12,
     tree: '#0d1534', treeSh: '#0a1028', trunk: '#0a1028',
     water: ['#2b3f7a', '#203266', '#172751', '#101d40', '#0a142f'], shine: '#8ea4e8', ripple: '#b8c8ff', glit: '#e8ecff', reflA: 0.45,
     plankton: '#45f2dc', pad: '#2f6a5a', padSh: '#1f4a40', wood: '#5a4a5a', woodSh: '#3a2e3a',
-    obj: { plankton: 0.045, pad: 0.015, coin: 0.055, pearl: 0.0055 }, decor: 'minuit', amb: 'lucioles', night: true },
-  { id: 'etoiles', nom: 'Lac des Étoiles', desc: 'Gravité faible : tes ricochets volent loin, très loin…', mult: 1024, g: 6.2, need: 950, root: 63,
+    obj: { plankton: 0.045, pad: 0.012, coin: 0.05, obst: 0.018, pearl: 0.005 }, ob: { nom: 'Récif', shape: 'recif', c: '#2a5a6a', s: '#173642', h: '#45f2dc' },
+    bird: { nom: 'Chouette lumineuse', b: '#bff6ff', w: '#7fe6f2', w2: '#45c6d8', t: '#1a3a48', k: '#ffe36b' },
+    decor: 'minuit', amb: 'lucioles', night: true },
+  { id: 'etoiles', nom: 'Lac des Étoiles', desc: 'Gravité faible : tes ricochets volent loin, très loin…', mult: 32, x0: 2400, g: 6.2, root: 63,
     sky: ['#0d0620', '#22104a', '#3d1b66', '#6b2a7a'], sun: { x: 0.24, y: 0.19, r: 12, c: '#f0b8e8', glow: '#b06ad8', ring: '#ffe0f4' },
     stars: true, nebula: true, cloud: '#5a2a7a', cloudSh: '#3a1a5a', far: '#3a2470', farSnow: '#9a7ae0', mid: '#2a1858', farAmp: 0.5, midAmp: 0.2,
     tree: '#5a3ca8', treeSh: '#3e2780', trunk: '#3e2780', glow: '#c8a8ff',
     water: ['#6a46b0', '#4e3392', '#382474', '#261858', '#170e3c'], shine: '#e0ccff', ripple: '#f0e4ff', glit: '#ffffff', reflA: 0.45,
     plankton: '#ff8af0', crystal: '#9af0ff', wood: '#6a5a8a', woodSh: '#45386a',
-    obj: { crystal: 0.035, plankton: 0.02, coin: 0.055, pearl: 0.006 }, decor: 'cosmos', amb: 'etincelles', night: true },
+    obj: { crystal: 0.032, plankton: 0.02, coin: 0.052, obst: 0.02, pearl: 0.0055 }, ob: { nom: 'Pic de cristal', shape: 'cristal', c: '#9a7ae0', s: '#5a3ca8', h: '#e0ccff' },
+    bird: { nom: 'Oiseau céleste', b: '#f0d8ff', w: '#d8a8ff', w2: '#b07ae8', t: '#4a2a7a', k: '#ffd0f4' },
+    decor: 'cosmos', amb: 'etincelles', night: true },
 ];
 
+/* les 6 décors sont les zones d'un seul grand lac : on les découvre en allant plus loin */
+function zoneAt(x) { let z = 0; for (let i = 1; i < LACS.length; i++) if (x >= LACS[i].x0) z = i; return z; }
+function zm(x) { return LACS[zoneAt(x)].mult; }
+
+/* ======================= ARBRE D'AMÉLIORATIONS =======================
+   p = parent, n = niveau du parent nécessaire, x = condition en plus, c/r = colonne/ligne dans l'arbre */
 const UPG = [
-  { id: 'force', ic: '💪', nom: 'Force du bras', desc: 'Lance le galet plus vite et plus loin.', base: 10, gr: 1.5, max: 55,
-    req: () => true, val: L => 8 + 0.4 * L, show: v => fmt1(v) + ' m/s' },
-  { id: 'valeur', ic: '💰', nom: 'Ricochets en or', desc: 'Plus de pièces à chaque ricochet.', base: 15, gr: 1.4, max: 100,
-    req: () => true, val: L => 1 + L * (1 + 0.05 * L), show: v => fmt(v) + ' par ricochet' },
-  { id: 'glisse', ic: '🌊', nom: 'Glisse', desc: 'Le galet perd moins de vitesse à chaque ricochet.', base: 25, gr: 1.85, max: 35,
-    req: () => S.stats.throws >= 2, reqTxt: 'Se débloque après 2 lancers.', val: L => 0.955 - 0.115 * Math.pow(0.905, L), show: v => Math.round(v * 100) + ' % gardés' },
-  { id: 'plat', ic: '🥏', nom: 'Galet plat', desc: 'Rebonds plus hauts et plus longs.', base: 30, gr: 2.0, max: 30,
-    req: () => S.stats.throws >= 3, reqTxt: 'Se débloque après 3 lancers.', val: L => 0.22 + 0.008 * L, show: v => 'rebond ' + Math.round(v / 0.22 * 100) + ' %' },
-  { id: 'distance', ic: '📏', nom: 'Prime de distance', desc: 'Des pièces pour chaque mètre parcouru.', base: 40, gr: 1.4, max: 100,
-    req: () => S.stats.throws >= 4, reqTxt: 'Se débloque après 4 lancers.', val: L => 0.2 * (1 + 0.5 * L + 0.03 * L * L), show: v => fmt(v) + ' par mètre' },
-  { id: 'oiseau', ic: '🐦', nom: 'Oiseau plongeur', desc: 'L’oiseau attrape ton galet de plus en plus bas.', base: 80, gr: 2.1, max: 12,
-    req: () => S.stats.maxDist >= 30 || S.stats.lakeMax >= 1 || S.stats.birds >= 1, reqTxt: 'Atteins 30 m pour rencontrer l’oiseau.', val: L => 0.5 + 0.38 * L, show: v => 'plonge de ' + fmt1(v) + ' m' },
-  { id: 'oeil', ic: '🎯', nom: 'Œil de lynx', desc: 'Le ricochet parfait est plus facile à réussir.', base: 80, gr: 2.2, max: 12,
-    req: () => S.stats.perfects >= 3 || S.stats.lakeMax >= 1, reqTxt: 'Réussis 3 ricochets parfaits.', val: L => 0.085 + 0.01 * L, show: v => 'fenêtre ' + Math.round(v * 1000) + ' ms' },
-  { id: 'combo', ic: '🔥', nom: 'Enchaînement', desc: 'Chaque parfait d’affilée multiplie les pièces.', base: 120, gr: 2.0, max: 20,
-    req: () => S.stats.maxCombo >= 2 || S.stats.lakeMax >= 1, reqTxt: 'Enchaîne 2 ricochets parfaits.', val: L => 0.1 + 0.03 * L, show: v => '+' + Math.round(v * 100) + ' % par parfait' },
-  { id: 'concentration', ic: '🧘', nom: 'Concentration', desc: 'Jauge plus lente et zone parfaite plus grande.', base: 100, gr: 2.3, max: 10,
-    req: () => S.stats.throws >= 6, reqTxt: 'Se débloque après 6 lancers.', val: L => L, show: v => 'zone parfaite ' + Math.round(gaugeZone(v) * 100) + ' %' },
-  { id: 'chance', ic: '🍀', nom: 'Chance', desc: 'Plus de pièces et perles sur l’eau, plus de super ricochets.', base: 300, gr: 1.9, max: 25,
-    req: () => S.stats.lakeMax >= 1, reqTxt: 'Débloque le Lac des Pins.', val: L => L, show: v => 'super ricochet ' + fmt1((0.02 + 0.012 * v) * 100) + ' %' },
-  { id: 'canards', ic: '🦆', nom: 'Équipe de canards', desc: 'Ils ramassent des pièces, même quand tu ne joues pas.', base: 250, gr: 1.6, max: 60,
-    req: () => S.stats.throws >= 8, reqTxt: 'Se débloque après 8 lancers.', val: L => L, show: v => fmt(idleRate(v)) + ' / min' },
+  { id: 'force', ic: '💪', nom: 'Force du bras', desc: 'Le galet part plus vite et plus loin.', base: 30, gr: 1.3, max: 80, p: null, c: 0, r: 2.5,
+    val: L => 7 + 0.3 * L, show: v => fmt1(v) + ' m/s' },
+  { id: 'plat', ic: '🥏', nom: 'Galet plat', desc: 'Rebonds plus hauts et plus longs.', base: 100, gr: 1.5, max: 30, p: 'force', n: 2, c: 1, r: 0,
+    val: L => 0.2 + 0.007 * L, show: v => 'rebond ' + Math.round(v / 0.2 * 100) + ' %' },
+  { id: 'glisse', ic: '🌊', nom: 'Glisse', desc: 'Le galet perd moins de vitesse à chaque ricochet.', base: 150, gr: 1.55, max: 35, p: 'plat', n: 2, c: 2, r: 0,
+    val: L => 0.955 - 0.135 * Math.pow(0.91, L), show: v => Math.round(v * 100) + ' % de vitesse gardée' },
+  { id: 'aero', ic: '🪶', nom: 'Aérodynamisme', desc: 'Le galet plane : la gravité le tire moins vers l’eau.', base: 5000, gr: 1.9, max: 20, p: 'glisse', n: 6, c: 3, r: 0,
+    val: L => 1 - 0.014 * L, show: v => 'gravité ' + Math.round(v * 100) + ' %' },
+  { id: 'concentration', ic: '🧘', nom: 'Concentration', desc: 'La flèche du lancer bouge moins vite et la zone idéale grandit.', base: 90, gr: 1.9, max: 10, p: 'force', n: 4, c: 1, r: 1,
+    val: L => L, show: v => 'zone idéale ' + Math.round(idealW(v) * 180 / Math.PI) + '°' },
+  { id: 'surf', ic: '🏄', nom: 'Surf', desc: 'Trop lent pour rebondir ? Le galet surfe au lieu de couler.', base: 700, gr: 1.9, max: 20, p: 'glisse', n: 3, c: 2, r: 1,
+    val: L => L ? 0.6 + 0.3 * L : 0, show: v => v ? fmt1(v) + ' s de surf' : 'pas de surf' },
+  { id: 'surfv', ic: '🌀', nom: 'Planche de surf', desc: 'Le galet garde sa vitesse en surfant.', base: 3000, gr: 1.9, max: 15, p: 'surf', n: 3, c: 3, r: 1,
+    val: L => 0.55 * Math.pow(0.9, L), show: v => 'freinage ' + Math.round(v / 0.55 * 100) + ' %' },
+  { id: 'imp', ic: '⚡', nom: 'Impulsions', desc: 'Touche l’écran pendant le vol pour relancer ton galet.', base: 200, gr: 3.0, max: 8, p: 'force', n: 3, c: 1, r: 2,
+    val: L => 2 + L, show: v => v + ' par lancer' },
+  { id: 'impf', ic: '💥', nom: 'Puissance d’impulsion', desc: 'Chaque impulsion pousse plus fort.', base: 200, gr: 1.5, max: 30, p: 'imp', n: 1, c: 2, r: 2,
+    val: L => 1.8 + 0.2 * L, show: v => '+' + fmt1(v) + ' m/s' },
+  { id: 'oeil', ic: '🎯', nom: 'Œil de lynx', desc: 'L’impulsion parfaite, au moment du ricochet, est plus facile.', base: 160, gr: 1.9, max: 12, p: 'imp', n: 2, c: 3, r: 2,
+    val: L => 0.1 + 0.01 * L, show: v => 'fenêtre ' + Math.round(v * 1000) + ' ms' },
+  { id: 'combo', ic: '🔥', nom: 'Enchaînement', desc: 'Chaque impulsion parfaite d’affilée multiplie tes pièces.', base: 350, gr: 1.8, max: 20, p: 'oeil', n: 2, c: 4, r: 2,
+    val: L => 0.15 + 0.04 * L, show: v => '+' + Math.round(v * 100) + ' % par parfait' },
+  { id: 'valeur', ic: '💰', nom: 'Ricochets en or', desc: 'Plus de pièces à chaque ricochet.', base: 25, gr: 1.34, max: 150, p: 'force', n: 1, c: 1, r: 3,
+    val: L => 1 + L * (1 + 0.04 * L), show: v => fmt(v) + ' par ricochet' },
+  { id: 'distance', ic: '📏', nom: 'Prime de distance', desc: 'Des pièces pour chaque mètre parcouru.', base: 120, gr: 1.36, max: 150, p: 'valeur', n: 3, c: 2, r: 3,
+    val: L => 0.15 * (1 + 0.5 * L + 0.03 * L * L), show: v => fmt(v) + ' par mètre' },
+  { id: 'chance', ic: '🍀', nom: 'Chance', desc: 'Plus de pièces et de perles sur l’eau, plus de super ricochets.', base: 900, gr: 1.65, max: 25, p: 'distance', n: 5, c: 3, r: 3,
+    val: L => L, show: v => 'super ricochet ' + fmt1((0.02 + 0.01 * v) * 100) + ' %' },
+  { id: 'canards', ic: '🦆', nom: 'Équipe de canards', desc: 'Ils ramassent des pièces, même quand tu ne joues pas.', base: 2000, gr: 1.55, max: 60, p: 'chance', n: 1, c: 4, r: 3,
+    val: L => L, show: v => fmt(idleRate(v)) + ' / min' },
+  { id: 'oiseau', ic: '🐦', nom: 'Oiseau plongeur', desc: 'L’oiseau attrape ton galet de plus en plus bas.', base: 250, gr: 1.85, max: 12, p: 'force', n: 1,
+    x: () => S.stats.maxDist >= 50 || S.stats.birds >= 1, xt: 'Atteins 50 m pour rencontrer l’oiseau.', c: 1, r: 4,
+    val: L => 0.5 + 0.35 * L, show: v => 'plonge de ' + fmt1(v) + ' m' },
+  { id: 'ailes', ic: '🦅', nom: 'Grandes ailes', desc: 'L’oiseau porte ton galet plus loin.', base: 800, gr: 2.0, max: 15, p: 'oiseau', n: 1, c: 2, r: 4,
+    val: L => 14 + 5 * L, show: v => Math.round(v) + ' m de vol' },
+  { id: 'envol', ic: '☁️', nom: 'Envol', desc: 'L’oiseau monte en volant : ton galet retombe de plus haut et repart loin.', base: 3000, gr: 2.2, max: 10, p: 'ailes', n: 2, c: 3, r: 4,
+    val: L => 1.2 + 0.6 * L, show: v => '+' + fmt1(v) + ' m de hauteur' },
+  { id: 'volee', ic: '🕊️', nom: 'Volée', desc: 'Les oiseaux passent plus souvent.', base: 6000, gr: 2.3, max: 10, p: 'envol', n: 1, c: 4, r: 4,
+    val: L => 1 - 0.05 * L, show: v => '1 oiseau tous les ' + Math.round(50 * v) + '-' + Math.round(100 * v) + ' m' },
+  { id: 'solide', ic: '🛡️', nom: 'Solidité', desc: 'Ton galet traverse un obstacle au lieu de s’arrêter.', base: 1500, gr: 4.0, max: 6, p: 'force', n: 1,
+    x: () => S.maxZone >= 1, xt: 'Atteins le Lac des Pins (120 m).', c: 1, r: 5,
+    val: L => L, show: v => v ? v + ' obstacle' + (v > 1 ? 's' : '') + ' par lancer' : 'aucun obstacle' },
+  { id: 'espace', ic: '🪨', nom: 'Espacement', desc: 'Moins d’obstacles sur ton chemin.', base: 1500, gr: 2.0, max: 10, p: 'solide', n: 1, c: 2, r: 5,
+    val: L => 1 - 0.06 * L, show: v => Math.round(v * 100) + ' % d’obstacles' },
 ];
 const UPGM = {};
-UPG.forEach(u => { UPGM[u.id] = u; });
+UPG.forEach(u => { UPGM[u.id] = u; u.req = () => (!u.p || lvl(u.p) >= u.n) && (!u.x || u.x()); u.reqTxt = () => (u.p && lvl(u.p) < u.n ? 'Il faut ' + UPGM[u.p].nom + ' niveau ' + u.n + '.' : u.xt || ''); });
 
 const POW = [
   { id: 'rafale', ic: '💨', nom: 'Rafale', desc: 'Un coup de vent pousse ton galet vers l’avant.', costs: [2, 4, 7, 11, 16],
     eff: L => L + ' fois par lancer' },
-  { id: 'bond', ic: '🦘', nom: 'Grand Bond', desc: 'Ton galet fait un bond immense.', costs: [3, 6, 10],
+  { id: 'bond', ic: '🦘', nom: 'Grand Bond', desc: 'Ton galet fait un bond immense, par-dessus les obstacles.', costs: [3, 6, 10],
     eff: L => L + ' fois par lancer' },
   { id: 'aimant', ic: '🧲', nom: 'Aimant', desc: 'Attire les pièces et les perles autour du galet.', costs: [4, 8, 13],
     eff: L => 'dure ' + (3 + 2 * L) + ' s' },
-  { id: 'ralenti', ic: '⏳', nom: 'Ralenti', desc: 'Le temps ralentit : les parfaits deviennent faciles.', costs: [5, 9, 14],
+  { id: 'ralenti', ic: '⏳', nom: 'Ralenti', desc: 'Le temps ralentit : les impulsions parfaites deviennent faciles.', costs: [5, 9, 14],
     eff: L => 'dure ' + fmt1(1.5 + L) + ' s' },
 ];
 function powUses(id, L) { return (id === 'rafale' || id === 'bond') ? L : (L > 0 ? 1 : 0); }
@@ -344,37 +426,39 @@ const STONES = [
 
 const ACH = [
   { id: 't1', nom: 'Premier ricochet', desc: 'Fais ton premier lancer.', k: 'throws', v: 1, r: 1 },
-  { id: 'p1', nom: 'Parfait !', desc: 'Réussis un ricochet parfait.', k: 'perfects', v: 1, r: 1 },
+  { id: 'p1', nom: 'Parfait !', desc: 'Réussis une impulsion parfaite.', k: 'perfects', v: 1, r: 1 },
   { id: 'r10', nom: 'Dix d’un coup', desc: '10 ricochets en un seul lancer.', k: 'maxSkips', v: 10, r: 1 },
   { id: 'd25', nom: 'Bon début', desc: 'Atteins 25 m.', k: 'maxDist', v: 25, r: 1 },
-  { id: 'c3', nom: 'En rythme', desc: '3 parfaits d’affilée.', k: 'maxCombo', v: 3, r: 1 },
+  { id: 'c3', nom: 'En rythme', desc: '3 impulsions parfaites d’affilée.', k: 'maxCombo', v: 3, r: 1 },
   { id: 'm1k', nom: 'Tirelire', desc: 'Gagne 1 000 pièces au total.', k: 'totalCoins', v: 1e3, r: 1 },
+  { id: 'o1', nom: 'Pris au vol', desc: 'Un oiseau attrape ton galet.', k: 'birds', v: 1, r: 1 },
   { id: 'r25', nom: 'Petit prodige', desc: '25 ricochets en un lancer.', k: 'maxSkips', v: 25, r: 2 },
-  { id: 'l2', nom: 'Explorateur', desc: 'Débloque le Lac des Pins.', k: 'lakeMax', v: 1, r: 2 },
   { id: 'd100', nom: 'Cent mètres', desc: 'Atteins 100 m.', k: 'maxDist', v: 100, r: 2 },
   { id: 'pad10', nom: 'Grenouille', desc: 'Rebondis sur 10 nénuphars.', k: 'pads', v: 10, r: 2 },
   { id: 'sup1', nom: 'Super !', desc: 'Fais un super ricochet.', k: 'supers', v: 1, r: 1 },
-  { id: 'o1', nom: 'Pris au vol', desc: 'Un oiseau attrape ton galet.', k: 'birds', v: 1, r: 1 },
+  { id: 'surf1', nom: 'Surfeur', desc: 'Surfe pendant 30 secondes au total.', k: 'surfT', v: 30, r: 2 },
+  { id: 'l2', nom: 'Explorateur', desc: 'Découvre le Lac des Pins.', k: 'lakeMax', v: 1, r: 2 },
   { id: 'perle3', nom: 'Pêcheur de perles', desc: 'Attrape 3 perles sur l’eau.', k: 'pearlsFound', v: 3, r: 2 },
+  { id: 'cr10', nom: 'Casse-cou', desc: 'Traverse 10 obstacles.', k: 'breaks', v: 10, r: 3 },
   { id: 't50', nom: 'Habitué', desc: 'Fais 50 lancers.', k: 'throws', v: 50, r: 2 },
-  { id: 'c8', nom: 'Métronome', desc: '8 parfaits d’affilée.', k: 'maxCombo', v: 8, r: 3 },
+  { id: 'c8', nom: 'Métronome', desc: '8 impulsions parfaites d’affilée.', k: 'maxCombo', v: 8, r: 3 },
   { id: 'r50', nom: 'Virtuose', desc: '50 ricochets en un lancer.', k: 'maxSkips', v: 50, r: 3 },
-  { id: 'l3', nom: 'Vers le couchant', desc: 'Débloque la Rivière du Couchant.', k: 'lakeMax', v: 2, r: 3 },
+  { id: 'l3', nom: 'Vers le couchant', desc: 'Découvre la Rivière du Couchant.', k: 'lakeMax', v: 2, r: 3 },
   { id: 'd250', nom: 'Bras d’acier', desc: 'Atteins 250 m.', k: 'maxDist', v: 250, r: 3 },
   { id: 'm1m', nom: 'Coffre-fort', desc: 'Gagne 1 M de pièces au total.', k: 'totalCoins', v: 1e6, r: 3 },
   { id: 'sup25', nom: 'Super star', desc: 'Fais 25 super ricochets.', k: 'supers', v: 25, r: 3 },
   { id: 'o25', nom: 'Ami des oiseaux', desc: '25 prises par un oiseau.', k: 'birds', v: 25, r: 3 },
-  { id: 'l4', nom: 'Grand froid', desc: 'Débloque le Fjord Gelé.', k: 'lakeMax', v: 3, r: 4 },
+  { id: 'l4', nom: 'Grand froid', desc: 'Découvre le Fjord Gelé.', k: 'lakeMax', v: 3, r: 4 },
   { id: 'd500', nom: 'Demi-kilomètre', desc: 'Atteins 500 m.', k: 'maxDist', v: 500, r: 4 },
   { id: 't200', nom: 'Passionné', desc: 'Fais 200 lancers.', k: 'throws', v: 200, r: 4 },
   { id: 'r100', nom: 'Légende du lac', desc: '100 ricochets en un lancer.', k: 'maxSkips', v: 100, r: 5 },
-  { id: 'l5', nom: 'Nuit magique', desc: 'Débloque le Lagon de Minuit.', k: 'lakeMax', v: 4, r: 5 },
-  { id: 'c20', nom: 'Maître du tempo', desc: '20 parfaits d’affilée.', k: 'maxCombo', v: 20, r: 6 },
+  { id: 'l5', nom: 'Nuit magique', desc: 'Découvre le Lagon de Minuit.', k: 'lakeMax', v: 4, r: 5 },
+  { id: 'c20', nom: 'Maître du tempo', desc: '20 impulsions parfaites d’affilée.', k: 'maxCombo', v: 20, r: 6 },
   { id: 'd1000', nom: 'Un kilomètre !', desc: 'Atteins 1 km.', k: 'maxDist', v: 1000, r: 6 },
   { id: 'm1b', nom: 'Trésor du lac', desc: 'Gagne 1 B de pièces au total.', k: 'totalCoins', v: 1e9, r: 6 },
-  { id: 'l6', nom: 'Dans les étoiles', desc: 'Débloque le Lac des Étoiles.', k: 'lakeMax', v: 5, r: 8 },
+  { id: 'l6', nom: 'Dans les étoiles', desc: 'Découvre le Lac des Étoiles.', k: 'lakeMax', v: 5, r: 8 },
   { id: 'b1', nom: 'La boucle est bouclée', desc: 'Fais ta première nouvelle boucle.', k: 'loops', v: 1, r: 8 },
-  { id: 'd2000', nom: 'Au-delà de l’horizon', desc: 'Atteins 2 km.', k: 'maxDist', v: 2000, r: 10 },
+  { id: 'd3000', nom: 'Au-delà de l’horizon', desc: 'Atteins 3 km.', k: 'maxDist', v: 3000, r: 10 },
   { id: 'm1t', nom: 'Fortune légendaire', desc: 'Gagne 1 T de pièces au total.', k: 'totalCoins', v: 1e12, r: 10 },
   { id: 'b3', nom: 'Éternel retour', desc: 'Fais 3 nouvelles boucles.', k: 'loops', v: 3, r: 10 },
 ];
@@ -383,10 +467,10 @@ const ACH = [
 const SAVE_KEY = 'ricochets_sauvegarde_v1';
 function defaultSave() {
   return {
-    v: 1, coins: 0, pearls: 0, ondes: 0, loopCoins: 0, upg: {}, pow: {}, stones: { gris: true }, stone: 'gris',
-    lake: 0, maxLake: 0, best: [0, 0, 0, 0, 0, 0], bestEver: [0, 0, 0, 0, 0, 0],
-    stats: { throws: 0, skips: 0, perfects: 0, maxSkips: 0, maxCombo: 0, maxDist: 0, pads: 0, pearlsFound: 0, supers: 0, loops: 0, totalCoins: 0, lakeMax: 0, birds: 0 },
-    ach: {}, set: { sound: true, music: true, vib: true }, buyMode: '1', last: Date.now(), seenLake: 0,
+    v: 2, coins: 0, pearls: 0, ondes: 0, upg: {}, pow: {}, stones: { gris: true }, stone: 'gris',
+    maxZone: 0, zoneLoop: 0, best: 0, loopBest: 0, seenZone: 0, sel: 'force', nouveau2: false,
+    stats: { throws: 0, skips: 0, perfects: 0, maxSkips: 0, maxCombo: 0, maxDist: 0, pads: 0, pearlsFound: 0, supers: 0, loops: 0, totalCoins: 0, lakeMax: 0, birds: 0, surfT: 0, breaks: 0 },
+    ach: {}, set: { sound: true, music: true, vib: true }, buyMode: '1', last: Date.now(),
   };
 }
 let S = defaultSave();
@@ -403,14 +487,22 @@ function loadGame() {
   try { if (window.Android && Android.load) raw = Android.load(); } catch (e) { raw = null; }
   if (!raw) { try { raw = localStorage.getItem(SAVE_KEY); } catch (e) { raw = null; } }
   const d = defaultSave();
-  if (raw) { try { mergeSave(d, JSON.parse(raw)); } catch (e) { /* sauvegarde illisible */ } }
-  while (d.best.length < LACS.length) d.best.push(0);
-  while (d.bestEver.length < LACS.length) d.bestEver.push(0);
-  d.lake = clamp(d.lake | 0, 0, LACS.length - 1);
-  d.maxLake = clamp(d.maxLake | 0, 0, LACS.length - 1);
-  if (d.lake > d.maxLake) d.lake = d.maxLake;
+  if (raw) {
+    let o = null;
+    try { o = JSON.parse(raw); } catch (e) { o = null; }
+    if (o && o.v === 2) mergeSave(d, o);
+    else if (o) {
+      /* version 1 : la progression repart de zéro (nouvelles règles), on garde perles, galets, pouvoirs, défis et réglages */
+      for (const k of ['pearls', 'pow', 'stones', 'stone', 'ach', 'set']) if (o[k] != null) d[k] = o[k];
+      if (o.stats) for (const k of ['throws', 'skips', 'perfects', 'maxSkips', 'maxCombo', 'pads', 'pearlsFound', 'supers', 'birds', 'totalCoins']) if (isFinite(o.stats[k])) d.stats[k] = o.stats[k];
+      d.nouveau2 = true;
+    }
+  }
+  d.maxZone = clamp(d.maxZone | 0, 0, LACS.length - 1);
+  d.zoneLoop = clamp(d.zoneLoop | 0, 0, LACS.length - 1);
   if (!d.stones[d.stone]) d.stone = 'gris';
-  for (const k of ['coins', 'pearls', 'ondes', 'loopCoins']) if (!isFinite(d[k]) || d[k] < 0) d[k] = 0;
+  if (!UPGM[d.sel]) d.sel = 'force';
+  for (const k of ['coins', 'pearls', 'ondes', 'best', 'loopBest']) if (!isFinite(d[k]) || d[k] < 0) d[k] = 0;
   S = d;
 }
 function saveGame() {
@@ -422,37 +514,42 @@ function saveGame() {
 }
 
 /* ======================= STATS DU JOUEUR ======================= */
+const A_MIN = 0.06, A_MAX = 0.75, A_IDEAL = 0.27;
 function lvl(id) { return S.upg[id] | 0; }
 function plv(id) { return S.pow[id] | 0; }
 function curStone() { for (const s of STONES) if (s.id === S.stone) return s; return STONES[0]; }
-function gaugeZone(L) { return 0.08 + 0.02 * L; }
+function idealW(L) { return 0.09 + 0.014 * L; }
 function upCost(u, L) { return Math.ceil(u.base * Math.pow(u.gr, L)); }
 function idleRate(L) {
   if (!L) return 0;
-  return 1.5 * L * (1 + 0.08 * L) * LACS[S.maxLake].mult * (1 + 0.1 * S.ondes);
+  return 1.2 * L * (1 + 0.08 * L) * LACS[S.zoneLoop].mult * (1 + 0.03 * S.ondes);
 }
+/* bonus des boucles : +3 % de pièces et +0,5 % de force par boucle, + paliers */
+function boucleImp() { return S.ondes >= 5 ? 1 : 0; }
+function boucleSol() { return S.ondes >= 15 ? 1 : 0; }
 function getStats() {
-  const b = curStone().bonus, lake = LACS[S.lake];
-  const v0 = UPGM.force.val(lvl('force')) * (b.v0 || 1) * (1 + 0.01 * S.ondes);
+  const b = curStone().bonus, fb = 1 + 0.005 * S.ondes;
+  const v0 = UPGM.force.val(lvl('force')) * (b.v0 || 1) * fb;
   const lift = UPGM.plat.val(lvl('plat')) * (b.lift || 1);
   const k = Math.min(0.97, UPGM.glisse.val(lvl('glisse')) + (b.k || 0));
-  const g = lake.g;
-  const vy = lift * 1.15 * v0 * 0.85;
   return {
-    v0, lift, k, g, apex: Math.max(0.8, vy * vy / (2 * g)),
-    cps: UPGM.valeur.val(lvl('valeur')),
-    cpm: UPGM.distance.val(lvl('distance')),
-    reach: UPGM.oiseau.val(lvl('oiseau')),
-    win: UPGM.oeil.val(lvl('oeil')) + (b.win || 0),
-    comboB: UPGM.combo.val(lvl('combo')) + (b.combo || 0),
-    gaugeP: 0.85 * (1 + 0.12 * lvl('concentration')),
-    gaugeZone: gaugeZone(lvl('concentration')),
-    luck: 1 + 0.1 * lvl('chance'),
-    crit: 0.02 + 0.012 * lvl('chance'),
-    coinMult: lake.mult * (b.coins || 1) * (1 + 0.1 * S.ondes),
+    v0, lift, k, gMul: UPGM.aero.val(lvl('aero')),
+    angP: 0.8 * (1 + 0.1 * lvl('concentration')), idealW: idealW(lvl('concentration')),
+    surf: UPGM.surf.val(lvl('surf')), surfDec: UPGM.surfv.val(lvl('surfv')),
+    imp: UPGM.imp.val(lvl('imp')) + boucleImp(), impf: UPGM.impf.val(lvl('impf')),
+    win: UPGM.oeil.val(lvl('oeil')) + (b.win || 0), comboB: UPGM.combo.val(lvl('combo')) + (b.combo || 0),
+    cps: UPGM.valeur.val(lvl('valeur')), cpm: UPGM.distance.val(lvl('distance')),
+    luck: 1 + 0.08 * lvl('chance'), crit: 0.02 + 0.01 * lvl('chance'),
+    reach: UPGM.oiseau.val(lvl('oiseau')), carry: UPGM.ailes.val(lvl('ailes')), rise: UPGM.envol.val(lvl('envol')), birdMul: UPGM.volee.val(lvl('volee')),
+    tough: UPGM.solide.val(lvl('solide')) + boucleSol(), obstMul: UPGM.espace.val(lvl('espace')),
+    coinMult: (b.coins || 1) * (1 + 0.03 * S.ondes),
   };
 }
-function ondesGain() { if (S.maxLake < 2) return 0; return Math.max(0, Math.floor((Math.log10(Math.max(1, S.loopCoins)) - 6) * 3)); }
+/* boucles : possibles une fois le Lac des Étoiles atteint dans la boucle en cours */
+function ondesGain() {
+  if (S.zoneLoop < LACS.length - 1) return 0;
+  return Math.max(1, Math.floor(3 * Math.pow(S.loopBest / LACS[LACS.length - 1].x0, 2)));
+}
 
 /* ======================= SON (synthétisé) ======================= */
 const AU = { c: null, master: null, sfx: null, mus: null, dly: null, noise: null, next: 0, chord: 0, chordT: 0 };
@@ -522,7 +619,7 @@ function nz(t, dur, f, q, vol, type, f2) {
 function now() { return AU.c.currentTime + 0.004; }
 function sfxSkip(i, j, crit) {
   if (!auOn()) return;
-  const t = now(), base = (LACS[S.lake].root || 60) + 12;
+  const t = now(), base = (LACS[zoneAt(G.camX)].root || 60) + 12;
   const f = pnote(Math.min(i, 17), base);
   if (j === 'parfait' || crit) {
     tone(f, t, 0.9, 'sine', 0.18, { send: 0.5 });
@@ -572,7 +669,7 @@ function auMusic() {
   if (!AU.c || !S.set.music || AU.c.state !== 'running') return;
   const c = AU.c, tn = c.currentTime;
   if (AU.next < tn) AU.next = tn + 0.05;
-  const root = LACS[S.lake].root || 60;
+  const root = LACS[zoneAt(G.camX)].root || 60;
   while (AU.next < tn + 0.4) {
     const t = AU.next;
     if (t >= AU.chordT) {
@@ -597,12 +694,15 @@ function vib(ms) {
 
 /* ======================= RENDU (pixel art) ======================= */
 const cv = document.getElementById('cv');
-const ctx = cv.getContext('2d', { alpha: false });
+let ctx = cv.getContext('2d', { alpha: false });
+const MAINCTX = ctx;
+let OFFC = null, AMBZ = -1;
 const fx = document.getElementById('fx');
 const fctx = fx.getContext('2d');
 let RW = 480, RH = 216, VW = 800, VH = 360, DPR = 1, KX = 1, KY = 1, yHor = 91, yLane = 156, anchorX = 130;
 const VEX = 2.4;
-const BG = { lake: -1 };
+let BG = { lake: -1 };
+let BGS = {};
 const LABELS = [];
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + 0.5) / 16);
 const FONT = 'system-ui,-apple-system,Roboto,"Segoe UI",Arial,sans-serif';
@@ -617,7 +717,7 @@ function resize() {
   KX = VW / RW; KY = VH / RH;
   yHor = Math.round(RH * 0.42); yLane = Math.round(RH * 0.72); anchorX = Math.round(RW * 0.27);
   ctx.imageSmoothingEnabled = false;
-  BG.lake = -1;
+  BG = { lake: -1 }; BGS = {}; OFFC = null;
 }
 function WX(x) { return anchorX + (x - G.camX) * G.zoom; }
 function WY(y) { return yLane - y * G.zoom * VEX; }
@@ -784,7 +884,11 @@ function buildBG(li) {
   BG.clouds = [];
   const nC = L.stars ? 3 : 6;
   for (let i = 0; i < nC; i++) BG.clouds.push({ spr: cloudSpr(r, L), x: r() * (RW + 160), y: 4 + r() * (yHor * 0.42), sp: 1.2 + r() * 2.5, f: 0.02 + r() * 0.03, a: L.stars ? 0.5 : 0.95 });
-  initAmbient(L);
+}
+function getBG(li) {
+  let b = BGS[li];
+  if (!b || b.W !== RW || b.H !== RH) { const keep = BG; BG = { lake: -1 }; buildBG(li); b = BGS[li] = BG; BG = keep; }
+  return b;
 }
 
 /* ---------- dessin de la scène ---------- */
@@ -865,10 +969,11 @@ function drawMarkers(L, t) {
     ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.fillRect(X - 2, by, 5, 1);
     LABELS.push({ x: X, y: by - 7, txt: m >= 1000 ? fmtDist(m) : m + ' m', c: '#ffffff', s: 11 });
   }
-  const best = S.best[S.lake];
-  if (best > 3) flag(best, '#ff5b6e', 'Record', t);
-  const next = LACS[S.lake + 1];
-  if (next && S.lake === S.maxLake) flag(next.need, '#ffd23f', '🔓 ' + next.nom, t);
+  if (S.best > 3) flag(S.best, '#ff5b6e', 'Record', t);
+  for (let i = 1; i < LACS.length; i++) {
+    const Z = LACS[i];
+    flag(Z.x0, i > S.maxZone ? '#ffd23f' : '#9ff0c0', (i > S.maxZone ? '❓ ' : '') + Z.nom + ' ×' + fmt(Z.mult), t);
+  }
 }
 function flag(m, col, txt, t) {
   const X = Math.round(WX(m)); if (X < -30 || X > RW + 60) return;
@@ -885,6 +990,7 @@ function drawSurface(L, t) {
     const ow = o.w || 0;
     if (o.x + ow < xmin || o.x > xmax) continue;
     const X0 = WX(o.x), X1 = WX(o.x + ow);
+    L = LACS[zoneAt(o.x)];
     switch (o.type) {
       case 'pad': {
         const cx = (X0 + X1) / 2, rx = Math.max(3, Math.round((X1 - X0) / 2)), ry = Math.max(1, Math.round(rx * 0.3));
@@ -929,14 +1035,38 @@ function drawSurface(L, t) {
         ctx.globalAlpha = 1;
         break;
       }
-      case 'rock': {
-        const cx = (X0 + X1) / 2, rx = Math.max(3, Math.round((X1 - X0) / 2)), ry = Math.max(2, Math.round(o.top * G.zoom * VEX));
-        for (let dy = -ry; dy <= 0; dy++) {
-          const k = dy / (ry + 0.5), w = Math.round(rx * Math.sqrt(Math.max(0, 1 - k * k)));
-          ctx.fillStyle = dy < -ry * 0.55 ? '#a7a39b' : '#7d7a74'; ctx.fillRect(Math.round(cx - w), yLane + dy, w * 2 + 1, 1);
+      case 'obst': {
+        const st = LACS[o.z].ob, cx = Math.round((X0 + X1) / 2), rx = Math.max(2, Math.round((X1 - X0) / 2)), hgt = Math.max(3, Math.round(o.top * G.zoom * VEX));
+        const hit = o.hitT && t - o.hitT < 0.6;
+        if (o.hitT && !hit) ctx.globalAlpha = 0.35;
+        if (st.shape === 'tronc') {
+          ctx.fillStyle = st.s; ctx.fillRect(cx - rx - 2, yLane - hgt + 1, rx * 2 + 5, hgt);
+          ctx.fillStyle = st.c; ctx.fillRect(cx - rx - 2, yLane - hgt, rx * 2 + 4, hgt - 1);
+          ctx.fillStyle = st.h; ctx.fillRect(cx - rx - 1, yLane - hgt, rx * 2 + 2, 1);
+          ctx.fillStyle = st.s; for (let X = cx - rx; X < cx + rx; X += 3) ctx.fillRect(X, yLane - hgt + 2, 1, Math.max(1, hgt - 3));
+          ctx.fillStyle = '#c9a07a'; ell(ctx, cx + rx + 2, yLane - (hgt >> 1), 1, Math.max(1, hgt >> 1));
+        } else if (st.shape === 'glace') {
+          ctx.fillStyle = st.s; ctx.fillRect(cx - rx, yLane - hgt + 2, rx * 2 + 1, hgt - 1);
+          ctx.fillStyle = st.c; ctx.fillRect(cx - rx, yLane - hgt, rx * 2 + 1, hgt - 2);
+          ctx.fillStyle = st.h; ctx.fillRect(cx - rx + 1, yLane - hgt, Math.max(1, rx), 1); ctx.fillRect(cx - rx + 1, yLane - hgt + 1, 1, Math.max(1, hgt - 4));
+        } else if (st.shape === 'cristal' || st.shape === 'recif') {
+          for (let dy = 0; dy < hgt; dy++) {
+            const w = Math.max(0, Math.round(rx * (1 - dy / hgt)));
+            ctx.fillStyle = dy > hgt * 0.6 ? st.h : (dy & 1 ? st.c : st.s); ctx.fillRect(cx - w, yLane - dy, w * 2 + 1, 1);
+          }
+          if (st.shape === 'recif') { ctx.fillStyle = rgba(st.h, 0.5 + 0.4 * Math.sin(t * 3 + o.x)); ctx.fillRect(cx - 1, yLane - hgt - 1, 2, 2); }
+          else { ctx.fillStyle = rgba(st.h, 0.25); disc(ctx, cx, yLane - (hgt >> 1), rx + 2); }
+        } else {
+          for (let dy = -hgt; dy <= 0; dy++) {
+            const k = dy / (hgt + 0.5), w = Math.round(rx * Math.sqrt(Math.max(0, 1 - k * k)) + (st.shape === 'souche' ? 1 : 0));
+            ctx.fillStyle = dy < -hgt * 0.55 ? st.h : st.c; ctx.fillRect(cx - w, yLane + dy, w * 2 + 1, 1);
+          }
+          ctx.fillStyle = st.s; ctx.fillRect(cx - rx, yLane - 1, rx * 2 + 1, 1);
+          if (st.shape === 'souche') { ctx.fillStyle = st.s; ctx.fillRect(cx - 1, yLane - hgt, 3, 1); }
         }
-        ctx.fillStyle = '#c9c5bc'; ctx.fillRect(Math.round(cx - rx * 0.4), yLane - ry + 1, Math.max(1, Math.round(rx * 0.5)), 1);
-        ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillRect(Math.round(cx - rx - 1), yLane + 1, rx * 2 + 3, 1);
+        ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.fillRect(cx - rx - 2, yLane + 1, rx * 2 + 5, 1);
+        if (hit) { ctx.fillStyle = 'rgba(255,240,200,' + (0.8 - (t - o.hitT)) + ')'; ctx.fillRect(cx - rx - 3, yLane - hgt - 3, rx * 2 + 7, 2); }
+        ctx.globalAlpha = 1;
         break;
       }
       case 'duck': {
@@ -971,8 +1101,9 @@ function drawItems(L, t) {
       ctx.fillStyle = '#ffffff'; ctx.fillRect(X - 1, Y - 1, 1, 1);
       if (Math.sin(t * 5 + o.ph) > 0.85) { ctx.fillRect(X + 3, Y - 4, 1, 3); ctx.fillRect(X + 2, Y - 3, 3, 1); }
     } else {
-      ctx.fillStyle = rgba(L.crystal || '#9af0ff', 0.25); disc(ctx, X, Y, 4);
-      ctx.fillStyle = L.crystal || '#9af0ff';
+      const C = LACS[zoneAt(o.x)].crystal || '#9af0ff';
+      ctx.fillStyle = rgba(C, 0.25); disc(ctx, X, Y, 4);
+      ctx.fillStyle = C;
       ctx.fillRect(X, Y - 4, 1, 1); ctx.fillRect(X - 1, Y - 3, 3, 5); ctx.fillRect(X, Y + 2, 1, 1);
       ctx.fillStyle = '#ffffff'; ctx.fillRect(X - 1, Y - 2, 1, 2);
     }
@@ -1079,6 +1210,7 @@ function drawStone(L, t) {
 }
 function drawBirds(t) {
   const reach = UPGM.oiseau.val(lvl('oiseau'));
+  let B;
   for (const b of OBJ) {
     if (b.type !== 'bird' || b.st === 'gone') continue;
     const wait = b.st === 'wait';
@@ -1091,17 +1223,18 @@ function drawBirds(t) {
       for (let y = Y + 4; y < yb; y += 3) ctx.fillRect(X, y, 1, 1);
       ctx.fillRect(X - 3, yb, 7, 1);
     }
+    B = LACS[b.z || 0].bird;
     const ph = Math.sin(t * (wait ? 8 : 22) + b.ph), fr = ph > 0.35 ? 0 : ph < -0.35 ? 2 : 1;
-    const R = [[-5, -1, 9, 3, '#ffffff'], [3, -3, 4, 3, '#ffffff'], [-7, -1, 2, 2, '#c9d2dc']];
-    if (fr === 0) R.push([-3, -3, 4, 2, '#e3e9ef'], [-5, -5, 4, 2, '#d6dde5'], [-7, -7, 3, 2, '#5a6470']);
-    else if (fr === 2) R.push([-3, 1, 4, 2, '#e3e9ef'], [-5, 3, 4, 2, '#d6dde5'], [-7, 5, 3, 1, '#5a6470']);
-    else R.push([-7, -2, 7, 1, '#d6dde5'], [-9, -2, 2, 1, '#5a6470']);
+    const R = [[-5, -1, 9, 3, B.b], [3, -3, 4, 3, B.b], [-7, -1, 2, 2, B.w2]];
+    if (fr === 0) R.push([-3, -3, 4, 2, B.w], [-5, -5, 4, 2, B.w2], [-7, -7, 3, 2, B.t]);
+    else if (fr === 2) R.push([-3, 1, 4, 2, B.w], [-5, 3, 4, 2, B.w2], [-7, 5, 3, 1, B.t]);
+    else R.push([-7, -2, 7, 1, B.w2], [-9, -2, 2, 1, B.t]);
     ctx.fillStyle = 'rgba(40,52,66,0.55)';
     for (const r of R) ctx.fillRect(X + r[0] - 1, Y + r[1] - 1, r[2] + 2, r[3] + 2);
     for (const r of R) { ctx.fillStyle = r[4]; ctx.fillRect(X + r[0], Y + r[1], r[2], r[3]); }
-    ctx.fillStyle = '#d5dde6'; ctx.fillRect(X - 4, Y + 1, 7, 1);
+    ctx.fillStyle = B.w2; ctx.fillRect(X - 4, Y + 1, 7, 1);
     ctx.fillStyle = '#2a2a2a'; ctx.fillRect(X + 5, Y - 2, 1, 1);
-    ctx.fillStyle = '#f2a33a'; ctx.fillRect(X + 7, Y - 1, 2, 1);
+    ctx.fillStyle = B.k; ctx.fillRect(X + 7, Y - 1, 2, 1);
     if (b.st === 'carry') { ctx.fillRect(X - 1, Y + 2, 1, 3); ctx.fillRect(X + 1, Y + 2, 1, 3); }
   }
 }
@@ -1116,7 +1249,7 @@ function drawParticles() {
 function drawLanding(t) {
   if (G.state !== 'flight') return;
   const s = G.stone; if (!s || s.mode !== 'air') return;
-  const g = G.st.g, th = (s.vy + Math.sqrt(s.vy * s.vy + 2 * g * Math.max(0, s.y))) / g, tr = th / (G.run.ts || 1);
+  const g = grav(s.x), th = (s.vy + Math.sqrt(s.vy * s.vy + 2 * g * Math.max(0, s.y))) / g, tr = th / (G.run.ts || 1);
   const X = WX(s.x + s.vx * th); if (X > RW + 20) return;
   const k = clamp(tr / 0.7, 0, 1), rx = 3 + k * 15, ry = Math.max(1.2, rx * 0.3), inWin = tr <= G.st.win;
   ctx.lineWidth = 1;
@@ -1166,10 +1299,7 @@ function drawSlowTint() {
   if (G.slowT > 0) { ctx.fillStyle = 'rgba(120,170,255,0.10)'; ctx.fillRect(0, 0, RW, RH); }
 }
 
-function draw(dt) {
-  const L = LACS[S.lake];
-  if (BG.lake !== S.lake || BG.W !== RW || BG.H !== RH) buildBG(S.lake);
-  const t = G.t;
+function drawBack(L, t) {
   ctx.drawImage(BG.sky, 0, 0);
   drawCelestial(L, t);
   drawClouds(t);
@@ -1181,11 +1311,29 @@ function draw(dt) {
   drawGlitter(L, t);
   shimmer(yHor + 3, yLane - 3, G.offW1, 0.3, L.shine, t, 0.55);
   shimmer(yLane + 3, RH, G.offW2, 0.26, L.shine, t, 0.7);
+}
+function draw(dt) {
+  const t = G.t, TR = 22;
+  const cx = G.camX + (RW * 0.5 - anchorX) / G.zoom;
+  let zA = zoneAt(cx), zB = zA, k = 0;
+  if (zA + 1 < LACS.length && cx > LACS[zA + 1].x0 - TR) { zB = zA + 1; k = (cx - (LACS[zB].x0 - TR)) / (2 * TR); }
+  else if (zA > 0 && cx < LACS[zA].x0 + TR) { zB = zA; zA = zA - 1; k = (cx - (LACS[zB].x0 - TR)) / (2 * TR); }
+  k = clamp(k, 0, 1);
+  const zD = k < 0.5 ? zA : zB, L = LACS[zD];
+  if (AMBZ !== zD) { AMBZ = zD; initAmbient(L); }
+  BG = getBG(zA); drawBack(LACS[zA], t);
+  if (k > 0.001 && zB !== zA) {
+    if (!OFFC || OFFC.width !== RW || OFFC.height !== RH) OFFC = mkC(RW, RH);
+    const oc = OFFC.getContext('2d'); oc.imageSmoothingEnabled = false;
+    ctx = oc; BG = getBG(zB); drawBack(LACS[zB], t); ctx = MAINCTX;
+    ctx.globalAlpha = k; ctx.drawImage(OFFC, 0, 0); ctx.globalAlpha = 1;
+  }
+  BG = getBG(zD);
   drawMarkers(L, t);
   drawSurface(L, t);
   drawRipples(L);
-  drawDock(L, t);
-  drawChar(L, t);
+  drawDock(LACS[0], t);
+  drawChar(LACS[0], t);
   drawItems(L, t);
   drawLanding(t);
   drawStone(L, t);
@@ -1222,20 +1370,21 @@ function drawFX() {
   if (G.fade > 0) { c.fillStyle = 'rgba(8,12,22,' + G.fade + ')'; c.fillRect(0, 0, VW, VH); }
 }
 function drawGauge(c) {
-  const ST = G.st, v = G.gauge, zone = ST.gaugeZone;
-  const cx = (WX(CHAR_X) + 15) * KX, by = (WY(DOCK_H) - 2) * KY, h = Math.min(130, VH * 0.4), w = 20, top = by - h;
-  c.fillStyle = 'rgba(15,22,38,.72)'; rr(c, cx - w / 2 - 4, top - 4, w + 8, h + 8, 12); c.fill();
-  c.fillStyle = 'rgba(255,215,90,.28)'; rr(c, cx - w / 2, top, w, h * zone, 8); c.fill();
-  const fh = Math.max(4, h * v), inZ = v >= 1 - zone;
-  const gr = c.createLinearGradient(0, by, 0, top);
-  gr.addColorStop(0, '#5fd36a'); gr.addColorStop(0.6, '#f6d34a'); gr.addColorStop(1, '#ff8a3a');
-  c.fillStyle = inZ ? '#ffd23f' : gr; rr(c, cx - w / 2, by - fh, w, fh, 8); c.fill();
-  c.strokeStyle = '#ffd23f'; c.lineWidth = 2; c.beginPath(); c.moveTo(cx - w / 2 - 3, top + h * zone); c.lineTo(cx + w / 2 + 3, top + h * zone); c.stroke();
-  c.font = '900 13px ' + FONT; c.textAlign = 'left';
-  c.lineWidth = 3; c.strokeStyle = 'rgba(15,20,35,.6)';
-  const lab = inZ ? 'PARFAIT !' : Math.round(v * 100) + ' %';
-  c.strokeText(lab, cx + w / 2 + 8, by - fh + 5); c.fillStyle = inZ ? '#ffd23f' : '#ffffff'; c.fillText(lab, cx + w / 2 + 8, by - fh + 5);
-  c.textAlign = 'center';
+  const ST = G.st, a = G.ang, w = ST.idealW;
+  const cx = (WX(CHAR_X) + 2) * KX, cy = (WY(DOCK_H) - 9) * KY, R = Math.min(120, VH * 0.36);
+  c.save();
+  c.lineCap = 'round';
+  c.fillStyle = 'rgba(15,22,38,.55)'; c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, R + 8, -A_MAX - 0.06, -A_MIN + 0.06); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(255,215,90,.35)'; c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, R + 4, -(A_IDEAL + w / 2), -(A_IDEAL - w / 2)); c.closePath(); c.fill();
+  const ideal = idealLaunch(a), steep = a > 0.5;
+  c.strokeStyle = ideal ? '#ffd23f' : steep ? '#ff8a6a' : '#ffffff'; c.lineWidth = 5;
+  c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a) * R, cy - Math.sin(a) * R); c.stroke();
+  const hx = cx + Math.cos(a) * R, hy = cy - Math.sin(a) * R;
+  c.fillStyle = c.strokeStyle; c.beginPath(); c.moveTo(hx + Math.cos(a) * 12, hy - Math.sin(a) * 12); c.lineTo(hx + Math.cos(a + 2.4) * 9, hy - Math.sin(a + 2.4) * 9); c.lineTo(hx + Math.cos(a - 2.4) * 9, hy - Math.sin(a - 2.4) * 9); c.closePath(); c.fill();
+  c.font = '900 14px ' + FONT; c.textAlign = 'left'; c.lineWidth = 3; c.strokeStyle = 'rgba(15,20,35,.65)';
+  const lab = ideal ? 'IDÉAL !' : Math.round(a * 180 / Math.PI) + '°' + (steep ? ' · trop haut' : '');
+  c.strokeText(lab, hx + 12, hy - 6); c.fillStyle = ideal ? '#ffd23f' : '#ffffff'; c.fillText(lab, hx + 12, hy - 6);
+  c.restore();
 }
 
 /* ---------- vignettes des lacs (menu) ---------- */
@@ -1260,61 +1409,62 @@ function drawThumb(cnv, li) {
 }
 
 /* ======================= LOGIQUE DU JEU ======================= */
-const VMIN = 1.6, SINK_ANG = 1.0, THROW_H = 0.7, THROW_A = 0.2;
+const VMIN = 1.6, SINK_ANG = 0.95, STEEP_ANG = 0.5, THROW_H = 0.7;
 const CHAR_X = -0.45, DOCK_H = 0.34, DOCK0 = -9, DOCK1 = 0.3, AIM_CAM = 4.2, AIM_ZOOM = 12;
 const G = {
   state: 'aim', t: 0, camX: AIM_CAM, zoom: AIM_ZOOM, prevCam: AIM_CAM, dCam: 0, st: null, stone: null, run: null,
-  gauge: 0, gt: 0, char: 'idle', charT: 0, slowT: 0, magT: 0, fade: 0, resT: 0, sinkT: 0, frameNow: 0,
-  offFar: 0, offMid: 0, offTree: 0, offW1: 0, offW2: 0, genUntil: 8, seed: 1, genApex: 1, genLuck: 1,
-  idleAcc: 0, saveAcc: 0, pointer: null, sim: false, simP: 0, nextBird: 60, birdR: null,
+  ang: A_IDEAL, gt: 0, char: 'idle', charT: 0, slowT: 0, magT: 0, fade: 0, resT: 0, sinkT: 0, frameNow: 0,
+  offFar: 0, offMid: 0, offTree: 0, offW1: 0, offW2: 0, genUntil: 8, seed: 1, genApex: 1, genLuck: 1, genObst: 1,
+  idleAcc: 0, saveAcc: 0, pointer: null, sim: false, simP: 0, nextBird: 60, birdR: null, birdMul: 1,
 };
 let OBJ = [], RIP = [], PART = [], TXT = [];
 
-/* ---------- génération des objets sur l'eau ---------- */
+/* ---------- génération des objets sur l'eau (selon la zone) ---------- */
 function genReset(seed) {
   OBJ = []; G.genUntil = 8; G.seed = seed | 0;
-  const st = getStats(); G.genApex = st.apex; G.genLuck = st.luck;
-  G.birdR = rng32((seed ^ 0x5b1d) | 0); G.nextBird = 50 + G.birdR() * 50;
+  const st = getStats(); G.genApex = Math.max(1, st.v0 * st.v0 * 0.06); G.genLuck = st.luck; G.genObst = st.obstMul; G.birdMul = st.birdMul;
+  G.birdR = rng32((seed ^ 0x5b1d) | 0); G.nextBird = (50 + G.birdR() * 50) * G.birdMul;
 }
 function overlapsSurf(o) {
   for (let i = OBJ.length - 1; i >= 0 && i >= OBJ.length - 40; i--) {
     const p = OBJ[i];
     if (!(p.surf || p.solid)) continue;
-    if (o.x < p.x + p.w + 0.6 && p.x < o.x + o.w + 0.6) return true;
+    if (o.x < p.x + p.w + 0.8 && p.x < o.x + o.w + 0.8) return true;
   }
   return false;
 }
-function makeObj(type, x, r, apex) {
+function makeObj(type, x, r, apex, z) {
   switch (type) {
     case 'pad': return { type, x, w: 0.9 + r() * 0.6, surf: true, flower: r() < 0.35 };
     case 'weed': return { type, x, w: 1.8 + r() * 2.5, surf: true };
     case 'current': return { type, x, w: 3 + r() * 4, surf: true };
     case 'ice': return { type, x, w: 3 + r() * 6, surf: true };
     case 'plankton': return { type, x, w: 2 + r() * 3, surf: true, ph: r() * TAU };
-    case 'rock': return { type, x, w: 0.7 + r() * 0.6, top: 0.25 + r() * 0.15, solid: true };
+    case 'obst': return { type, x, w: 0.6 + r() * 0.7, top: 0.3 + r() * 0.3, solid: true, z };
     case 'coin': return { type, x, h: 0.15 + r() * apex * 0.9, ph: r() * TAU };
     case 'pearl': return { type, x, h: 0.15 + r() * apex * 0.8, ph: r() * TAU };
     default: return { type: 'crystal', x, h: 0.3 + r() * apex * 0.9, ph: r() * TAU };
   }
 }
 function genMore(upTo) {
-  const L = LACS[S.lake];
   while (G.genUntil < upTo) {
-    const x0 = G.genUntil, len = 25, ci = Math.floor(x0 / len);
-    const r = rng32((Math.imul(G.seed, 7919) + Math.imul(ci, 104729) + S.lake * 31) | 0);
+    const x0 = G.genUntil, len = 25, ci = Math.floor(x0 / len), z = zoneAt(x0), L = LACS[z];
+    const r = rng32((Math.imul(G.seed, 7919) + Math.imul(ci, 104729)) | 0);
     for (const type in L.obj) {
-      const n = L.obj[type] * len * ((type === 'coin' || type === 'pearl' || type === 'crystal') ? G.genLuck : 1);
+      let n = L.obj[type] * len;
+      if (type === 'coin' || type === 'pearl' || type === 'crystal') n *= G.genLuck;
+      if (type === 'obst') { n *= G.genObst * (1 + 0.25 * Math.min(4, (x0 - L.x0) / 300)); if (x0 < L.x0 + 12) n = 0; }
       const cnt = Math.floor(n) + (r() < n - Math.floor(n) ? 1 : 0);
       for (let i = 0; i < cnt; i++) {
-        const o = makeObj(type, x0 + r() * len, r, G.genApex);
+        const o = makeObj(type, x0 + r() * len, r, G.genApex, z);
         if ((o.surf || o.solid) && overlapsSurf(o)) continue;
         OBJ.push(o);
       }
     }
     while (G.nextBird < x0 + len) {
       const br = G.birdR;
-      OBJ.push({ type: 'bird', x: G.nextBird, h: clamp(0.55 * G.genApex, 1.4, 6) + (br() - 0.5) * 0.5, ph: br() * TAU, st: 'wait', t: 0 });
-      G.nextBird += 50 + br() * 50;
+      OBJ.push({ type: 'bird', x: G.nextBird, h: clamp(0.5 * G.genApex, 1.4, 7) + (br() - 0.5) * 0.6, ph: br() * TAU, st: 'wait', t: 0, z: zoneAt(G.nextBird) });
+      G.nextBird += (50 + br() * 50) * G.birdMul;
     }
     if (L.decor !== 'cosmos' && r() < 0.3) OBJ.push({ type: 'duck', x: x0 + r() * len, d: 3 + Math.floor(r() * 8), fly: 0, col: r() < 0.5 ? 0 : 1 });
     G.genUntil += len;
@@ -1347,32 +1497,40 @@ function pop(txt, x, y, col, size) {
   if (TXT.length > 40) TXT.shift();
 }
 
-/* ---------- lancer ---------- */
+/* ---------- lancer : on règle la hauteur avec la flèche ---------- */
 function beginCharge() {
-  G.st = getStats(); G.state = 'charge'; G.gt = 0; G.gauge = 0;
+  G.st = getStats(); G.state = 'charge'; G.gt = 0; G.ang = A_MIN;
   hideResult(); setHint();
 }
-function startThrow(power) {
+function updateCharge(dt) {
+  G.gt += dt;
+  const ph = (G.gt / G.st.angP) % 2, tri = ph < 1 ? ph : 2 - ph;
+  G.ang = A_MIN + (A_MAX - A_MIN) * tri;
+}
+function idealLaunch(a) { return Math.abs(a - A_IDEAL) <= G.st.idealW / 2; }
+function startThrow(ang) {
   const ST = G.st = getStats();
-  const perfect = power >= 1 - ST.gaugeZone;
-  const v = ST.v0 * (0.3 + 0.7 * power) * (perfect ? 1.08 : 1);
-  G.stone = { x: CHAR_X + 0.3, y: THROW_H, vx: v * Math.cos(THROW_A), vy: v * Math.sin(THROW_A), mode: 'air', trail: [], slideEnd: 0 };
+  const perfect = idealLaunch(ang);
+  const v = ST.v0 * (perfect ? 1.1 : 1);
+  G.stone = { x: CHAR_X + 0.3, y: THROW_H, vx: v * Math.cos(ang), vy: v * Math.sin(ang), mode: 'air', trail: [], slideEnd: 0, safe: false };
   const uses = {};
   for (const p of POW) uses[p.id] = powUses(p.id, plv(p.id));
-  G.run = { skips: 0, perfects: 0, combo: 0, maxCombo: 0, coins: 0, pearls: 0, supers: 0, pads: 0, dist: 0, rt: 0, ts: 1,
-    attempt: -1, last: null, vmin: Math.max(VMIN, 0.12 * v), uses, perfectThrow: perfect, birds: 0 };
+  G.run = { skips: 0, perfects: 0, combo: 0, maxCombo: 0, coins: 0, dcoins: 0, pearls: 0, supers: 0, pads: 0, dist: 0, rt: 0, ts: 1,
+    lastB: -9, queued: false, vmin: Math.max(VMIN, 0.1 * v), uses, perfectThrow: perfect, birds: 0, breaks: 0,
+    imp: ST.imp, impMax: ST.imp, tough: ST.tough, surfT: ST.surf, surfed: 0, zone: 0, end: '' };
   G.slowT = 0; G.magT = 0;
   G.state = 'flight'; G.char = 'throw'; G.charT = 0;
   if (G.sim) return;
   sfxThrow();
-  if (perfect) { pop('Lancer parfait !', G.stone.x + 1.2, 1.7, '#ffd23f', 18); vib(15); }
+  if (perfect) { pop('Lancer idéal !', G.stone.x + 1.2, 1.7, '#ffd23f', 18); vib(15); }
   renderPowers(); setHint(); updateHUD(true);
 }
+function grav(x) { return LACS[zoneAt(x)].g * G.st.gMul; }
 function updateFlight(dt) {
-  const s = G.stone, R = G.run, ST = G.st;
+  const s = G.stone, R = G.run;
   if (G.slowT > 0) G.slowT -= dt;
   if (G.magT > 0) G.magT -= dt;
-  const ts = clamp(s.vx / 8, 1, 4) * (1 + Math.max(0, R.rt - 20) / 20) * (G.slowT > 0 ? 0.4 : 1);
+  const ts = clamp(s.vx / 8, 1, 4.5) * (1 + Math.max(0, R.rt - 20) / 20) * (G.slowT > 0 ? 0.4 : 1);
   R.ts = ts;
   let sim = dt * ts, guard = 0;
   const H = 1 / 240;
@@ -1382,24 +1540,46 @@ function updateFlight(dt) {
     stepStone(h);
   }
   if (G.state !== 'flight') return;
-  if (R.last && !R.last.done && R.rt - R.last.rt > ST.win) {
-    R.last.done = true;
-    if (R.combo > 0) { if (R.combo >= 3) pop('Combo perdu', s.x, 0.8, '#d0d8e8', 12); R.combo = 0; }
-  }
-  if (s.x > R.dist) R.dist = s.x;
   if (!G.sim && curStone().trail) { s.trail.push({ x: s.x, y: s.y }); if (s.trail.length > 10) s.trail.shift(); }
 }
+function advance(px) {
+  const s = G.stone, R = G.run, ST = G.st;
+  if (s.x > R.dist) {
+    const a = Math.max(px, R.dist), b = s.x;
+    R.dcoins += ST.cpm * ST.coinMult * zm(b) * (b - a);
+    R.dist = b;
+    const z = zoneAt(b);
+    if (z > R.zone) { R.zone = z; newZone(z); }
+  }
+}
+function newZone(z) {
+  const first = z > S.maxZone;
+  if (z > S.zoneLoop) S.zoneLoop = z;
+  if (first) { S.maxZone = z; if (z > S.stats.lakeMax) S.stats.lakeMax = z; }
+  if (G.sim) return;
+  const L = LACS[z], s = G.stone;
+  pop((first ? 'Nouvelle zone : ' : '') + L.nom + ' · pièces ×' + fmt(L.mult), s.x, Math.max(2.2, s.y + 1.6), '#ffe27a', first ? 20 : 16);
+  if (first) { sfxUnlock(); vib(30); toast('🗺️ Zone découverte : <b>' + L.nom + '</b> (pièces ×' + fmt(L.mult) + ')', 3500); }
+}
 function stepStone(h) {
-  const s = G.stone, ST = G.st, px = s.x, py = s.y;
+  const s = G.stone, ST = G.st, R = G.run, px = s.x, py = s.y;
   if (s.mode === 'air') {
-    s.vy -= ST.g * h; s.x += s.vx * h; s.y += s.vy * h;
-    if (s.y < 0.6) rockCheck();
-    if (s.y <= 0 && s.mode === 'air') { s.y = 0; impact(); }
+    s.vy -= grav(s.x) * h; s.x += s.vx * h; s.y += s.vy * h;
+    if (s.y < 0.65) obstCheck(px);
+    if (s.mode === 'air' && s.y <= 0) { s.y = 0; impact(); }
   } else if (s.mode === 'slide') {
-    s.x += s.vx * h; s.vx *= 1 - 0.1 * h; s.y = 0;
+    s.x += s.vx * h; s.vx *= 1 - 0.08 * h; s.y = 0;
+    obstCheck(px);
     if (!G.sim && Math.random() < h * 30) PART.push({ x: s.x, y: 0.02, vx: -1 - Math.random(), vy: 0.5 + Math.random(), t: 0, life: 0.4, col: '#ffffff', sz: 1, g: 4 });
-    if (s.x >= s.slideEnd) { s.mode = 'air'; s.vy = Math.max(0.8, ST.lift * s.vx * 0.6); }
-    else if (s.vx < G.run.vmin) { sink('lent'); return; }
+    if (s.mode === 'slide') {
+      if (s.x >= s.slideEnd) { s.mode = 'air'; s.vy = Math.max(0.8, ST.lift * s.vx * 0.6); }
+      else if (s.vx < 1) { sink('lent'); return; }
+    }
+  } else if (s.mode === 'surf') {
+    s.x += s.vx * h; s.vx *= 1 - ST.surfDec * h; s.y = 0; R.surfT -= h; R.surfed += h;
+    obstCheck(px);
+    if (!G.sim && Math.random() < h * 45) PART.push({ x: s.x - 0.1, y: 0.03, vx: -0.5 - Math.random() * 1.5, vy: 0.6 + Math.random() * 1.2, t: 0, life: 0.35, col: '#ffffff', sz: 1, g: 6 });
+    if (s.mode === 'surf' && (R.surfT <= 0 || s.vx < 0.8)) { sink('surf'); return; }
   } else if (s.mode === 'carry') {
     const c = s.carry; c.t += h;
     const k = Math.min(1, c.t / c.T), e = 1 - (1 - k) * (1 - k);
@@ -1408,9 +1588,33 @@ function stepStone(h) {
     if (k >= 1) releaseBird();
   }
   if (G.state !== 'flight') return;
-  if (s.mode !== 'carry') birdCheck(px, s.x, py, s.y);
+  advance(px);
+  if (s.mode === 'air') birdCheck(px, s.x, py, s.y);
   collect(px, s.x, py, s.y, h);
   if (s.x > G.genUntil - 140) genMore(s.x + 280);
+}
+/* ---------- obstacles : ils arrêtent le galet, sauf s'il est assez solide ---------- */
+function obstCheck(px) {
+  const s = G.stone, R = G.run;
+  const lo = Math.min(px, s.x) - 0.05, hi = Math.max(px, s.x) + 0.05;
+  for (const o of OBJ) {
+    if (o.type !== 'obst' || o.hitT) continue;
+    if (o.x > hi || o.x + o.w < lo) continue;
+    if (s.y > o.top) continue;
+    o.hitT = G.t || 1;
+    if (R.tough > 0) {
+      R.tough--; R.breaks++; S.stats.breaks++;
+      s.vx *= 0.9;
+      if (s.mode !== 'air') s.mode = 'air';
+      s.vy = Math.max(s.vy, 1.6 + G.st.lift * s.vx * 0.3); s.y = Math.max(s.y, o.top * 0.6); s.safe = true;
+      if (!G.sim) { pop('Crac ! ' + LACS[o.z].ob.nom + ' traversé', s.x, 1.2, '#ffe0b0', 15); sfxToc(); splash(s.x, 8, LACS[o.z].ob.h, 1.2); vib(15); }
+    } else {
+      R.end = 'obst'; s.vx = 0;
+      s.mode = 'sink'; G.state = 'sink'; G.sinkT = 0;
+      if (!G.sim) { pop('Bloqué par un ' + LACS[o.z].ob.nom.toLowerCase() + ' !', s.x, 1.2, '#ffffff', 17); sfxToc(); sfxSink(); splash(s.x, 10, '#ffffff', 1.1); vib(30); }
+    }
+    return;
+  }
 }
 /* ---------- l'oiseau : attrape le galet, monte et le relâche plus loin ---------- */
 function birdCheck(x0, x1, y0, y1) {
@@ -1424,95 +1628,112 @@ function birdCheck(x0, x1, y0, y1) {
 }
 function catchBird(b) {
   const s = G.stone, R = G.run, ST = G.st;
-  const v = s.vx, vc = Math.max(v, 9), dist = clamp(v * 0.9, 12, 35);
+  const vc = Math.max(s.vx, 9), dist = ST.carry;
   b.st = 'carry';
-  s.carry = { b, t: 0, T: dist / vc, x0: s.x, y0: s.y, x1: s.x + dist, y1: Math.max(s.y, b.h) + 1.8 };
+  s.carry = { b, t: 0, T: dist / vc, vc, x0: s.x, y0: s.y, x1: s.x + dist, y1: Math.max(s.y, b.h) + ST.rise, vx: s.vx };
   s.mode = 'carry'; s.vy = 0;
-  R.attempt = -1; R.last = null; R.birds++; S.stats.birds++;
-  const c = ST.cps * 4 * ST.coinMult; R.coins += c;
-  if (!G.sim) { pop('L’oiseau l’attrape ! +' + fmt(c), s.x, s.y + 1.3, '#ffffff', 16); sfxBird(); vib(20); }
+  R.birds++; S.stats.birds++;
+  const c = ST.cps * 4 * ST.coinMult * zm(s.x); R.coins += c;
+  if (!G.sim) { pop(LACS[b.z].bird.nom + ' : il l’attrape ! +' + fmt(c), s.x, s.y + 1.3, '#ffffff', 16); sfxBird(); vib(20); }
 }
 function releaseBird() {
   const s = G.stone, c = s.carry;
-  s.mode = 'air'; s.vy = 0.6; s.safe = true; s.carry = null;
+  s.mode = 'air'; s.vy = 0.4; s.vx = Math.max(c.vx, c.vc * 0.75); s.safe = true; s.carry = null;
   c.b.st = 'leave'; c.b.t = 0;
   if (!G.sim) pop('Lâché !', s.x, s.y + 0.7, '#e8f4ff', 14);
 }
-function rockCheck() {
-  const s = G.stone, R = G.run, ST = G.st;
-  for (const o of OBJ) {
-    if (o.type !== 'rock' || o.hitT) continue;
-    if (s.x >= o.x && s.x <= o.x + o.w && s.y <= o.top) {
-      o.hitT = G.t || 1; s.y = o.top;
-      s.vy = Math.max(Math.abs(s.vy) * 0.85, 3.4 + ST.lift * s.vx * 0.4); s.vx *= 0.93; s.safe = true;
-      const c = ST.cps * 2 * ST.coinMult; R.coins += c; R.skips++; R.attempt = -1; R.last = null;
-      if (!G.sim) { pop('Toc ! +' + fmt(c), s.x, 1.0, '#ece8e0', 14); sfxToc(); splash(s.x, 4, '#d8d4cc', 1.2); vib(10); }
-      return;
-    }
-  }
-}
 function impact() {
-  const s = G.stone, R = G.run, ST = G.st, L = LACS[S.lake];
+  const s = G.stone, R = G.run, ST = G.st, L = LACS[zoneAt(s.x)];
   const vin = -s.vy, ang = Math.atan2(vin, s.vx), o = surfaceAt(s.x);
-  let j = null;
-  if (G.sim) j = Math.random() < G.simP ? 'parfait' : null;
-  else if (R.attempt >= 0) { const d = R.rt - R.attempt; j = d <= ST.win ? 'parfait' : d <= ST.win * 2 ? 'bien' : 'tot'; }
-  R.attempt = -1;
+  const queued = R.queued; R.queued = false;
   if (o && o.type === 'ice') {
-    s.mode = 'slide'; s.vy = 0; s.y = 0; s.slideEnd = o.x + o.w; R.skips++; R.last = null;
-    R.coins += ST.cps * ST.coinMult;
+    s.mode = 'slide'; s.vy = 0; s.y = 0; s.slideEnd = o.x + o.w; R.skips++; R.lastB = R.rt; s.safe = false;
+    R.coins += ST.cps * ST.coinMult * L.mult;
+    if (queued) applyImpulse(true);
     if (!G.sim) { ripple(s.x, 0.8, '#ffffff', 1); pop('Glisse !', s.x, 0.7, '#dff4ff', 15); sfxIce(); }
     return;
   }
-  if (ang > SINK_ANG && !s.safe && !(o && o.type === 'pad')) { sink('raide'); return; }
+  const pad = o && o.type === 'pad';
+  if (ang > SINK_ANG && !s.safe && !pad) { R.end = 'raide'; sink('raide'); return; }
+  const steep = ang > STEEP_ANG && !s.safe && !pad;
   s.safe = false;
-  const k = ST.k;
-  let vy = Math.max(vin * 0.42, ST.lift * s.vx), vx = s.vx * k, mult = 1, label = null, lcol = '#ffffff';
-  if (j === 'parfait') { vx = s.vx * (k + (1 - k) * 0.6); vy *= 1.2; }
-  else if (j === 'bien') { vx = s.vx * (k + (1 - k) * 0.3); vy *= 1.07; }
+  let vy = Math.max(vin * 0.42, ST.lift * s.vx), vx = s.vx * ST.k, mult = 1, label = null, lcol = '#ffffff';
+  if (steep) { vx *= 0.8; vy *= 0.85; label = 'Trop raide…'; lcol = '#d0d8e8'; }
   if (o) {
-    if (o.type === 'pad') { vy = Math.max(vy * 1.6, 3.2); vx *= 1.03; s.safe = true; mult *= 2; R.pads++; S.stats.pads++; o.hit = G.t || 1; label = 'Boing !'; lcol = '#a6f58f'; if (!G.sim) sfxBoing(); }
+    if (pad) { vy = Math.max(vy * 1.6, 3.2); vx *= 1.03; s.safe = true; mult *= 2; R.pads++; S.stats.pads++; o.hit = G.t || 1; label = 'Boing !'; lcol = '#a6f58f'; if (!G.sim) sfxBoing(); }
     else if (o.type === 'weed') { vx *= 0.86; vy *= 0.8; label = 'Algues…'; lcol = '#a8d8b0'; }
     else if (o.type === 'current') { vx *= 1.1; label = 'Courant !'; lcol = '#c4f4ff'; }
     else if (o.type === 'plankton') { vx *= 1.04; mult *= 3; o.hit = G.t || 1; label = 'Lumière ×3'; lcol = L.plankton || '#7ffff0'; }
   }
   const crit = Math.random() < ST.crit;
   if (crit) { vy = vy * 1.8 + 1; mult *= 5; s.safe = true; R.supers++; S.stats.supers++; }
-  if (vx < R.vmin) { sink('lent'); return; }
+  R.lastB = R.rt;
+  if (vx < R.vmin && !queued) {
+    if (R.surfT > 0.05) { startSurf(Math.max(vx, 1.3)); return; }
+    R.end = 'lent'; sink('lent'); return;
+  }
   s.vx = vx; s.vy = vy; R.skips++;
-  if (j === 'parfait') { R.combo++; R.perfects++; S.stats.perfects++; if (R.combo > R.maxCombo) R.maxCombo = R.combo; R.last = { rt: R.rt, done: true }; }
-  else if (j === 'bien') R.last = { rt: R.rt, done: true };
-  else if (j === 'tot') { if (R.combo >= 3 && !G.sim) pop('Combo perdu', s.x, 0.8, '#d0d8e8', 12); R.combo = 0; R.last = { rt: R.rt, done: true }; }
-  else { R.last = { rt: R.rt, done: false }; if (G.sim) R.combo = 0; }
-  const c = ST.cps * (1 + ST.comboB * Math.min(R.combo, 8)) * ST.coinMult * mult;
+  if (queued) applyImpulse(true);
+  const c = ST.cps * (1 + ST.comboB * Math.min(R.combo, 8)) * ST.coinMult * L.mult * mult;
   R.coins += c;
   if (G.sim) return;
   ripple(s.x, crit ? 1.5 : 1, o && o.type === 'plankton' ? L.plankton : null, crit ? 4 : 3);
   splash(s.x, crit ? 14 : 5 + Math.min(6, Math.floor(s.vx / 6)));
-  sfxSkip(R.skips, j, crit);
-  if (j === 'parfait') { pop(R.combo > 1 ? 'Parfait ×' + R.combo : 'Parfait !', s.x, 0.95, '#ffd23f', 17); vib(12); }
-  else if (j === 'bien') pop('Bien', s.x, 0.95, '#ffffff', 14);
-  else if (j === 'tot') pop('Trop tôt', s.x, 0.95, '#c8d2e0', 12);
+  sfxSkip(R.skips, queued ? 'parfait' : null, crit);
   if (crit) { pop('Super ricochet !', s.x, 1.6, '#ff9be0', 18); vib(30); sparkleAt(s.x, 0.3, '#ffd0f4'); }
   if (label) pop(label, s.x, crit ? 2.2 : 1.45, lcol, 15);
   pop('+' + fmt(c), s.x, 0.4, '#ffe27a', 12);
 }
+function startSurf(vx) {
+  const s = G.stone;
+  s.mode = 'surf'; s.vx = vx; s.vy = 0; s.y = 0;
+  if (!G.sim) { pop('Surf !', s.x, 0.9, '#bff4ff', 16); sfxIce(); }
+}
+/* ---------- impulsions : touche l'écran pendant le vol ---------- */
+function timeToWater() {
+  const s = G.stone, g = grav(s.x);
+  return (s.vy + Math.sqrt(Math.max(0, s.vy * s.vy + 2 * g * Math.max(0, s.y)))) / g;
+}
 function tapFlight() {
   const R = G.run, s = G.stone, ST = G.st;
-  if (!R || !s || s.mode !== 'air') return;
+  if (!R || !s || G.state !== 'flight') return;
+  if (R.imp <= 0) { if (!G.sim) { pop('Plus d’impulsion', s.x, s.y + 1.1, '#d0d8e8', 13); sfxNo(); } return; }
+  if (s.mode === 'carry') {
+    R.imp--;
+    const c = s.carry, add = 5 + ST.impf * 2.5;
+    c.x1 += add; c.T += add / c.vc;
+    if (!G.sim) { pop('Plus loin ! +' + Math.round(add) + ' m', s.x, s.y + 1.2, '#dff6ff', 15); sfxPower(); vib(10); }
+    renderImp(); return;
+  }
+  if (s.mode === 'surf' || s.mode === 'slide') {
+    R.imp--; s.mode = 'air'; s.vy = 2.2 + ST.impf * 0.45 + ST.lift * s.vx * 0.3; s.vx += ST.impf * 0.8;
+    if (!G.sim) { pop('Hop !', s.x, 0.9, '#ffffff', 16); sfxSkip(R.skips, null, false); vib(10); }
+    renderImp(); return;
+  }
+  if (s.mode !== 'air') return;
   const trt = R.rt + clamp((performance.now() - G.frameNow) / 1000, 0, 0.05);
-  if (R.last && !R.last.done && trt - R.last.rt <= ST.win) {
-    R.last.done = true;
-    const k = ST.k;
-    s.vx *= (k + (1 - k) * 0.6) / k; s.vy *= 1.2;
+  R.imp--;
+  if (trt - R.lastB <= ST.win) applyImpulse(true);
+  else if (s.vy < 0 && timeToWater() / (R.ts || 1) <= ST.win) { R.queued = true; if (!G.sim) vib(8); }
+  else applyImpulse(false);
+  renderImp();
+}
+function applyImpulse(perfect) {
+  const s = G.stone, R = G.run, ST = G.st, f = perfect ? 1.6 : 1;
+  s.vx += ST.impf * f;
+  s.vy = Math.max(s.vy, (1.3 + ST.lift * s.vx * 0.35) * (perfect ? 1.25 : 1));
+  if (s.mode !== 'air') { s.mode = 'air'; s.y = Math.max(s.y, 0.01); }
+  if (perfect) {
     R.combo++; R.perfects++; S.stats.perfects++;
     if (R.combo > R.maxCombo) R.maxCombo = R.combo;
-    R.coins += ST.cps * ST.comboB * Math.min(R.combo, 8) * ST.coinMult;
-    pop(R.combo > 1 ? 'Parfait ×' + R.combo : 'Parfait !', s.x, 0.95, '#ffd23f', 17);
-    sfxSkip(R.skips, 'parfait', false); vib(12);
-    return;
+    const c = ST.cps * ST.comboB * Math.min(R.combo, 8) * ST.coinMult * zm(s.x) * 2;
+    R.coins += c;
+    if (!G.sim) { pop(R.combo > 1 ? 'Parfait ×' + R.combo : 'Impulsion parfaite !', s.x, s.y + 1.0, '#ffd23f', 17); vib(14); sfxSkip(R.skips, 'parfait', false); }
+  } else {
+    if (R.combo >= 3 && !G.sim) pop('Combo perdu', s.x, s.y + 0.8, '#d0d8e8', 12);
+    R.combo = 0;
+    if (!G.sim) { pop('Impulsion', s.x, s.y + 0.9, '#ffffff', 14); sfxPower(); vib(8); }
   }
-  if (s.vy <= 0 && R.attempt < 0) R.attempt = trt;
 }
 function collect(x0, x1, y0, y1, h) {
   const s = G.stone, mag = G.magT > 0;
@@ -1531,13 +1752,13 @@ function collect(x0, x1, y0, y1, h) {
 }
 function take(o) {
   o.taken = true;
-  const R = G.run, ST = G.st;
+  const R = G.run, ST = G.st, m = zm(o.x);
   if (o.type === 'coin') {
-    const c = 3 * ST.cps * ST.coinMult; R.coins += c;
+    const c = 3 * ST.cps * ST.coinMult * m; R.coins += c;
     if (!G.sim) { pop('+' + fmt(c), o.x, o.h + 0.3, '#ffd23f', 14); sfxCoin(); sparkleAt(o.x, o.h, '#ffe27a'); }
   } else if (o.type === 'crystal') {
-    const c = 15 * ST.cps * ST.coinMult; R.coins += c;
-    if (!G.sim) { pop('Cristal +' + fmt(c), o.x, o.h + 0.3, LACS[S.lake].crystal || '#9af0ff', 15); sfxPearl(); sparkleAt(o.x, o.h, '#c8f8ff'); }
+    const c = 15 * ST.cps * ST.coinMult * m; R.coins += c;
+    if (!G.sim) { pop('Cristal +' + fmt(c), o.x, o.h + 0.3, LACS[zoneAt(o.x)].crystal || '#9af0ff', 15); sfxPearl(); sparkleAt(o.x, o.h, '#c8f8ff'); }
   } else {
     R.pearls++; S.pearls++; S.stats.pearlsFound++;
     if (!G.sim) { pop('+1 perle', o.x, o.h + 0.3, '#f3dcff', 16); sfxPearl(); vib(20); sparkleAt(o.x, o.h, '#ffffff'); }
@@ -1554,7 +1775,7 @@ function usePower(id) {
     for (let i = 0; i < 10; i++) PART.push({ x: s.x - Math.random() * 2, y: Math.max(0.05, s.y + (Math.random() - 0.5) * 0.6), vx: 6 + Math.random() * 6, vy: 0, t: 0, life: 0.4, col: '#ffffff', sz: 1, g: 0 });
     pop('Rafale !', s.x, s.y + 0.9, '#dff6ff', 17);
   } else if (id === 'bond') {
-    if (s.mode === 'slide') s.mode = 'air';
+    if (s.mode === 'slide' || s.mode === 'surf') s.mode = 'air';
     s.vy = Math.max(s.vy, 3.5 + 1.2 * L + G.st.lift * s.vx * 0.5); s.safe = true;
     pop('Grand bond !', s.x, s.y + 0.9, '#ffe7a0', 17);
   } else if (id === 'aimant') { G.magT = 3 + 2 * L; pop('Aimant !', s.x, s.y + 0.9, '#ffb0b0', 17); }
@@ -1566,7 +1787,7 @@ function sink(reason) {
   s.mode = 'sink'; G.state = 'sink'; G.sinkT = 0; s.y = 0;
   if (G.sim) return;
   ripple(s.x, 1.3, null, 4); splash(s.x, 12, '#ffffff', 1.3); sfxSink(); vib(25);
-  pop(reason === 'raide' ? 'Trop raide… Plouf !' : 'Plouf !', s.x, 1.0, '#ffffff', 17);
+  pop(reason === 'raide' ? 'Trop raide… Plouf !' : reason === 'surf' ? 'Fin du surf… Plouf !' : 'Plouf !', s.x, 1.0, '#ffffff', 17);
 }
 function updateSink(dt) {
   G.sinkT += dt;
@@ -1574,45 +1795,33 @@ function updateSink(dt) {
   if (G.sinkT > 1.1) endRun();
 }
 function endRun() {
-  const R = G.run, ST = G.st, li = S.lake, dist = Math.max(0, R.dist), st = S.stats;
-  const distCoins = dist * ST.cpm * ST.coinMult, total = R.coins + distCoins;
-  S.coins += total; S.loopCoins += total; st.totalCoins += total;
-  st.throws++; st.skips += R.skips;
+  const R = G.run, dist = Math.max(0, R.dist), st = S.stats;
+  const total = R.coins + R.dcoins;
+  S.coins += total; st.totalCoins += total;
+  st.throws++; st.skips += R.skips; st.surfT += R.surfed;
   if (R.skips > st.maxSkips) st.maxSkips = R.skips;
   if (R.maxCombo > st.maxCombo) st.maxCombo = R.maxCombo;
   if (dist > st.maxDist) st.maxDist = dist;
-  const rec = S.best[li] > 0 && dist > S.best[li] + 0.05;
-  if (dist > S.best[li]) S.best[li] = dist;
-  if (dist > S.bestEver[li]) S.bestEver[li] = dist;
-  let unlocked = null;
-  if (li === S.maxLake && li + 1 < LACS.length && dist >= LACS[li + 1].need) {
-    S.maxLake = li + 1; unlocked = LACS[li + 1];
-    if (S.maxLake > st.lakeMax) st.lakeMax = S.maxLake;
-  }
+  const rec = S.best > 0 && dist > S.best + 0.05;
+  if (dist > S.best) S.best = dist;
+  if (dist > S.loopBest) S.loopBest = dist;
   G.state = 'result'; G.resT = 0;
   if (G.sim) return;
   const achs = checkAch(true); saveGame();
-  showResult({ dist, rec, R, total, distCoins, unlocked, achs });
-  if (unlocked) { sfxUnlock(); vib(40); }
+  showResult({ dist, rec, R, total, distCoins: R.dcoins, achs });
   renderPowers(); setHint(); updateHUD(true);
 }
 function backToDock(instant) {
   G.state = 'aim'; G.stone = null; G.run = null; G.char = 'idle'; G.slowT = 0; G.magT = 0;
   G.camX = AIM_CAM; G.zoom = AIM_ZOOM; G.prevCam = AIM_CAM; G.fade = instant ? 1 : 0.85;
   RIP = []; PART = []; TXT = [];
-  genReset((Math.imul(S.stats.throws + 1, 2654435761 | 0) ^ (S.lake * 977)) | 0);
+  genReset((Math.imul(S.stats.throws + 1, 2654435761 | 0)) | 0);
   genMore(AIM_CAM + 70);
   hideResult(); renderPowers(); setHint(); updateHUD(true);
 }
 function refreshAim() {
   if (G.state !== 'aim') return;
   const sd = G.seed; genReset(sd); genMore(AIM_CAM + 70);
-}
-function goLake(i) {
-  if (i < 0 || i > S.maxLake) return;
-  S.lake = i; if (i > S.seenLake) S.seenLake = i;
-  saveGame(); backToDock(true);
-  AU.chordT = 0;
 }
 function checkAch(quiet) {
   const got = [];
@@ -1634,15 +1843,15 @@ function followCam(dt) {
   const s = G.stone; if (!s) return;
   let zt = 13;
   if (s.mode === 'air') {
-    const g = G.st.g, fl = (s.vy + Math.sqrt(s.vy * s.vy + 2 * g * Math.max(0, s.y))) / g;
+    const g = grav(s.x), fl = (s.vy + Math.sqrt(s.vy * s.vy + 2 * g * Math.max(0, s.y))) / g;
     const next = 2 * Math.max(G.st.lift * s.vx, 0.5) / g * s.vx * G.st.k;
     const span = Math.max(7, s.vx * fl + next * 0.6);
     zt = Math.min(zt, (RW - anchorX - 24) / span);
     const apex = s.y + (s.vy > 0 ? s.vy * s.vy / (2 * g) : 0);
     zt = Math.min(zt, (yLane - 26) / (Math.max(0.4, apex) * VEX));
-  } else if (s.mode === 'slide') zt = Math.min(13, (RW - anchorX - 24) / Math.max(7, s.vx * 0.8));
+  } else if (s.mode === 'slide' || s.mode === 'surf') zt = Math.min(13, (RW - anchorX - 24) / Math.max(7, s.vx * 0.8));
   else if (s.mode === 'carry') { const c = s.carry; zt = Math.min((RW - anchorX - 24) / Math.max(7, c.x1 - s.x + 12), (yLane - 26) / ((c.y1 + 0.8) * VEX)); }
-  zt = clamp(zt, 2.2, 13);
+  zt = clamp(zt, 1.6, 13);
   const sy = yLane - s.y * G.zoom * VEX;
   G.zoom += (zt - G.zoom) * Math.min(1, dt * (sy < 34 && zt < G.zoom ? 9 : 2.4));
   if (G.state === 'flight') G.camX = s.x;
@@ -1653,14 +1862,14 @@ function update(dt) {
   G.idleAcc += dt;
   if (G.idleAcc >= 1) {
     const ir = idleRate(lvl('canards'));
-    if (ir > 0) { const g = ir / 60 * G.idleAcc; S.coins += g; S.loopCoins += g; S.stats.totalCoins += g; }
+    if (ir > 0) { const g = ir / 60 * G.idleAcc; S.coins += g; S.stats.totalCoins += g; }
     G.idleAcc = 0;
   }
   G.saveAcc += dt;
   if (G.saveAcc > 20) { G.saveAcc = 0; if (G.state === 'aim' || G.state === 'result') saveGame(); }
   switch (G.state) {
     case 'aim': if (UI.menu) camTo(AIM_CAM + 9 + Math.sin(G.t * 0.07) * 9, 10, dt * 0.25); else camTo(AIM_CAM, AIM_ZOOM, dt); break;
-    case 'charge': { G.gt += dt; const ph = (G.gt / G.st.gaugeP) % 2; G.gauge = ph < 1 ? ph : 2 - ph; camTo(AIM_CAM, AIM_ZOOM, dt); break; }
+    case 'charge': updateCharge(dt); camTo(AIM_CAM, AIM_ZOOM, dt); break;
     case 'flight': updateFlight(dt); if (G.state === 'flight') followCam(dt); break;
     case 'sink': updateSink(dt); break;
     case 'result': G.resT += dt; break;
@@ -1684,17 +1893,30 @@ function update(dt) {
   G.offW1 += d * G.zoom * 0.55; G.offW2 += d * G.zoom * 1.3;
 }
 
-/* ---------- simulation (équilibrage, sans affichage) ---------- */
-function simThrow(power, p) {
+/* ---------- simulation (équilibrage, sans affichage) ----------
+   ang : angle du lancer ; p : chance de réussir une impulsion parfaite ; useImp : le joueur se sert de ses impulsions */
+function simThrow(ang, p, useImp) {
   G.sim = true; G.simP = p;
   genReset(Math.floor(Math.random() * 1e9)); G.zoom = 6;
-  startThrow(power);
-  let n = 0;
-  while (G.state === 'flight' && n++ < 30000) { updateFlight(1 / 30); if (G.stone) G.camX = G.stone.x; }
+  G.st = getStats();
+  startThrow(ang);
+  let n = 0, nextImp = 0.6 + Math.random();
+  while (G.state === 'flight' && n++ < 40000) {
+    updateFlight(1 / 30); if (G.stone) G.camX = G.stone.x;
+    if (useImp && G.state === 'flight' && G.run.imp > 0) {
+      const s = G.stone, R = G.run;
+      const urgent = (s.mode === 'surf' && R.surfT < 0.4) || s.mode === 'carry';
+      if (urgent || R.rt > nextImp) {
+        nextImp = R.rt + 0.8 + Math.random() * 1.5;
+        if (s.mode === 'air' && Math.random() < p) { R.imp--; applyImpulse(true); }
+        else tapFlight();
+      }
+    }
+  }
   const R = G.run, rt = R.rt;
   if (G.state === 'sink') endRun();
   G.sim = false; G.state = 'aim';
-  return { rt, dist: R.dist, skips: R.skips, coins: R.coins + R.dist * G.st.cpm * G.st.coinMult };
+  return { rt, dist: R.dist, skips: R.skips, coins: R.coins + R.dcoins, end: R.end };
 }
 
 /* ---------- entrées tactiles ---------- */
@@ -1711,7 +1933,7 @@ function onDown(e) {
 function onUp(e) {
   if (e.pointerId !== G.pointer) return;
   G.pointer = null;
-  if (G.state === 'charge') startThrow(G.gauge);
+  if (G.state === 'charge') startThrow(G.ang);
 }
 function onCancel(e) {
   if (e.pointerId !== G.pointer) return;
@@ -1726,11 +1948,12 @@ const TABS = [
   { id: 'up', ic: '⬆️', nom: 'Améliorer' },
   { id: 'pow', ic: '⚡', nom: 'Pouvoirs' },
   { id: 'gal', ic: '🥌', nom: 'Galets' },
-  { id: 'lacs', ic: '🗺️', nom: 'Lacs' },
+  { id: 'carte', ic: '🗺️', nom: 'Carte' },
   { id: 'defis', ic: '🏆', nom: 'Défis' },
   { id: 'boucle', ic: '🌀', nom: 'Boucle' },
 ];
 const RED_BTN = 'style="background:var(--red);box-shadow:0 3px 0 var(--red2)"';
+const VERSION = 'v2.0';
 
 function setText(id, v, html) {
   if (UI.cache[id] === v) return;
@@ -1747,6 +1970,7 @@ function affordable() {
   for (const u of UPG) { if (!u.req()) continue; const L = lvl(u.id); if (L < u.max && upCost(u, L) <= S.coins) n++; }
   return n;
 }
+function nextZone() { return LACS[S.maxZone + 1] || null; }
 let hudTick = 0;
 function updateHUD(force) {
   const flying = G.state === 'flight' || G.state === 'sink';
@@ -1756,14 +1980,16 @@ function updateHUD(force) {
   if (S.ondes > 0) setText('vOndes', fmt(S.ondes));
   const ir = idleRate(lvl('canards'));
   setText('vIdle', ir > 0 ? '+' + fmt(ir) + '/min' : '');
-  show('lakeName', !flying); show('lakeSub', !flying); show('dist', flying); show('sub', flying);
+  show('lakeName', !flying); show('lakeSub', !flying); show('dist', flying); show('sub', flying); show('impBox', flying && !!G.run);
   if (flying && G.run) {
+    const Z = LACS[zoneAt(G.run.dist)];
     setText('dist', fmtDist(G.run.dist));
-    setText('sub', 'Ricochets <b>' + G.run.skips + '</b>' + (G.run.combo > 1 ? ' · Combo <b>×' + G.run.combo + '</b>' : '') + ' · <b>+' + fmt(G.run.coins) + '</b>', true);
+    setText('sub', Z.nom + ' ×' + fmt(Z.mult) + ' · Ricochets <b>' + G.run.skips + '</b>' + (G.run.combo > 1 ? ' · Combo <b>×' + G.run.combo + '</b>' : '') + ' · <b>+' + fmt(G.run.coins + G.run.dcoins) + '</b>', true);
+    renderImp();
   } else {
-    const L = LACS[S.lake];
-    setText('lakeName', L.nom);
-    setText('lakeSub', (S.best[S.lake] > 0 ? 'Record ' + fmtDist(S.best[S.lake]) + ' · ' : '') + 'Pièces ×' + fmt(L.mult * (1 + 0.1 * S.ondes) * (curStone().bonus.coins || 1)));
+    const nz = nextZone();
+    setText('lakeName', S.best > 0 ? '🏁 Record ' + fmtDist(S.best) : '🏁 Fais ton premier lancer !');
+    setText('lakeSub', nz ? 'Prochaine zone : ' + nz.nom + ' à ' + fmtDist(nz.x0) : 'Toutes les zones sont découvertes');
   }
   show('btnsL', !flying && !UI.panel && G.state !== 'charge');
   show('hudR', !flying && G.state !== 'charge');
@@ -1771,26 +1997,39 @@ function updateHUD(force) {
     const n = affordable(), b = $('upBadge');
     b.style.display = n ? 'grid' : 'none'; b.textContent = n;
     $('bUp').classList.toggle('pulse', n > 0 && S.stats.throws < 20);
-    $('lkBadge').style.display = S.maxLake > S.seenLake ? 'grid' : 'none';
+    $('lkBadge').style.display = S.maxZone > S.seenZone ? 'grid' : 'none';
     const ab = $('achBadge'); ab.style.display = UI.newAch ? 'grid' : 'none'; ab.textContent = UI.newAch;
   }
 }
+/* impulsions, solidité et surf pendant le lancer */
+function renderImp() {
+  if (G.sim) return;
+  const R = G.run, s = G.stone; if (!R || !s) return;
+  let h = '<div class="imps">';
+  for (let i = 0; i < R.impMax; i++) h += '<i class="' + (i < R.imp ? 'on' : '') + '">⚡</i>';
+  h += '</div>';
+  if (G.st.tough > 0) { h += '<div class="shields">'; for (let i = 0; i < G.st.tough; i++) h += '<i class="' + (i < R.tough ? 'on' : '') + '">🛡️</i>'; h += '</div>'; }
+  if (G.st.surf > 0) h += '<div class="surfbar' + (s.mode === 'surf' ? ' act' : '') + '"><span>🏄</span><b><u style="width:' + clamp(R.surfT / G.st.surf * 100, 0, 100).toFixed(0) + '%"></u></b></div>';
+  setText('impBox', h, true);
+}
 function setHint() {
   let h = '';
+  const s = G.stone;
   if (UI.panel || UI.modal || UI.menu) h = '';
-  else if (G.state === 'aim') h = S.stats.throws === 0 ? '👆 Maintiens ton doigt sur l’écran…' : S.stats.throws < 4 ? '👆 Maintiens, puis relâche quand la jauge est en haut' : 'Maintiens pour lancer';
-  else if (G.state === 'charge') h = G.st && G.gauge >= 1 - G.st.gaugeZone ? '✨ Relâche maintenant !' : '…et relâche au bon moment !';
-  else if (G.state === 'flight' && S.stats.birds === 0 && birdInView()) h = '🐦 Passe dans la zone de l’oiseau : il attrape ton galet !';
-  else if (G.state === 'flight' && S.stats.perfects < 6) h = '👆 Touche l’écran quand le galet touche l’eau !';
-  else if (G.state === 'result') h = '';
+  else if (G.state === 'aim') h = S.stats.throws === 0 ? '👆 Maintiens ton doigt sur l’écran…' : S.stats.throws < 5 ? '👆 Maintiens, puis relâche quand la flèche est dans la zone dorée' : 'Maintiens pour lancer';
+  else if (G.state === 'charge') h = G.st && idealLaunch(G.ang) ? '✨ Relâche maintenant !' : G.ang > 0.5 ? 'Trop haut : le galet risque de couler' : '…et relâche dans la zone dorée !';
+  else if (G.state === 'flight' && s && s.mode === 'surf') h = '🏄 Touche l’écran pour sauter !';
+  else if (G.state === 'flight' && s && s.mode === 'carry') h = G.run.imp > 0 ? '🐦 Touche l’écran : l’oiseau vole plus loin !' : '';
+  else if (G.state === 'flight' && S.stats.birds === 0 && birdInView()) h = '🐦 Passe sous l’oiseau : il attrape ton galet !';
+  else if (G.state === 'flight' && obstInView() && G.run.tough === 0 && S.stats.throws < 60) h = '⚠️ Obstacle ! Une impulsion pour sauter par-dessus';
+  else if (G.state === 'flight' && S.stats.perfects < 8 && G.run.imp > 0) h = '👆 Touche l’écran quand le galet touche l’eau : impulsion parfaite !';
   if (h !== UI.hint) { UI.hint = h; $('hint').textContent = h; }
 }
 /* ---------- écran d'accueil ---------- */
 function updateMenu() {
-  let rec = 0; for (const d of S.bestEver) if (d > rec) rec = d;
-  $('mStats').innerHTML = (rec > 0 ? '<span>🏁 Record ' + fmtDist(rec) + '</span>' : '<span>🏁 Premier lancer à faire !</span>')
+  $('mStats').innerHTML = (S.best > 0 ? '<span>🏁 Record ' + fmtDist(S.best) + '</span>' : '<span>🏁 Premier lancer à faire !</span>')
     + '<span><i class="ico i-coin"></i>' + fmt(S.coins) + '</span><span><i class="ico i-pearl"></i>' + fmt(S.pearls) + '</span>'
-    + '<span>🗺️ ' + LACS[S.lake].nom + '</span>';
+    + '<span>🗺️ ' + LACS[S.maxZone].nom + '</span>';
   $('mQuit').style.display = window.Android && Android.quit ? '' : 'none';
 }
 function goMenu() {
@@ -1809,6 +2048,11 @@ function birdInView() {
   for (const b of OBJ) if (b.type === 'bird' && b.st === 'wait') { const X = WX(b.x); if (X > 0 && X < RW) return true; }
   return false;
 }
+function obstInView() {
+  const s = G.stone; if (!s) return false;
+  for (const o of OBJ) if (o.type === 'obst' && !o.hitT && o.x > s.x && o.x < s.x + 12) return true;
+  return false;
+}
 function toast(html, ms) {
   const box = $('toasts'), d = document.createElement('div');
   d.className = 'toast'; d.innerHTML = html; box.appendChild(d);
@@ -1818,17 +2062,18 @@ function toast(html, ms) {
 
 /* ---------- résultat d'un lancer ---------- */
 function showResult(o) {
-  const R = o.R, el = $('result'), next = LACS[S.maxLake + 1];
+  const R = o.R, el = $('result'), nz = nextZone(), Z = LACS[zoneAt(o.dist)];
+  const fin = R.end === 'obst' ? 'Bloqué par un obstacle' : R.end === 'raide' ? 'Arrivée trop raide' : 'Plus assez de vitesse';
   let goal = '';
-  if (o.unlocked) goal = '<div class="rgoal new">🎉 Nouveau lac débloqué : <b>' + o.unlocked.nom + '</b> (pièces ×' + fmt(o.unlocked.mult) + ') <button class="buy blue sm" data-act="golake">Y aller</button></div>';
-  else if (next && S.lake === S.maxLake) {
-    const pct = clamp(S.best[S.lake] / next.need * 100, 0, 100);
-    goal = '<div class="rgoal">Objectif : <b>' + fmtDist(next.need) + '</b> pour débloquer <b>' + next.nom + '</b><div class="prog"><i style="width:' + pct.toFixed(1) + '%"></i></div></div>';
-  } else if (S.lake < S.maxLake) goal = '<div class="rgoal">Astuce : <b>' + LACS[S.maxLake].nom + '</b> rapporte plus de pièces !</div>';
-  else if (!next && S.maxLake >= 2) goal = '<div class="rgoal">Tous les lacs sont débloqués. Pense à la <b>Boucle</b> 🌀</div>';
+  if (ondesGain() > 0 && S.stats.loops === 0) goal = '<div class="rgoal new">🌀 Tu as atteint le Lac des Étoiles : tu peux faire une <b>nouvelle boucle</b> !</div>';
+  else if (nz) {
+    const pct = clamp(S.best / nz.x0 * 100, 0, 100);
+    goal = '<div class="rgoal">Prochaine zone : <b>' + nz.nom + '</b> à <b>' + fmtDist(nz.x0) + '</b> (pièces ×' + fmt(nz.mult) + ')<div class="prog"><i style="width:' + pct.toFixed(1) + '%"></i></div></div>';
+  }
   const n = affordable();
   el.innerHTML = '<div class="rt">' + fmtDist(o.dist) + (o.rec ? ' <span class="tag">Record !</span>' : '') + '</div>'
-    + '<div class="rr">Ricochets <b>' + R.skips + '</b> · Parfaits <b>' + R.perfects + '</b>' + (R.maxCombo > 1 ? ' · Combo max <b>×' + R.maxCombo + '</b>' : '') + (R.birds ? ' · Oiseau <b>×' + R.birds + '</b>' : '') + '</div>'
+    + '<div class="rr">' + Z.nom + ' · ' + fin + '</div>'
+    + '<div class="rr">Ricochets <b>' + R.skips + '</b> · Parfaits <b>' + R.perfects + '</b>' + (R.birds ? ' · Oiseaux <b>×' + R.birds + '</b>' : '') + (R.breaks ? ' · Obstacles traversés <b>' + R.breaks + '</b>' : '') + (R.surfed > 0.2 ? ' · Surf <b>' + fmt1(R.surfed) + ' s</b>' : '') + '</div>'
     + '<div class="rc"><i class="ico i-coin"></i> +' + fmt(o.total) + ' <small>(dont distance +' + fmt(o.distCoins) + ')</small>' + (R.pearls ? ' &nbsp;<i class="ico i-pearl"></i> +' + R.pearls : '') + '</div>'
     + (o.achs && o.achs.length ? '<div class="rach">🏆 Défi' + (o.achs.length > 1 ? 's' : '') + ' réussi' + (o.achs.length > 1 ? 's' : '') + ' : ' + o.achs.slice(0, 2).map(a => a.nom).join(', ') + (o.achs.length > 2 ? ' (+' + (o.achs.length - 2) + ')' : '') + ' &nbsp;+' + o.achs.reduce((t, a) => t + a.r, 0) + ' <i class="ico i-pearl"></i></div>' : '')
     + goal
@@ -1857,7 +2102,7 @@ function openPanel(tab) {
   UI.panel = true;
   if (tab) UI.tab = tab;
   if (UI.tab === 'defis') UI.newAch = 0;
-  if (UI.tab === 'lacs') S.seenLake = Math.max(S.seenLake, S.maxLake);
+  if (UI.tab === 'carte') S.seenZone = Math.max(S.seenZone, S.maxZone);
   $('panel').classList.add('open');
   renderTabs(); $('pbody').scrollTop = 0; renderTab();
   sfxClick(); setHint(); updateHUD(true);
@@ -1870,7 +2115,8 @@ function closePanel() {
 function tabBadge(id) {
   if (id === 'up') { const n = affordable(); return n ? '<span class="badge">' + n + '</span>' : ''; }
   if (id === 'defis' && UI.newAch) return '<span class="badge">' + UI.newAch + '</span>';
-  if (id === 'lacs' && S.maxLake > S.seenLake) return '<span class="badge">!</span>';
+  if (id === 'carte' && S.maxZone > S.seenZone) return '<span class="badge">!</span>';
+  if (id === 'boucle' && ondesGain() > 0) return '<span class="badge">!</span>';
   return '';
 }
 function renderTabs() {
@@ -1880,18 +2126,20 @@ function renderPcur() {
   setText('pcur', '<div class="pill"><i class="ico i-coin"></i>' + fmt(S.coins) + '</div><div class="pill"><i class="ico i-pearl"></i>' + fmt(S.pearls) + '</div>', true);
 }
 function renderTab() {
-  const b = $('pbody'), st = b.scrollTop;
+  const b = $('pbody'), st = b.scrollTop, ts = $('tscroll') ? [$('tscroll').scrollLeft, $('tscroll').scrollTop] : null;
   let h;
   switch (UI.tab) {
     case 'up': h = tabUp(); break;
     case 'pow': h = tabPow(); break;
     case 'gal': h = tabGal(); break;
-    case 'lacs': h = tabLacs(); break;
+    case 'carte': h = tabCarte(); break;
     case 'defis': h = tabDefis(); break;
     default: h = tabBoucle();
   }
   b.innerHTML = h; b.scrollTop = st;
-  if (UI.tab === 'lacs') b.querySelectorAll('canvas[data-thumb]').forEach(c => drawThumb(c, +c.dataset.thumb));
+  b.classList.toggle('treemode', UI.tab === 'up');
+  if (ts && $('tscroll')) { $('tscroll').scrollLeft = ts[0]; $('tscroll').scrollTop = ts[1]; }
+  if (UI.tab === 'carte') b.querySelectorAll('canvas[data-thumb]').forEach(c => drawThumb(c, +c.dataset.thumb));
   renderPcur();
 }
 function buyPlan(u, L) {
@@ -1906,17 +2154,38 @@ function buyPlan(u, L) {
   while (n < want && L + n < u.max) { c += upCost(u, L + n); n++; }
   return { n, c };
 }
+/* ---------- l'arbre d'améliorations ---------- */
+const TCW = 86, TRH = 66;
+function nodePos(u) { return [14 + u.c * TCW + TCW / 2, 10 + u.r * TRH + TRH / 2]; }
 function tabUp() {
-  let h = '<div class="bar">Acheter :' + ['1', '10', 'max'].map(m => '<button class="seg ' + (S.buyMode === m ? 'on' : '') + '" data-bm="' + m + '">' + (m === 'max' ? 'Max' : '×' + m) + '</button>').join('') + '</div><div class="grid">';
+  let maxC = 0, maxR = 0;
+  for (const u of UPG) { maxC = Math.max(maxC, u.c); maxR = Math.max(maxR, u.r); }
+  const W = 28 + (maxC + 1) * TCW, H = 20 + (maxR + 1) * TRH;
+  let lines = '', nodes = '';
   for (const u of UPG) {
-    if (!u.req()) { h += '<div class="card locked"><div class="ic">🔒</div><div class="info"><div class="nom">' + u.nom + '</div><div class="desc">' + (u.reqTxt || '') + '</div></div></div>'; continue; }
-    const L = lvl(u.id), mx = L >= u.max, p = buyPlan(u, L);
-    h += '<div class="card"><div class="ic">' + u.ic + '</div><div class="info"><div class="nom">' + u.nom + '<span class="lv">niv. ' + L + (mx ? ' · max' : '') + '</span></div><div class="desc">' + u.desc + '</div>'
-      + '<div class="eff">' + u.show(u.val(L)) + (mx ? '' : ' → <b>' + u.show(u.val(L + p.n)) + '</b>') + '</div></div>'
-      + (mx ? '<div class="maxed">MAX</div>' : '<button class="buy" data-buy="' + u.id + '" data-n="' + p.n + '"' + (S.coins >= p.c ? '' : ' disabled') + '><i class="ico i-coin"></i><span class="bc">' + fmt(p.c) + (p.n > 1 ? '<small>×' + p.n + '</small>' : '') + '</span></button>')
-      + '</div>';
+    if (!u.p) continue;
+    const a = nodePos(UPGM[u.p]), b = nodePos(u), on = u.req();
+    const d = UPGM[u.p].c === u.c ? 'M' + a[0] + ' ' + a[1] + ' L' + b[0] + ' ' + b[1] : 'M' + a[0] + ' ' + a[1] + ' C' + (a[0] + TCW * 0.5) + ' ' + a[1] + ',' + (b[0] - TCW * 0.5) + ' ' + b[1] + ',' + b[0] + ' ' + b[1];
+    lines += '<path d="' + d + '" class="' + (on ? 'on' : '') + '"/>';
   }
-  return h + '</div>';
+  for (const u of UPG) {
+    const [x, y] = nodePos(u), L = lvl(u.id), open = u.req(), mx = L >= u.max, can = open && !mx && upCost(u, L) <= S.coins;
+    nodes += '<button class="node' + (open ? '' : ' lock') + (mx ? ' max' : '') + (can ? ' can' : '') + (S.sel === u.id ? ' sel' : '') + '" data-node="' + u.id + '" style="left:' + (x - 25) + 'px;top:' + (y - 25) + 'px">'
+      + '<span class="nic">' + u.ic + '</span>' + (open ? '' : '<span class="nlock">🔒</span>') + '<span class="nlv">' + (mx ? 'MAX' : L + '/' + u.max) + '</span></button>';
+  }
+  return '<div class="treewrap"><div id="tscroll"><div class="tree" style="width:' + W + 'px;height:' + H + 'px"><svg width="' + W + '" height="' + H + '">' + lines + '</svg>' + nodes + '</div></div>'
+    + '<div class="tdet" id="tdet">' + nodeDetail() + '</div></div>';
+}
+function nodeDetail() {
+  const u = UPGM[S.sel] || UPG[0], L = lvl(u.id), open = u.req(), mx = L >= u.max, p = buyPlan(u, L);
+  let h = '<div class="dhead"><span class="dic">' + u.ic + '</span><div><div class="dnom">' + u.nom + '</div><div class="dlv">niveau ' + L + ' / ' + u.max + '</div></div></div>'
+    + '<div class="ddesc">' + u.desc + '</div>';
+  if (!open) return h + '<div class="dlock">🔒 ' + u.reqTxt() + '</div>';
+  h += '<div class="deff">' + u.show(u.val(L)) + (mx ? '' : '<br>→ <b>' + u.show(u.val(L + p.n)) + '</b>') + '</div>';
+  if (mx) return h + '<div class="maxed">Niveau maximum</div>';
+  h += '<div class="bar">' + ['1', '10', 'max'].map(m => '<button class="seg ' + (S.buyMode === m ? 'on' : '') + '" data-bm="' + m + '">' + (m === 'max' ? 'Max' : '×' + m) + '</button>').join('') + '</div>'
+    + '<button class="buy wide" data-buy="' + u.id + '" data-n="' + p.n + '"' + (S.coins >= p.c ? '' : ' disabled') + '><i class="ico i-coin"></i>' + fmt(p.c) + (p.n > 1 ? ' <small>(' + p.n + ' niveaux)</small>' : '') + '</button>';
+  return h;
 }
 function tabPow() {
   let h = '<div class="note">Les pouvoirs s’utilisent <b>pendant un lancer</b>, avec les boutons ronds en bas à droite. Ils se paient en <b>perles</b> (défis et perles attrapées sur l’eau).</div><div class="grid">';
@@ -1942,14 +2211,14 @@ function tabGal() {
   }
   return h + '</div>';
 }
-function tabLacs() {
-  let h = '<div class="note">Chaque nouveau lac multiplie tes pièces. Pour en débloquer un, atteins la distance indiquée sur le lac précédent.</div><div class="grid">';
+function tabCarte() {
+  let h = '<div class="note">Un seul grand lac, de plus en plus loin. Chaque zone découverte multiplie les pièces gagnées <b>dans cette zone</b>. Ton record : <b>' + fmtDist(S.best) + '</b>.</div><div class="grid">';
   LACS.forEach((L, i) => {
-    const open = i <= S.maxLake, here = i === S.lake;
-    h += '<div class="card lake ' + (open ? '' : 'locked') + ' ' + (here ? 'eq' : '') + '"><canvas class="thumb" data-thumb="' + i + '" width="96" height="44"></canvas><div class="info"><div class="nom">' + (open ? '' : '🔒 ') + L.nom + '</div>'
-      + '<div class="desc">' + (open ? L.desc : 'Atteins ' + fmtDist(L.need) + ' sur ' + LACS[i - 1].nom + '.') + '</div>'
-      + '<div class="eff">Pièces ×' + fmt(L.mult) + (open && S.best[i] > 0 ? ' · record ' + fmtDist(S.best[i]) : '') + '</div></div>'
-      + (here ? '<div class="maxed ok">Tu es ici</div>' : open ? '<button class="buy blue" data-lake="' + i + '">Y aller</button>' : '')
+    const open = i <= S.maxZone;
+    h += '<div class="card lake ' + (open ? '' : 'locked') + '"><canvas class="thumb" data-thumb="' + i + '" width="96" height="44"></canvas><div class="info"><div class="nom">' + (open ? '' : '❓ ') + L.nom + '</div>'
+      + '<div class="desc">' + (i === 0 ? 'Départ du ponton.' : 'À partir de ' + fmtDist(L.x0) + '.') + ' ' + (open ? L.desc : 'Encore à découvrir.') + '</div>'
+      + '<div class="eff">Pièces ×' + fmt(L.mult) + ' · obstacles : ' + (L.obj.obst ? L.ob.nom.toLowerCase() + 's' : 'aucun') + ' · oiseau : ' + L.bird.nom.toLowerCase() + '</div></div>'
+      + (open ? '<div class="maxed ok">Découverte</div>' : '<div class="maxed">' + Math.floor(clamp(S.best / L.x0, 0, 1) * 100) + ' %</div>')
       + '</div>';
   });
   return h + '</div>';
@@ -1965,30 +2234,34 @@ function tabDefis() {
   return h + '</div>';
 }
 function tabBoucle() {
-  const can = S.maxLake >= 2, g = ondesGain();
+  const last = LACS[LACS.length - 1], g = ondesGain();
   return '<div class="boucle"><div class="bt">🌀 Nouvelle boucle</div>'
-    + '<p>Recommence depuis l’Étang des Saules avec un <b>bonus permanent</b>. Tu perds tes pièces, tes améliorations et tes lacs, mais tu gardes tes perles, tes galets, tes pouvoirs et tes défis.</p>'
-    + '<div class="bstat"><div><i class="ico i-onde"></i> Ondes : <b>' + S.ondes + '</b></div><div>Bonus actuel : <b>+' + (S.ondes * 10) + ' % de pièces</b> et <b>+' + S.ondes + ' % de force</b></div><div class="small">Boucles terminées : ' + S.stats.loops + '</div></div>'
-    + '<div class="bgain">' + (can ? (g > 0 ? 'Tu gagnerais <b>' + g + ' onde' + (g > 1 ? 's' : '') + '</b> (+' + g + ' perle' + (g > 1 ? 's' : '') + ')' : 'Gagne encore des pièces pour obtenir ta première onde.') : 'Débloque la <b>Rivière du Couchant</b> pour pouvoir boucler.') + '</div>'
-    + '<button class="buy big" data-act="prestige"' + (can && g > 0 ? '' : ' disabled') + '>Lancer une nouvelle boucle</button>'
-    + '<p class="small">Plus tu gagnes de pièces pendant une boucle, plus tu obtiens d’ondes (×10 pièces = +3 ondes).</p></div>';
+    + '<p>Une fois le <b>' + last.nom + '</b> atteint (' + fmtDist(last.x0) + '), tu peux recommencer depuis le ponton avec un <b>bonus pour toujours</b>. Tu perds tes pièces et tes améliorations, mais tu gardes tes perles, tes galets, tes pouvoirs, tes défis et tes records.</p>'
+    + '<div class="bstat"><div><i class="ico i-onde"></i> Boucles : <b>' + S.ondes + '</b> &nbsp;·&nbsp; terminées : ' + S.stats.loops + '</div>'
+    + '<div>Bonus actuel : <b>+' + (S.ondes * 3) + ' % de pièces</b> et <b>+' + fmt1(S.ondes * 0.5) + ' % de force</b></div>'
+    + '<div>Paliers : ' + (S.ondes >= 5 ? '✅' : '🔒') + ' 5 boucles = +1 impulsion · ' + (S.ondes >= 15 ? '✅' : '🔒') + ' 15 boucles = +1 solidité</div></div>'
+    + '<div class="bgain">' + (g > 0 ? 'Avec ton record de cette boucle (' + fmtDist(S.loopBest) + '), tu gagnerais <b>' + g + ' boucle' + (g > 1 ? 's' : '') + '</b> et ' + g + ' perle' + (g > 1 ? 's' : '') + '.' : 'Atteins le <b>' + last.nom + '</b> dans cette boucle pour pouvoir recommencer. Record de la boucle : ' + fmtDist(S.loopBest) + '.') + '</div>'
+    + '<button class="buy big" data-act="prestige"' + (g > 0 ? '' : ' disabled') + '>Lancer une nouvelle boucle</button>'
+    + '<p class="small">Plus tu vas loin avant de boucler, plus tu gagnes de boucles (' + fmtDist(last.x0) + ' = 3 boucles, ' + fmtDist(last.x0 * 1.5) + ' = 6).</p></div>';
 }
 function refreshPanelLive() {
   renderPcur();
   const b = $('pbody');
-  let rerender = false;
-  b.querySelectorAll('button[data-buy]').forEach(btn => {
-    const u = UPGM[btn.dataset.buy], p = buyPlan(u, lvl(u.id));
-    if (String(p.n) !== btn.dataset.n) rerender = true;
-    btn.disabled = S.coins < p.c;
-  });
+  if (UI.tab === 'up') {
+    b.querySelectorAll('button[data-node]').forEach(btn => {
+      const u = UPGM[btn.dataset.node], L = lvl(u.id);
+      btn.classList.toggle('can', u.req() && L < u.max && upCost(u, L) <= S.coins);
+    });
+    const bb = b.querySelector('button[data-buy]');
+    if (bb) { const u = UPGM[bb.dataset.buy], p = buyPlan(u, lvl(u.id)); if (String(p.n) !== bb.dataset.n) $('tdet').innerHTML = nodeDetail(); else bb.disabled = S.coins < p.c; }
+  }
   b.querySelectorAll('button[data-pw]').forEach(btn => { const p = POW.find(x => x.id === btn.dataset.pw), L = plv(p.id); btn.disabled = L >= p.costs.length || S.pearls < p.costs[L]; });
   b.querySelectorAll('button[data-stone]').forEach(btn => { const s = STONES.find(x => x.id === btn.dataset.stone); btn.disabled = S.pearls < s.cost; });
-  if (rerender && UI.tab === 'up') renderTab();
 }
+function selectNode(id) { S.sel = id; renderTab(); sfxClick(); }
 function buyUpg(id) {
   const u = UPGM[id], L = lvl(id), p = buyPlan(u, L);
-  if (!p.n || S.coins < p.c) { sfxNo(); return; }
+  if (!p.n || S.coins < p.c || !u.req()) { sfxNo(); return; }
   S.coins -= p.c; S.upg[id] = L + p.n;
   sfxBuy(); vib(8); saveGame(); renderTabs(); renderTab(); updateHUD(true);
 }
@@ -2018,18 +2291,18 @@ function showSettings() {
   const row = (k, lab) => '<div class="opt">' + lab + '<button class="sw ' + (S.set[k] ? 'on' : '') + '" data-m="tog" data-k="' + k + '"></button></div>';
   showModal('<div class="mhead"><div class="mt">⚙️ Paramètres</div><button class="mx" data-m="ok" aria-label="Fermer">✕</button></div>' + row('sound', '🔊 Sons') + row('music', '🎵 Musique et ambiance') + row('vib', '📳 Vibrations')
     + '<div class="opt"><div style="text-align:left">🗑️ Réinitialiser le jeu<div class="small" style="font-weight:700">Efface toutes tes données.</div></div><button class="reset" data-m="reset">Réinitialiser</button></div>'
-    + '<p class="small" style="margin:6px 0 0">Ricochets v1.1</p>', {
+    + '<p class="small" style="margin:6px 0 0">Ricochets ' + VERSION + '</p>', {
     tog: b => { const k = b.dataset.k; S.set[k] = !S.set[k]; b.classList.toggle('on', S.set[k]); auApply(); saveGame(); if (k === 'vib' && S.set.vib) vib(25); },
     ok: () => closeModal(),
     reset: () => confirmReset(),
   });
 }
 function confirmReset() {
-  showModal('<div class="mt">Réinitialiser le jeu ?</div><p>Toutes tes données seront effacées : pièces, perles, améliorations, pouvoirs, galets, lacs, défis et records. Impossible de revenir en arrière.</p><div class="mrow"><button class="buy blue" data-m="no">Annuler</button><button class="buy" ' + RED_BTN + ' data-m="yes">Tout effacer</button></div>', {
+  showModal('<div class="mt">Réinitialiser le jeu ?</div><p>Toutes tes données seront effacées : pièces, perles, améliorations, pouvoirs, galets, zones, boucles, défis et records. Impossible de revenir en arrière.</p><div class="mrow"><button class="buy blue" data-m="no">Annuler</button><button class="buy" ' + RED_BTN + ' data-m="yes">Tout effacer</button></div>', {
     no: () => showSettings(),
     yes: () => {
       const set = S.set; S = defaultSave(); S.set = set; UI.newAch = 0; saveGame();
-      closeModal(); closePanel(); BG.lake = -1; backToDock(true); updateMenu(); updateHUD(true);
+      closeModal(); closePanel(); backToDock(true); updateMenu(); updateHUD(true);
       showModal('<div class="mt">✅ Jeu réinitialisé</div><p>Toutes les données ont été effacées. Tu repars de zéro.</p><div class="mrow"><button class="buy" data-m="ok">OK</button></div>', { ok: () => closeModal() });
     },
   });
@@ -2040,9 +2313,14 @@ function showQuit() {
     yes: () => { saveGame(); closeModal(); try { if (window.Android && Android.quit) Android.quit(); } catch (e) { /* */ } },
   });
 }
+function showNouveautes() {
+  showModal('<div class="mt">🌊 Ricochets 2.0</div><p>Le jeu a été refait pour ressembler davantage à Ripple Loop :</p>'
+    + '<p style="text-align:left">• Tu règles la <b>hauteur du lancer</b> avec la flèche<br>• Tu as des <b>impulsions</b> : touche l’écran pendant le vol (parfaite au moment du ricochet)<br>• Le galet peut <b>surfer</b>, et les <b>obstacles l’arrêtent</b> (améliore sa solidité)<br>• Les <b>oiseaux</b> le portent de plus en plus loin et de plus en plus haut<br>• Un seul <b>grand lac</b> de 6 zones et un <b>arbre d’améliorations</b><br>• Une progression bien plus longue</p>'
+    + '<p>Ta progression repart de zéro. Tu gardes tes perles, tes galets, tes pouvoirs et tes défis.</p><div class="mrow"><button class="buy" data-m="ok">C’est parti !</button></div>', { ok: () => closeModal() });
+}
 function confirmPrestige() {
   const g = ondesGain(); if (g <= 0) return;
-  showModal('<div class="mt">🌀 Nouvelle boucle ?</div><p>Tu repars de l’Étang des Saules sans pièces ni améliorations, mais tu gagnes <b>' + g + ' onde' + (g > 1 ? 's' : '') + '</b> et <b>' + g + ' perle' + (g > 1 ? 's' : '') + '</b>.</p><p>Bonus après la boucle : <b>+' + ((S.ondes + g) * 10) + ' % de pièces</b> et <b>+' + (S.ondes + g) + ' % de force</b>, pour toujours.</p><div class="mrow"><button class="buy blue" data-m="no">Pas maintenant</button><button class="buy" data-m="yes">C’est parti !</button></div>', {
+  showModal('<div class="mt">🌀 Nouvelle boucle ?</div><p>Tu repars du ponton sans pièces ni améliorations, mais tu gagnes <b>' + g + ' boucle' + (g > 1 ? 's' : '') + '</b> et <b>' + g + ' perle' + (g > 1 ? 's' : '') + '</b>.</p><p>Bonus ensuite : <b>+' + ((S.ondes + g) * 3) + ' % de pièces</b> et <b>+' + fmt1((S.ondes + g) * 0.5) + ' % de force</b>, pour toujours.</p><div class="mrow"><button class="buy blue" data-m="no">Pas maintenant</button><button class="buy" data-m="yes">C’est parti !</button></div>', {
     no: () => closeModal(),
     yes: () => { closeModal(); doPrestige(); },
   });
@@ -2050,8 +2328,8 @@ function confirmPrestige() {
 function doPrestige() {
   const g = ondesGain(); if (g <= 0) return;
   S.ondes += g; S.pearls += g; S.stats.loops++;
-  S.coins = 0; S.loopCoins = 0; S.upg = {}; S.lake = 0; S.maxLake = 0; S.seenLake = 0; S.best = LACS.map(() => 0);
-  checkAch(); saveGame(); closePanel(); BG.lake = -1; backToDock(true); sfxUnlock();
+  S.coins = 0; S.upg = {}; S.zoneLoop = 0; S.loopBest = 0; S.sel = 'force';
+  checkAch(); saveGame(); closePanel(); backToDock(true); sfxUnlock();
   toast('🌀 Nouvelle boucle ! <b>+' + g + '</b> <i class="ico i-onde"></i>', 3500);
 }
 function checkOffline() {
@@ -2059,7 +2337,7 @@ function checkOffline() {
   const sec = Math.min(6 * 3600, (Date.now() - (S.last || Date.now())) / 1000);
   if (sec < 60) return;
   const gain = idleRate(L) / 60 * sec; if (gain < 1) return;
-  S.coins += gain; S.loopCoins += gain; S.stats.totalCoins += gain; saveGame();
+  S.coins += gain; S.stats.totalCoins += gain; saveGame();
   showModal('<div class="mt">🦆 Bon retour !</div><p>Pendant ton absence (' + fmtTime(sec) + '), tes canards ont ramassé :</p><div class="bigv"><i class="ico i-coin" style="width:26px;height:26px"></i> ' + fmt(gain) + '</div><div class="mrow"><button class="buy" data-m="ok">Super !</button></div><p class="small">Maximum 6 h d’absence.</p>', { ok: () => closeModal() });
 }
 
@@ -2086,7 +2364,7 @@ function bindUI() {
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('pointerdown', () => auInit(), true);
   $('bUp').addEventListener('click', () => openPanel('up'));
-  $('bLakes').addEventListener('click', () => openPanel('lacs'));
+  $('bLakes').addEventListener('click', () => openPanel('carte'));
   $('bMore').addEventListener('click', () => { UI.newAch = 0; openPanel('defis'); });
   $('bSet').addEventListener('click', () => { sfxClick(); showSettings(); });
   $('bHome').addEventListener('click', goMenu);
@@ -2098,7 +2376,6 @@ function bindUI() {
     const a = b.dataset.act;
     if (a === 'up') openPanel('up');
     else if (a === 'again') { sfxClick(); backToDock(); }
-    else if (a === 'golake') goLake(S.maxLake);
   });
   $('powers').addEventListener('pointerdown', e => {
     const b = e.target.closest('[data-pow]'); if (!b) return;
@@ -2111,15 +2388,15 @@ function bindUI() {
     if (d.tab) {
       UI.tab = d.tab;
       if (d.tab === 'defis') UI.newAch = 0;
-      if (d.tab === 'lacs') S.seenLake = Math.max(S.seenLake, S.maxLake);
+      if (d.tab === 'carte') S.seenZone = Math.max(S.seenZone, S.maxZone);
       renderTabs(); $('pbody').scrollTop = 0; renderTab(); sfxClick(); updateHUD(true); return;
     }
+    if (d.node) { selectNode(d.node); return; }
     if (d.bm) { S.buyMode = d.bm; renderTab(); sfxClick(); return; }
     if (d.buy) { buyUpg(d.buy); return; }
     if (d.pw) { buyPow(d.pw); return; }
     if (d.stone) { buyStone(d.stone); return; }
     if (d.equip) { S.stone = d.equip; saveGame(); renderTab(); sfxClick(); updateHUD(true); return; }
-    if (d.lake) { closePanel(); goLake(+d.lake); return; }
     if (d.act === 'prestige') confirmPrestige();
   });
   $('modal').addEventListener('click', e => {
@@ -2152,12 +2429,12 @@ function init() {
   bindUI();
   backToDock(true);
   updateHUD(true); updateMenu(); setHint();
-  setTimeout(checkOffline, 500);
+  setTimeout(() => { if (S.nouveau2) { S.nouveau2 = false; saveGame(); showNouveautes(); } else checkOffline(); }, 500);
   requestAnimationFrame(loop);
 }
 init();
 
-window.__G=G;window.__dbg={get S(){return S},set S(v){S=v},get OBJ(){return OBJ},G,LACS,UPG,UPGM,POW,STONES,getStats,simThrow,endRun,backToDock,openPanel,closePanel,goLake,startThrow,beginCharge,tapFlight,usePower,defaultSave,lvl,upCost,buyPlan,idleRate,ondesGain,checkAch,showResult};
+window.__G=G;window.__dbg={get S(){return S},set S(v){S=v},get OBJ(){return OBJ},G,LACS,UPG,UPGM,POW,STONES,getStats,simThrow,endRun,backToDock,openPanel,closePanel,startThrow,beginCharge,tapFlight,usePower,defaultSave,lvl,upCost,buyPlan,idleRate,ondesGain,checkAch,showResult,zoneAt,selectNode,doPrestige,showNouveautes,renderImp,applyImpulse};
 })();</script>
 </body>
 </html>

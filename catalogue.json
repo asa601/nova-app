@@ -1,6 +1,6 @@
 {
- "version": "1.0.0",
- "rev": 1,
+ "version": "1.1.0",
+ "rev": 2,
  "apk": {
   "versionCode": 1,
   "versionName": "1.0",
@@ -56,15 +56,15 @@
    "nom": "Ricochets",
    "groupe": "principaux",
    "genre": "Incrémental",
-   "desc": "Fais ricocher ta pierre le plus loin possible, améliore ton lancer et débloque de nouveaux lacs. L'oiseau attrape ta pierre et la relâche plus loin.",
-   "version": 1,
+   "desc": "Fais ricocher ton galet le plus loin possible sur un grand lac de 6 zones : règle ton lancer, donne des impulsions, surfe et évite les obstacles. Les oiseaux le portent plus loin.",
+   "version": 2,
    "orientation": "paysage",
    "nouveau": false,
-   "taille": 131048,
+   "taille": 150836,
    "fichiers": [
     {
      "p": "index.html",
-     "t": 131048
+     "t": 150836
     }
    ]
   },
